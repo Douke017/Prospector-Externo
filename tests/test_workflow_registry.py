@@ -1,7 +1,7 @@
 """Pruebas del registro de workflows (Plugin Registry)."""
 
 import pytest
-from prospector_externo.kernel.registry import WorkflowRegistry
+from prospector_externo.kernel.registry import WorkflowRegistry, WorkflowNotFoundError
 from prospector_externo.workflows.html_workflow import HtmlWorkflow
 from prospector_externo.workflows.commented_html import CommentedHtmlWorkflow
 from prospector_externo.workflows.javascript_workflow import JavascriptWorkflow
@@ -18,5 +18,5 @@ def test_registry_resolution():
     assert isinstance(WorkflowRegistry.resolve("api"), ApiWorkflow)
     assert isinstance(WorkflowRegistry.resolve("custom"), CustomWorkflow)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(WorkflowNotFoundError):
         WorkflowRegistry.resolve("non_existent_workflow")

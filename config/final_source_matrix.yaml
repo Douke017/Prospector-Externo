@@ -111,16 +111,17 @@ sources:
 - source_id: fmi
   logical_code: FMI
   name: Fondo Monetario Internacional
-  effective_entrypoint: https://www.imf.org
-  final_status: ACCESS_RESTRICTED
-  planned_workflow_strategy: null
-  execution_workflow: null
-  workflow_relation: null
-  next_phase: FINAL_STATUS
-  config_source_id: null
-  physical_entrypoint: null
-  execution_state: NOT_EXECUTED_BY_POLICY
-  decision_note: Acceso restringido observado; no intentar bypass.
+  effective_entrypoint: https://data.imf.org/en/datasets/IMF.RES%3AWEO
+  final_status: OPERATIONAL_HTTP_HTML
+  planned_workflow_strategy: html
+  execution_workflow: html
+  workflow_relation: EXACT
+  next_phase: LIVE_AUDIT
+  config_source_id: fmi
+  physical_entrypoint: https://data.imf.org/en/datasets/IMF.RES%3AWEO
+  execution_state: READY_FOR_B10_LIVE
+  decision_note: 'Lote 12C: datos WEO oficiales, 8 registros temporales; 4 enlaces con cabeceras HTTP 200. Requiere revalidar
+    limpieza de URL con lote 12D y live batch antes de cierre.'
 - source_id: mefp
   logical_code: MEFP
   name: Ministerio de Economía y Finanzas Públicas
@@ -260,15 +261,16 @@ sources:
   logical_code: FAM
   name: Federación de Asociaciones Municipales de Bolivia
   effective_entrypoint: https://fam.org.bo/
-  final_status: NO_PUBLIC_DATA_EVIDENCE
-  planned_workflow_strategy: null
-  execution_workflow: null
-  workflow_relation: null
-  next_phase: FINAL_STATUS
-  config_source_id: null
-  physical_entrypoint: null
-  execution_state: NOT_EXECUTED_BY_POLICY
-  decision_note: B8 no encontró evidencia pública suficiente de datasets o recursos descargables.
+  final_status: OPERATIONAL_HTTP_HTML
+  planned_workflow_strategy: html
+  execution_workflow: html
+  workflow_relation: EXACT
+  next_phase: LIVE_AUDIT
+  config_source_id: fam
+  physical_entrypoint: https://fam.org.bo/
+  execution_state: READY_FOR_B10_LIVE
+  decision_note: 'Lote 12C: 106 registros DATAX; 4 PDF confirmados por HTTP 200; 1 URL de recorrido fallida. Promocion a discovery
+    HTML, pendiente de live batch final.'
 - source_id: fifa
   logical_code: FIFA
   name: Federación Internacional de Fútbol Asociación
@@ -339,15 +341,16 @@ sources:
   logical_code: OTROS HISTORICOS
   name: Doing Business (Banco Mundial)
   effective_entrypoint: https://datacatalog.worldbank.org/search/dataset/0038564/doing-business
-  final_status: ARCHIVE_ONLY
-  planned_workflow_strategy: null
-  execution_workflow: null
-  workflow_relation: null
-  next_phase: FINAL_STATUS
-  config_source_id: null
-  physical_entrypoint: null
-  execution_state: NOT_EXECUTED_BY_POLICY
-  decision_note: Fuente discontinuada con archivo histórico; no tratar como portal live actual.
+  final_status: OPERATIONAL_HTTP_HTML
+  planned_workflow_strategy: html
+  execution_workflow: html
+  workflow_relation: EXACT
+  next_phase: LIVE_AUDIT
+  config_source_id: otros_historicos
+  physical_entrypoint: https://datacatalog.worldbank.org/search/dataset/0038564/doing-business
+  execution_state: READY_FOR_B10_LIVE
+  decision_note: 'Lote 12C: archivo historico Doing Business del Banco Mundial, 1 ZIP de datos verificado por HTTP 200 y 1
+    registro DATAX. Solo archivo, no publicacion vigente.'
 - source_id: sabsa
   logical_code: SABSA
   name: Servicios de Aeropuertos Bolivianos S.A.
@@ -457,16 +460,16 @@ sources:
   logical_code: IBCH
   name: Instituto Boliviano del Cemento y Hormigón
   effective_entrypoint: https://www.ibch.com/
-  final_status: NO_PUBLIC_DATA_EVIDENCE
-  planned_workflow_strategy: null
-  execution_workflow: null
-  workflow_relation: null
-  next_phase: FINAL_STATUS
-  config_source_id: null
-  physical_entrypoint: null
-  execution_state: NOT_EXECUTED_BY_POLICY
-  decision_note: La identidad institucional fue reconciliada, pero el sitio actual no expuso evidencia pública suficiente
-    de datos.
+  final_status: OPERATIONAL_HTTP_HTML
+  planned_workflow_strategy: html
+  execution_workflow: html
+  workflow_relation: EXACT
+  next_phase: LIVE_AUDIT
+  config_source_id: ibch
+  physical_entrypoint: https://www.ibch.com/
+  execution_state: READY_FOR_B10_LIVE
+  decision_note: 'Lote 12C: 23 registros DATAX y 23 referencias PDF; verificacion HEAD restringida por robots.txt. Promocion
+    a discovery HTML sin bypass, pendiente de live batch final.'
 - source_id: ine
   logical_code: INE
   name: Instituto Nacional de Estadística

@@ -239,10 +239,12 @@ class IndependentReferenceProbe:
                         candidate = line.split(":", 1)[1].strip()
                         if candidate:
                             sitemaps.append(candidate)
-            else:
+            elif response.status_code in {404, 410}:
                 parser.parse([])
+            else:
+                parser.parse(["User-agent: *", "Disallow: /"])
         except requests.RequestException:
-            parser.parse([])
+            parser.parse(["User-agent: *", "Disallow: /"])
         return parser, sitemaps, status
 
     def _sitemap_candidates(
@@ -251,6 +253,7 @@ class IndependentReferenceProbe:
         robots_sitemaps: Iterable[str],
         allowed_hosts: set[str],
         stats: ProbeStats,
+        robots: urllib.robotparser.RobotFileParser | None = None,
     ) -> tuple[list[str], list[ReferenceCandidate]]:
         parsed = urlparse(entrypoint)
         base = f"{parsed.scheme}://{parsed.netloc}"
@@ -267,6 +270,9 @@ class IndependentReferenceProbe:
 
         while queue and len(seen_docs) < self.max_sitemaps and len(seen_urls) < self.max_sitemap_urls:
             sitemap_url = queue.popleft()
+            if ((urlparse(sitemap_url).hostname or "").casefold() not in allowed_hosts
+                    or (robots is not None and not robots.can_fetch(self.USER_AGENT, sitemap_url))):
+                continue
             if sitemap_url in seen_docs:
                 continue
             seen_docs.add(sitemap_url)
@@ -319,7 +325,7 @@ class IndependentReferenceProbe:
         stats = ProbeStats(robots_status=robots_status)
 
         sitemap_pages, sitemap_resources = self._sitemap_candidates(
-            entrypoint, robots_sitemaps, allowed_hosts, stats
+            entrypoint, robots_sitemaps, allowed_hosts, stats, robots=robots
         )
 
         resources: dict[str, ReferenceCandidate] = {item.url: item for item in sitemap_resources}

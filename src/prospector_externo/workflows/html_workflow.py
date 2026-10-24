@@ -15,6 +15,8 @@ logger = logging.getLogger("prospector.workflows.html")
 
 
 class HtmlWorkflow(BaseWorkflow):
+    supports_discovery_resume = True
+    discovery_type = DiscoveryType.HTML
     _CONTENT_TYPE_EXTENSIONS = {
         "application/pdf": ".pdf",
         "application/vnd.ms-excel": ".xls",
@@ -71,7 +73,7 @@ class HtmlWorkflow(BaseWorkflow):
             raw_url=item.raw_url,
             current_url=item.normalized_url,
             title=config.name or item.normalized_url,
-            discovery_type=DiscoveryType.HTML,
+            discovery_type=self.discovery_type,
         )
         if extension and not resource.file_extension:
             resource.file_extension = extension
@@ -89,35 +91,43 @@ class HtmlWorkflow(BaseWorkflow):
     async def run(self, config: SourceConfig) -> ExtractionResult:
         logger.info("Iniciando HtmlWorkflow async para [%s]", config.source_id)
         session = self._session()
-        frontier = DiscoveryFrontier(config)
-        frontier.seed(config.seeds or [config.entrypoint])
-
-        coverage = CoverageStats()
-        discovered_urls: List[DiscoveredUrl] = []
-        resources: List[ResourceCandidate] = []
-        seen_resource_keys: Set[str] = set()
-        pagination = self._pagination_policy(config)
+        frontier, pagination, resources, discovered_urls, coverage = self._open_discovery(config)
+        restored_resource_count = len(resources)
+        self._capture_partial(resources, discovered_urls, coverage, frontier=frontier, pagination=pagination)
+        seen_resource_keys: Set[str] = {resource.resource_key for resource in resources}
         consecutive_errors = 0
         successful_pages = 0
         last_error = None
 
-        await self._seed_from_sitemaps(
-            config=config,
-            frontier=frontier,
-            resources=resources,
-            seen_resource_keys=seen_resource_keys,
-            coverage=coverage,
-        )
+        def checkpoint(finished=False):
+            self._checkpoint_discovery(
+                config=config, frontier=frontier, pagination=pagination,
+                resources=resources, discovered_urls=discovered_urls,
+                coverage=coverage, finished=finished,
+            )
+
+        checkpoint()
+        if not self._sitemaps_seeded:
+            await self._seed_from_sitemaps(
+                config=config, frontier=frontier, resources=resources,
+                seen_resource_keys=seen_resource_keys, coverage=coverage,
+            )
+            self._sitemaps_seeded = True
 
         while True:
+            checkpoint()
             if session.budget.remaining <= 0:
-                frontier.stop_reason = StopReason.REQUEST_BUDGET
+                if frontier.pending_count:
+                    frontier.stop_reason = StopReason.REQUEST_BUDGET
+                elif frontier.stop_reason is None:
+                    frontier.stop_reason = StopReason.QUEUE_EXHAUSTED
                 break
 
             item = frontier.pop()
             if item is None:
                 break
 
+            checkpoint()  # Antes del await: el elemento en vuelo sigue recuperable.
             html, status, error, response_headers = await session.fetch_document(
                 item.normalized_url,
                 conditional=False,
@@ -128,6 +138,13 @@ class HtmlWorkflow(BaseWorkflow):
             if error:
                 last_error = error
                 coverage.urls_failed += 1
+                if error == "ROBOTS_DISALLOWED":
+                    # Exclusión deliberada: no hubo fallo de una petición permitida.
+                    # Se conserva la cobertura parcial, pero no se agota la tolerancia
+                    # a fallos técnicos ni se abandona el resto de URLs autorizadas.
+                    coverage.robots_disallowed += 1
+                    continue
+                frontier.defer(item)
                 consecutive_errors += 1
                 if error == "TIMEOUT":
                     coverage.timeouts += 1
@@ -135,8 +152,6 @@ class HtmlWorkflow(BaseWorkflow):
                     coverage.http_403 += 1
                 elif error == "HTTP_429":
                     coverage.http_429 += 1
-                elif error == "ROBOTS_DISALLOWED":
-                    coverage.robots_disallowed += 1
                 elif error == "REQUEST_BUDGET_EXCEEDED":
                     frontier.stop_reason = StopReason.REQUEST_BUDGET
                     break
@@ -151,7 +166,7 @@ class HtmlWorkflow(BaseWorkflow):
                     normalized_url=item.normalized_url,
                     raw_url=item.raw_url,
                     source_id=config.source_id,
-                    discovery_type=DiscoveryType.HTML,
+                    discovery_type=self.discovery_type,
                     parent_url=item.parent_url,
                     depth=item.depth,
                     http_status=status,
@@ -168,6 +183,7 @@ class HtmlWorkflow(BaseWorkflow):
                     resources=resources,
                     seen_resource_keys=seen_resource_keys,
                 ):
+                    successful_pages += 1
                     consecutive_errors = 0
                     continue
 
@@ -190,7 +206,7 @@ class HtmlWorkflow(BaseWorkflow):
                     html or "",
                     item.normalized_url,
                     config,
-                    discovery_type=DiscoveryType.HTML,
+                    discovery_type=self.discovery_type,
                     seen_resource_keys=seen_resource_keys,
                 )
             except ParserRejectedMarkup as exc:
@@ -249,13 +265,20 @@ class HtmlWorkflow(BaseWorkflow):
             session=session,
         )
 
-        if successful_pages == 0 and not resources and coverage.urls_failed > 0:
+        checkpoint()
+        await self._inspect_archive_candidates(
+            config=config, resources=resources, coverage=coverage,
+        )
+        checkpoint(finished=True)
+
+        if successful_pages == 0 and len(resources) == restored_resource_count and coverage.urls_failed > 0:
             return ExtractionResult(
                 source_id=config.source_id,
                 success=False,
                 resources=resources,
                 discovered_urls=discovered_urls,
                 coverage=coverage,
+                metadata=self._discovery_metadata,
                 failure_code=last_error or coverage.stop_reason or "SOURCE_UNREACHABLE",
                 error_message=(
                     "No se pudo obtener ninguna página navegable ni recurso directo "
@@ -269,4 +292,5 @@ class HtmlWorkflow(BaseWorkflow):
             resources=resources,
             discovered_urls=discovered_urls,
             coverage=coverage,
+            metadata=self._discovery_metadata,
         )

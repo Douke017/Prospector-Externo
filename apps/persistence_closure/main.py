@@ -54,9 +54,9 @@ def validate_b9_smoke(
 
     expected_counts = {
         "FAILED": 0,
-        "PENDING": 39,
+        "PENDING": checkpoint["operational_sources"] - 2,
         "RUNNING": 0,
-        "SKIPPED_STATUS": 11,
+        "SKIPPED_STATUS": checkpoint["status_only_sources"],
         "SUCCEEDED": 2,
     }
 
@@ -72,9 +72,9 @@ def validate_b9_smoke(
         raise ValueError("source_execution_map.yaml sin sources")
 
     logical_count = execution_map.get("logical_operational_sources")
-    if logical_count != 41 or len(map_rows) != 41:
+    if logical_count != checkpoint["operational_sources"] or len(map_rows) != logical_count:
         raise ValueError(
-            "Execution map no contiene exactamente 41 fuentes lógicas"
+            "Execution map no corresponde al total operacional del checkpoint"
         )
 
     physical_rows = sources_cfg.get("sources")

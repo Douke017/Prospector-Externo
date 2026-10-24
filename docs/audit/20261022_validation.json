@@ -1,0 +1,2396 @@
+{
+  "schema_version": "datax-local-audit-1.0",
+  "audit_date": "2026-10-22",
+  "timezone": "America/La_Paz",
+  "requirements": {
+    "availability": "Incorporados por el usuario durante la sesión; evaluados antes de la entrega",
+    "sha256": {
+      "BACKLOG_USER_STORIES.md": "a713c62aea0a942cf19854f0af6624da571f311aded7309dbec69597fb6196b3",
+      "documento-arquitectura-prospector-externo.md": "30651212489afd80da90c1d79eb41a8d7c30ba768f7985a4ba75f4cff429566b"
+    }
+  },
+  "scope": {
+    "initial_audit_read_only": true,
+    "full_operational_crawl_executed": false,
+    "remote_git_writes": false,
+    "files_deleted": false,
+    "mongo_data_written": false,
+    "historical_outputs_rewritten": false,
+    "local_commits_created": false
+  },
+  "tests": {
+    "baseline": {
+      "passed": 556,
+      "warnings": 2,
+      "seconds": 32.82,
+      "coverage": {
+        "covered": 7516,
+        "statements": 14503,
+        "percent": 51.82
+      }
+    },
+    "final": {
+      "passed": 585,
+      "warnings": 2,
+      "seconds": 45.24,
+      "command": "python -B -m pytest -q -p no:cacheprovider --basetemp <TEMP>/datax-final-entrypoints-20261022-tests --cov=src --cov=apps --cov-report=term:skip-covered --cov-report=json:<TEMP>/datax-final-entrypoints-20261022-coverage.json --durations=5",
+      "coverage": {
+        "TOTAL": {
+          "covered": 7611,
+          "statements": 14540,
+          "percent": 52.35
+        },
+        "src/prospector_externo/": {
+          "covered": 4526,
+          "statements": 5302,
+          "percent": 85.36
+        },
+        "src/": {
+          "covered": 5216,
+          "statements": 6969,
+          "percent": 74.85
+        },
+        "apps/": {
+          "covered": 2395,
+          "statements": 7571,
+          "percent": 31.63
+        }
+      }
+    },
+    "coverage_kind": "line",
+    "coverage_exclusions": [],
+    "branch_coverage_measured": false,
+    "global_80_percent_DoD_met": false,
+    "python": "3.13.2",
+    "platform": "Windows"
+  },
+  "validation_batches": [
+    {
+      "topic": "Checkpoints aislados B13",
+      "passed": 30
+    },
+    {
+      "topic": "Replay y selección coherente JSON-Mongo",
+      "passed": 18
+    },
+    {
+      "topic": "Cobertura/parcialidad y reconciliación",
+      "passed": 72
+    },
+    {
+      "topic": "Integración y recuperación",
+      "passed": 60
+    },
+    {
+      "topic": "Proyección sin términos de negocio y registro",
+      "passed": 71
+    }
+  ],
+  "inventory_summary": {
+    "logical": 52,
+    "operational_logical": 45,
+    "status_only": 7,
+    "physical_configurations": 39,
+    "mapping_matches": 45,
+    "mapping_failures": 0,
+    "active_robots_overrides": 0,
+    "b13_cross_source_parallelism": 1
+  },
+  "hu_assessment": [
+    {
+      "id": "HU-01",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-02",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-03",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-04",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-05",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-06",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-07",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-08",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-09",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-10",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-11",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-12",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-13",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-14",
+      "status": "EXTERNAL_BLOCKER",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-15",
+      "status": "EXTERNAL_BLOCKER",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-16",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-17",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-18",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-19",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-20",
+      "status": "PASS",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-21",
+      "status": "FAIL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    },
+    {
+      "id": "HU-22",
+      "status": "PARTIAL",
+      "details": "docs/final_delivery_summary.md; PASS funcional no implica DoD global o aprobación de producción"
+    }
+  ],
+  "sources": [
+    {
+      "logical_source_id": "anapo",
+      "physical_source_id": "anapo",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.anapobolivia.org",
+      "seeds": [
+        "https://www.anapobolivia.org"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-21T04:29:21.637671Z",
+        "pipeline": "b13-12g-smoke-20261021-01",
+        "report": "output/checkpointed/b13-12g-smoke-20261021-01/anapo/reports/run_run_20261021_042508_fc1554.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 59,
+        "requests": 250,
+        "resources": 311
+      }
+    },
+    {
+      "logical_source_id": "aps",
+      "physical_source_id": "aps",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.aps.gob.bo",
+      "seeds": [
+        "https://www.aps.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:29:25.301292Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/aps/reports/run_run_20261008_232813_0145d6.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 71,
+        "resources": 161
+      }
+    },
+    {
+      "logical_source_id": "asfi_valores",
+      "physical_source_id": "asfi_valores",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.asfi.gob.bo",
+      "seeds": [
+        "https://www.asfi.gob.bo",
+        "https://www.asfi.gob.bo/pb/decretos-supremos-referidos-servicios-financieros",
+        "https://www.asfi.gob.bo/pb/decretos",
+        "https://www.asfi.gob.bo/auditorias?page=1"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:33:38.016350Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/asfi_valores/reports/run_run_20261008_232925_47be9f.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 22,
+        "requests": 250,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "bcb",
+      "physical_source_id": "bcb",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.bcb.gob.bo",
+      "seeds": [
+        "https://www.bcb.gob.bo/?q=estad-sticas-semanales",
+        "https://www.bcb.gob.bo/?q=pub_boletin-mensual",
+        "https://www.bcb.gob.bo/?q=pub_boletin-estadistico",
+        "https://www.bcb.gob.bo/?q=pub_boletin-sector-externo",
+        "https://www.bcb.gob.bo/?q=reporte-estadistico"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:34:25.969434Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/bcb/reports/run_run_20261008_233338_648478.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 31,
+        "resources": 585
+      }
+    },
+    {
+      "logical_source_id": "bm",
+      "physical_source_id": "bm",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.worldbank.org",
+      "seeds": [
+        "https://www.worldbank.org"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T05:34:10.967247Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/bm/reports/run_run_20260919_052959_a8ae70.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 81,
+        "requests": 250,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "cepal",
+      "physical_source_id": "cepal",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.cepal.org",
+      "seeds": [
+        "https://www.cepal.org"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:40:17.236022Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/cepal/reports/run_run_20261008_233600_770753.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 4,
+        "requests": 250,
+        "resources": 278
+      }
+    },
+    {
+      "logical_source_id": "fegasacruz",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "NO_PUBLIC_DATA_EVIDENCE",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "finrural",
+      "physical_source_id": "finrural",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.finrural.org.bo",
+      "seeds": [
+        "https://www.finrural.org.bo/reporte-financiero-mensual-instituciones-financieras-de-desarrollo/",
+        "https://www.finrural.org.bo/archivo-historico/"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:43:12.591701Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/finrural/reports/run_run_20261008_234017_e09abc.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 170,
+        "resources": 227
+      }
+    },
+    {
+      "logical_source_id": "fmi",
+      "physical_source_id": "fmi",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://data.imf.org/en/datasets/IMF.RES%3AWEO",
+      "seeds": [
+        "https://data.imf.org/en/datasets/IMF.RES%3AWEO",
+        "https://data.imf.org/en/Resource-Pages/IMF-API"
+      ],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "mefp",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "TLS_TECHNICAL_HOLD",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "mmym",
+      "physical_source_id": "mmym",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.mineria.gob.bo",
+      "seeds": [
+        "https://www.mineria.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:47:29.541267Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/mmym/reports/run_run_20261008_234313_fe3e1b.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 10,
+        "requests": 250,
+        "resources": 333
+      }
+    },
+    {
+      "logical_source_id": "omc",
+      "physical_source_id": "omc",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://data.wto.org/dataset/bulkdownload",
+      "seeds": [
+        "https://data.wto.org/dataset/bulkdownload"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:47:50.411261Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/omc/reports/run_run_20261008_234730_3d716e.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "MAX_CONSECUTIVE_ERRORS",
+        "stop_reason": "MAX_CONSECUTIVE_ERRORS",
+        "pending": 108,
+        "requests": 23,
+        "resources": 7
+      }
+    },
+    {
+      "logical_source_id": "statistics_denmark",
+      "physical_source_id": "statistics_denmark",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_JAVASCRIPT",
+      "workflow": "api",
+      "historical_strategy": "javascript",
+      "entrypoint": "https://api.statbank.dk/v1/tables?lang=en",
+      "seeds": [
+        "https://api.statbank.dk/v1/tables?lang=en"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:47:54.889205Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/statistics_denmark/reports/run_run_20261008_234750_be80c1.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "API_SEEDS_EXHAUSTED",
+        "pending": 0,
+        "requests": 2,
+        "resources": 1
+      }
+    },
+    {
+      "logical_source_id": "vipfe",
+      "physical_source_id": "vipfe",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_JAVASCRIPT",
+      "workflow": "javascript",
+      "historical_strategy": "javascript",
+      "entrypoint": "https://sisin.planificacion.gob.bo/",
+      "seeds": [
+        "https://sisin.planificacion.gob.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:48:02.704160Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/vipfe/reports/run_run_20261008_234755_e53bc9.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 2,
+        "resources": 3
+      }
+    },
+    {
+      "logical_source_id": "ada",
+      "physical_source_id": "ada",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.adascz.com.bo",
+      "seeds": [
+        "https://www.adascz.com.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:52:19.612802Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/ada/reports/run_run_20261008_234803_2741e6.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 2,
+        "requests": 250,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "atc",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "NO_PUBLIC_DATA_SCOPE",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "cadexco",
+      "physical_source_id": "cadexco",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML_CURATED",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://cadexco.bo/",
+      "seeds": [
+        "https://cadexco.bo/publicaciones/",
+        "https://cadexco.bo/cochabamba/",
+        "https://cadexco.bo/inteligencia/",
+        "https://cadexco.bo/lcoext/",
+        "https://cadexco.bo/ltributaria/"
+      ],
+      "evidence": {
+        "observed_at": "2026-10-08T23:58:45.460871Z",
+        "pipeline": "b13-anapo-docs-001",
+        "report": "output/checkpointed/b13-anapo-docs-001/cadexco/reports/run_run_20261008_235220_b1dcd7.json",
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "MAX_CONSECUTIVE_ERRORS",
+        "stop_reason": "MAX_CONSECUTIVE_ERRORS",
+        "pending": 29,
+        "requests": 224,
+        "resources": 216
+      }
+    },
+    {
+      "logical_source_id": "cndc",
+      "physical_source_id": "cndc",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.cndc.bo",
+      "seeds": [
+        "https://www.cndc.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:01:37.052230Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/cndc/reports/run_run_20260919_055725_cd0071.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 11,
+        "requests": 250,
+        "resources": 307
+      }
+    },
+    {
+      "logical_source_id": "dgac",
+      "physical_source_id": "dgac",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.dgac.gob.bo",
+      "seeds": [
+        "https://www.dgac.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:09:07.037273Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/dgac/reports/run_run_20260919_060137_b16cce.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 8,
+        "requests": 250,
+        "resources": 770
+      }
+    },
+    {
+      "logical_source_id": "fam",
+      "physical_source_id": "fam",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://fam.org.bo/",
+      "seeds": [
+        "https://fam.org.bo/publicaciones/"
+      ],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "fifa",
+      "physical_source_id": "fifa",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_CUSTOM_DATA_API",
+      "workflow": "custom",
+      "historical_strategy": "custom",
+      "entrypoint": "https://www.fifa.com",
+      "seeds": [
+        "https://cxm-api.fifa.com/fifaplusweb/api/themePalette"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:09:09.463202Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/fifa/reports/run_run_20260919_060908_8c04af.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "API_SEEDS_EXHAUSTED",
+        "pending": 0,
+        "requests": 2,
+        "resources": 1
+      }
+    },
+    {
+      "logical_source_id": "fundempresa",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "RETIRED_HISTORICAL_SOURCE",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "icco",
+      "physical_source_id": "icco",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.icco.org",
+      "seeds": [
+        "https://www.icco.org"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:10:27.992013Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/icco/reports/run_run_20260919_060910_3d4329.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "MAX_CONSECUTIVE_ERRORS",
+        "pending": 202,
+        "requests": 53,
+        "resources": 88
+      }
+    },
+    {
+      "logical_source_id": "itu",
+      "physical_source_id": "itu",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.itu.int",
+      "seeds": [
+        "https://www.itu.int"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:12:05.109075Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/itu/reports/run_run_20260919_061028_97ec79.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "MAX_CONSECUTIVE_ERRORS",
+        "pending": 189,
+        "requests": 92,
+        "resources": 175
+      }
+    },
+    {
+      "logical_source_id": "mdryt_oap",
+      "physical_source_id": "mdryt_oap",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://ruralytierras.gob.bo/",
+      "seeds": [
+        "https://ruralytierras.gob.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:16:19.207347Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/mdryt_oap/reports/run_run_20260919_061205_fd7dec.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 7,
+        "requests": 250,
+        "resources": 243
+      }
+    },
+    {
+      "logical_source_id": "otros_historicos",
+      "physical_source_id": "otros_historicos",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://datacatalog.worldbank.org/search/dataset/0038564/doing-business",
+      "seeds": [
+        "https://datacatalog.worldbank.org/search/dataset/0038564/doing-business"
+      ],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "sabsa",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "RETIRED_HISTORICAL_SOURCE",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "sicoes",
+      "physical_source_id": "sicoes",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_JAVASCRIPT",
+      "workflow": "javascript",
+      "historical_strategy": "javascript",
+      "entrypoint": "https://www.sicoes.gob.bo",
+      "seeds": [
+        "https://www.sicoes.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:16:27.071646Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/sicoes/reports/run_run_20260919_061619_d56056.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 3,
+        "resources": 1
+      }
+    },
+    {
+      "logical_source_id": "aps_soat",
+      "physical_source_id": "aps",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.aps.gob.bo",
+      "seeds": [
+        "https://www.aps.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:17:46.827902Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/aps_soat/reports/run_run_20260919_061627_e32d6c.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 75,
+        "resources": 162
+      }
+    },
+    {
+      "logical_source_id": "asfi",
+      "physical_source_id": "asfi_valores",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.asfi.gob.bo",
+      "seeds": [
+        "https://www.asfi.gob.bo",
+        "https://www.asfi.gob.bo/pb/decretos-supremos-referidos-servicios-financieros",
+        "https://www.asfi.gob.bo/pb/decretos",
+        "https://www.asfi.gob.bo/auditorias?page=1"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:21:59.076497Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/asfi/reports/run_run_20260919_061747_22a0df.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 22,
+        "requests": 250,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "asfi_finrural",
+      "physical_source_id": "asfi_valores",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.asfi.gob.bo",
+      "seeds": [
+        "https://www.asfi.gob.bo",
+        "https://www.asfi.gob.bo/pb/decretos-supremos-referidos-servicios-financieros",
+        "https://www.asfi.gob.bo/pb/decretos",
+        "https://www.asfi.gob.bo/auditorias?page=1"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:26:11.680235Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/asfi_finrural/reports/run_run_20260919_062159_bcf36f.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 22,
+        "requests": 250,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "bolcereales",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "IDENTITY_UNRESOLVED",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "ceprobol",
+      "physical_source_id": null,
+      "next_phase": "B10_STATUS",
+      "operational_status": "RETIRED_HISTORICAL_SOURCE",
+      "workflow": null,
+      "historical_strategy": null,
+      "entrypoint": null,
+      "seeds": [],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "fdta_valles",
+      "physical_source_id": "icco",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.icco.org",
+      "seeds": [
+        "https://www.icco.org"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:27:34.135998Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/fdta_valles/reports/run_run_20260919_062612_9d364b.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "MAX_CONSECUTIVE_ERRORS",
+        "pending": 202,
+        "requests": 53,
+        "resources": 88
+      }
+    },
+    {
+      "logical_source_id": "ibch",
+      "physical_source_id": "ibch",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.ibch.com/",
+      "seeds": [
+        "https://www.ibch.com/pub/",
+        "https://www.ibch.com/boletin/",
+        "https://www.ibch.com/pavimentos/publicaciones/"
+      ],
+      "evidence": null
+    },
+    {
+      "logical_source_id": "ine",
+      "physical_source_id": "ine",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.ine.gob.bo",
+      "seeds": [
+        "https://www.ine.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:33:15.242000Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/ine/reports/run_run_20260919_062735_2730a5.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 45,
+        "requests": 250,
+        "resources": 736
+      }
+    },
+    {
+      "logical_source_id": "mhe",
+      "physical_source_id": "mhe",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_JAVASCRIPT",
+      "workflow": "javascript",
+      "historical_strategy": "javascript",
+      "entrypoint": "https://www.mhe.gob.bo/",
+      "seeds": [
+        "https://www.mhe.gob.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:33:20.112136Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/mhe/reports/run_run_20260919_063316_b36fe3.json",
+        "status": "FAILED",
+        "failure_code": "ROBOTS_UNREACHABLE",
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 3,
+        "resources": 0
+      }
+    },
+    {
+      "logical_source_id": "seprec",
+      "physical_source_id": "seprec",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.seprec.gob.bo",
+      "seeds": [
+        "https://www.seprec.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:34:57.414669Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/seprec/reports/run_run_20260919_063320_f45d8d.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "MAX_CONSECUTIVE_ERRORS",
+        "pending": 39,
+        "requests": 95,
+        "resources": 347
+      }
+    },
+    {
+      "logical_source_id": "undata",
+      "physical_source_id": "undata",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_JAVASCRIPT",
+      "workflow": "api",
+      "historical_strategy": "javascript",
+      "entrypoint": "https://data.un.org",
+      "seeds": [
+        "https://unsd-datacommons.gcp.un-icc.cloud/core/api/v2/observation?date=LATEST&variable.dcids=undata%2Funodc%2FVIC_HOM_RT&entity.dcids=country%2FZAF&select=date&select=value&select=variable&select=entity",
+        "https://unsd-datacommons.gcp.un-icc.cloud/core/api/v2/observation?date=LATEST&variable.dcids=undata%2Fsdg%2FVC_DTH_TOTN&entity.dcids=country%2FSSD&select=date&select=value&select=variable&select=entity"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:35:42.525453Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/undata/reports/run_run_20260919_063458_0d4eaf.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "BROWSER_PAGE_LIMIT",
+        "pending": 235,
+        "requests": 17,
+        "resources": 66
+      }
+    },
+    {
+      "logical_source_id": "ae",
+      "physical_source_id": "ae",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://aetn.gob.bo",
+      "seeds": [
+        "https://aetn.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:38:25.417288Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/ae/reports/run_run_20260919_063543_8132bb.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 161,
+        "resources": 487
+      }
+    },
+    {
+      "logical_source_id": "asfi_bcb",
+      "physical_source_id": "bcb",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.bcb.gob.bo",
+      "seeds": [
+        "https://www.bcb.gob.bo/?q=estad-sticas-semanales",
+        "https://www.bcb.gob.bo/?q=pub_boletin-mensual",
+        "https://www.bcb.gob.bo/?q=pub_boletin-estadistico",
+        "https://www.bcb.gob.bo/?q=pub_boletin-sector-externo",
+        "https://www.bcb.gob.bo/?q=reporte-estadistico"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:39:17.068189Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/asfi_bcb/reports/run_run_20260919_063826_e022b8.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 31,
+        "resources": 580
+      }
+    },
+    {
+      "logical_source_id": "asofin",
+      "physical_source_id": "asofin",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://asofinbolivia.com/",
+      "seeds": [
+        "https://asofinbolivia.com/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:45:03.166371Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/asofin/reports/run_run_20260919_063917_0ac46f.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 26,
+        "requests": 250,
+        "resources": 369
+      }
+    },
+    {
+      "logical_source_id": "att",
+      "physical_source_id": "att",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.att.gob.bo",
+      "seeds": [
+        "https://www.att.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:49:15.858681Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/att/reports/run_run_20260919_064504_7a1e45.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 2,
+        "requests": 250,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "bbv",
+      "physical_source_id": "bbv",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTML_API_DISCOVERY",
+      "workflow": "commented_html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.bbv.com.bo",
+      "seeds": [
+        "https://www.bbv.com.bo/estadisticas/",
+        "https://www.bbv.com.bo/acerca-de-la-bolsa/memorias-anuales/",
+        "https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera/",
+        "https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera-2024/",
+        "https://www.bbv.com.bo/hechos-relevantes-y-noticias/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:49:33.909119Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/bbv/reports/run_run_20260919_064916_3f799d.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "MAX_URLS",
+        "pending": 249,
+        "requests": 11,
+        "resources": 1
+      }
+    },
+    {
+      "logical_source_id": "data_gov",
+      "physical_source_id": "data_gov",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_DATA_API",
+      "workflow": "html",
+      "historical_strategy": "api",
+      "entrypoint": "https://catalog.data.gov/",
+      "seeds": [
+        "https://catalog.data.gov/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:53:50.178558Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/data_gov/reports/run_run_20260919_064934_5b7688.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 3,
+        "requests": 250,
+        "resources": 224
+      }
+    },
+    {
+      "logical_source_id": "ibce_cao",
+      "physical_source_id": "ibce_cao",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://ibce.org.bo/",
+      "seeds": [
+        "https://ibce.org.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T06:56:32.716673Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/ibce_cao/reports/run_run_20260919_065351_b59e19.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 157,
+        "requests": 250,
+        "resources": 88
+      }
+    },
+    {
+      "logical_source_id": "mdryt",
+      "physical_source_id": "mdryt_oap",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://ruralytierras.gob.bo/",
+      "seeds": [
+        "https://ruralytierras.gob.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T07:00:50.275680Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/mdryt/reports/run_run_20260919_065633_420760.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "pending": 7,
+        "requests": 250,
+        "resources": 243
+      }
+    },
+    {
+      "logical_source_id": "min_educacion",
+      "physical_source_id": "min_educacion",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://www.minedu.gob.bo",
+      "seeds": [
+        "https://www.minedu.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T07:02:39.239280Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/min_educacion/reports/run_run_20260919_070051_682e7a.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 96,
+        "resources": 40
+      }
+    },
+    {
+      "logical_source_id": "senamhi",
+      "physical_source_id": "senamhi",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://senamhi.gob.bo/",
+      "seeds": [
+        "https://senamhi.gob.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T07:06:25.374060Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/senamhi/reports/run_run_20260919_070240_e0958b.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 125,
+        "resources": 1000
+      }
+    },
+    {
+      "logical_source_id": "sigma",
+      "physical_source_id": "sigma",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_JAVASCRIPT",
+      "workflow": "javascript",
+      "historical_strategy": "javascript",
+      "entrypoint": "https://www.sigmacorp.com.bo/",
+      "seeds": [
+        "https://www.sigmacorp.com.bo/"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T07:06:31.820065Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/sigma/reports/run_run_20260919_070626_29506d.json",
+        "status": "FAILED",
+        "failure_code": "ROBOTS_UNREACHABLE",
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 3,
+        "resources": 0
+      }
+    },
+    {
+      "logical_source_id": "snis",
+      "physical_source_id": "snis",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_HTTP_HTML",
+      "workflow": "html",
+      "historical_strategy": "html",
+      "entrypoint": "https://snis.minsalud.gob.bo",
+      "seeds": [
+        "https://snis.minsalud.gob.bo"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T07:12:01.077806Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/snis/reports/run_run_20260919_070632_dc38fc.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "pending": 0,
+        "requests": 121,
+        "resources": 35
+      }
+    },
+    {
+      "logical_source_id": "transtats",
+      "physical_source_id": "transtats",
+      "next_phase": "OPERATIONAL_CONFIG",
+      "operational_status": "OPERATIONAL_CUSTOM_FORM_RESOURCE",
+      "workflow": "custom",
+      "historical_strategy": "custom",
+      "entrypoint": "https://www.transtats.bts.gov",
+      "seeds": [
+        "https://www.transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=&gnoyr_VQ=GED"
+      ],
+      "evidence": {
+        "observed_at": "2026-09-19T07:12:08.819740Z",
+        "pipeline": "b13-e2e",
+        "report": "output/checkpointed/b13-e2e/transtats/reports/run_run_20260919_071202_5c80a0.json",
+        "status": "SUCCESS",
+        "failure_code": null,
+        "stop_reason": "CUSTOM_FORM_CONFIRMED",
+        "pending": 0,
+        "requests": 2,
+        "resources": 1
+      }
+    }
+  ],
+  "network_canaries": {
+    "profile": {
+      "max_requests": 12,
+      "max_runtime_seconds": 25,
+      "max_urls": 12,
+      "max_depth": 1,
+      "max_resources": 40,
+      "max_api_pages": 2,
+      "max_api_endpoints": 8,
+      "max_api_documents": 1,
+      "max_sitemap_documents": 1,
+      "max_sitemap_urls": 12,
+      "inspect_archives": false,
+      "robots_respected": true,
+      "tls_verified": true
+    },
+    "environment": "Host fuera del sandbox; primer intento aislado falló consultando robots y no se toma como caída de las fuentes",
+    "artifacts": "%TEMP%/datax-canary-host-config-20261022-7cbrgyzf/",
+    "projection_policy_at_measurement": "Antes de retirar los filtros de selección por vocabulario administrativo/estadístico",
+    "rss_cpu_sampling_interval_seconds": 0.1,
+    "results": [
+      {
+        "source_id": "finrural",
+        "workflow": "html",
+        "wall_seconds": 23.021,
+        "requests": 12,
+        "pages_visited": 10,
+        "raw_resources": 40,
+        "projected_records": 40,
+        "pending_urls": 2,
+        "failed_urls": 0,
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "resources_rejected_by_cap": 123,
+        "exit_code": 3,
+        "effective_source_concurrency": 1,
+        "peak_sampled_rss_bytes": 77303808,
+        "sampled_cpu_seconds": 1.71875,
+        "projection_wall_seconds": 0.334,
+        "projection_exit_code": 0
+      },
+      {
+        "source_id": "data_gov",
+        "workflow": "html",
+        "wall_seconds": 13.456,
+        "requests": 12,
+        "pages_visited": 8,
+        "raw_resources": 15,
+        "projected_records": 14,
+        "pending_urls": 4,
+        "failed_urls": 0,
+        "status": "PARTIAL_SUCCESS",
+        "failure_code": "REQUEST_BUDGET_REACHED",
+        "exit_code": 3,
+        "effective_source_concurrency": 1,
+        "peak_sampled_rss_bytes": 72822784,
+        "sampled_cpu_seconds": 1.515625,
+        "projection_wall_seconds": 0.405,
+        "projection_exit_code": 0
+      }
+    ],
+    "mongo_sync_seconds": null,
+    "full_crawl_duration_estimate": null,
+    "browser_rss": null
+  },
+  "offline_projection_replay": {
+    "source_id": "anapo",
+    "pipeline_run_id": "b13-12g-smoke-20261021-01",
+    "mode": "RAM_ONLY",
+    "raw_resources": 311,
+    "historical_projected_records": 302,
+    "historical_exclusion": {
+      "administrative_document": 9
+    },
+    "current_selected_resources": 311,
+    "current_legacy_records": 311,
+    "current_families": 308,
+    "historical_files_written": false
+  },
+  "preserved_historical_package": {
+    "path": "output/b13-pipeline/b13-e2e/datax-package/datax_package.zip",
+    "sha256": "f52bf8d1f62d887420517f3d60dd8911f9d3ca5ebf258d5cf58f8369f7326e70",
+    "matches_previous_delivery": true
+  },
+  "sync_preflight": {
+    "pipeline_run_id": "b13-12g-smoke-20261021-01",
+    "sources_checked": 1,
+    "physical_sources": 1,
+    "resources_checked": 311,
+    "mode": "CHECK_SIN_RED"
+  },
+  "api": {
+    "mode": "ASGI/TestClient con fixtures; no Docker",
+    "fixture_source_id": "finrural_smoke",
+    "successful_routes": [
+      "/health",
+      "/docs",
+      "/openapi.json",
+      "/catalog/sources",
+      "/catalog/sources/{fixture_id}",
+      "/catalog/resources?source_id={fixture_id}&limit=2",
+      "/runs",
+      "/runs/{id}",
+      "/runs/{id}/report",
+      "/sources/{id}/observations",
+      "POST /mapping/inspect"
+    ],
+    "error_statuses": {
+      "missing_source": 404,
+      "missing_run": 404,
+      "invalid_limit": 422,
+      "post_catalog": 405,
+      "search_export_index": 404
+    },
+    "live_localhost_8000_verified": false,
+    "UnifiedSearchDocument_schema_available": false
+  },
+  "docker": {
+    "compose_config_valid": true,
+    "engine_available": false,
+    "build_verified": false,
+    "warm_start_seconds": null,
+    "mongo_live_verified": false
+  },
+  "scheduler": {
+    "static_tests_passed": true,
+    "real_dry_run": "Bloqueado por política de ejecución de PowerShell",
+    "policy_changed": false,
+    "task_registered": false
+  },
+  "repository_integrity": {
+    "git_diff_check_exit_code": 0,
+    "git_fsck_no_reflogs_exit_code": 0,
+    "dangling_blobs_reported_and_preserved": true,
+    "source_ast_parse_valid": true,
+    "declared_cli_entrypoints_verified": [
+      "prospector-batch",
+      "prospector-api",
+      "prospector-project"
+    ]
+  },
+  "docs_validation": {
+    "powershell_blocks_parsed": 9,
+    "powershell_parse_errors": 0,
+    "json_examples_parsed": 2,
+    "legacy_example_records_validated": 1,
+    "canary_configuration_python_ast_valid": true
+  },
+  "git_initial": {
+    "branch": "fix/prospector-cierre",
+    "head": "7a7caead651529297737db941d84511b0f6533bf",
+    "tracked": 312,
+    "modified": 54,
+    "untracked": 1339,
+    "output_untracked": 881,
+    "runtime_untracked": 141
+  },
+  "git_at_delivery": {
+    "branch": "fix/prospector-cierre",
+    "head": "7a7caead651529297737db941d84511b0f6533bf",
+    "status_counts": {
+      " M": 58,
+      "??": 1092
+    },
+    "untracked_by_top": {
+      ".dockerignore": 1,
+      ".patch12e": 11,
+      ".patch12f": 4,
+      ".patch12g": 8,
+      ".patch12h": 5,
+      ".patch12i": 3,
+      ".runtime": 141,
+      "BACKLOG_USER_STORIES.md": 1,
+      "CODEX_DATAX_MASTER_PROMPT_EN.md": 1,
+      "DATAX_AUDITORIA_Y_PLAN_CIERRE_52_20261015.md": 1,
+      "Dockerfile.api": 1,
+      "Dockerfile.batch": 1,
+      "INSTRUCCIONES_12D.txt": 1,
+      "INSTRUCCIONES_12E.txt": 1,
+      "INSTRUCCIONES_12F.txt": 1,
+      "INSTRUCCIONES_12G.txt": 1,
+      "INSTRUCCIONES_12H.txt": 1,
+      "INSTRUCCIONES_12I.txt": 1,
+      "INSTRUCCIONES_DATAX_12B.txt": 1,
+      "INSTRUCCIONES_DATAX_12C.txt": 1,
+      "apply_batch_12D_urls_exportacion.py": 1,
+      "apply_batch_12E_fuentes.py": 1,
+      "apply_batch_12F_navegacion.py": 1,
+      "apply_batch_12G_sincronizacion.py": 1,
+      "apply_batch_12H_checkpoint_parcial.py": 1,
+      "apply_batch_12I_mapping_inspect.py": 1,
+      "apps": 2,
+      "docker-compose.yml": 1,
+      "documento-arquitectura-prospector-externo.md": 1,
+      "ops": 2,
+      "output": 881,
+      "src": 1,
+      "tests": 9,
+      "validar_exportacion_fuentes_12C.py": 1,
+      "validar_rescate_fuentes_12B.py": 1,
+      "docs": 1
+    },
+    "staged_entries": [],
+    "requirements_sha256": {
+      "BACKLOG_USER_STORIES.md": "a713c62aea0a942cf19854f0af6624da571f311aded7309dbec69597fb6196b3",
+      "documento-arquitectura-prospector-externo.md": "30651212489afd80da90c1d79eb41a8d7c30ba768f7985a4ba75f4cff429566b"
+    }
+  },
+  "files_touched_by_this_session": [
+    ".gitignore",
+    "README.md",
+    "pyproject.toml",
+    "apps/b13_pipeline/main.py",
+    "apps/catalog_sync/main.py",
+    "apps/catalog_api/main.py",
+    "src/prospector_externo/application/catalog_sync.py",
+    "src/prospector_externo/domain/projection.py",
+    "src/prospector_externo/kernel/registry.py",
+    "tests/test_b13_pipeline.py",
+    "tests/test_batch12g_catalog_sync.py",
+    "tests/test_catalog_api.py",
+    "tests/test_projection_batch4a.py",
+    "tests/test_workflow_registry.py",
+    "docs/final_delivery_summary.md",
+    "docs/audit/20261022_validation.json"
+  ],
+  "continuation": {
+    "reference_date": "2026-10-22 America/La_Paz",
+    "baseline_directory": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-continuation-baseline-20261022-9haqsrt5",
+    "tests": {
+      "passed": 642,
+      "skipped": 1,
+      "warnings": 2,
+      "seconds": 79.57,
+      "browser_real_separately_passed": 1,
+      "coverage_type": "lines; src+apps, no new exclusions; branches not measured",
+      "coverage": {
+        "TOTAL": {
+          "covered": 8080,
+          "statements": 14826,
+          "percent": 54.5
+        },
+        "src/": {
+          "covered": 5526,
+          "statements": 7253,
+          "percent": 76.19
+        },
+        "src/prospector_externo/": {
+          "covered": 4750,
+          "statements": 5514,
+          "percent": 86.14
+        },
+        "apps/": {
+          "covered": 2554,
+          "statements": 7573,
+          "percent": 33.73
+        }
+      },
+      "largest_gaps": [
+        {
+          "path": "apps/custom_probe/main.py",
+          "missing_lines": 308,
+          "percent": 17.65,
+          "functions": [
+            {
+              "function": "main",
+              "line": 530,
+              "missing_lines": 115
+            },
+            {
+              "function": "browser_custom_probe",
+              "line": 318,
+              "missing_lines": 74
+            },
+            {
+              "function": "safe_get_form_urls",
+              "line": 242,
+              "missing_lines": 38
+            },
+            {
+              "function": "probe_http_json",
+              "line": 130,
+              "missing_lines": 37
+            },
+            {
+              "function": "candidate_api_urls",
+              "line": 218,
+              "missing_lines": 14
+            }
+          ]
+        },
+        {
+          "path": "apps/site_validation/main.py",
+          "missing_lines": 304,
+          "percent": 0.0,
+          "functions": [
+            {
+              "function": "main",
+              "line": 476,
+              "missing_lines": 93
+            },
+            {
+              "function": "command_recheck_origins",
+              "line": 111,
+              "missing_lines": 34
+            },
+            {
+              "function": "command_run",
+              "line": 48,
+              "missing_lines": 33
+            },
+            {
+              "function": "command_batch",
+              "line": 179,
+              "missing_lines": 19
+            },
+            {
+              "function": "command_a8",
+              "line": 353,
+              "missing_lines": 19
+            }
+          ]
+        },
+        {
+          "path": "apps/operational_config_promotion/main.py",
+          "missing_lines": 276,
+          "percent": 0.0,
+          "functions": [
+            {
+              "function": "build_candidate",
+              "line": 332,
+              "missing_lines": 53
+            },
+            {
+              "function": "main",
+              "line": 466,
+              "missing_lines": 51
+            },
+            {
+              "function": "validate_runtime_source_model",
+              "line": 267,
+              "missing_lines": 30
+            },
+            {
+              "function": "build_generated_entry",
+              "line": 226,
+              "missing_lines": 23
+            },
+            {
+              "function": "derive_seeds",
+              "line": 195,
+              "missing_lines": 18
+            }
+          ]
+        },
+        {
+          "path": "apps/source_characterization/main.py",
+          "missing_lines": 249,
+          "percent": 36.32,
+          "functions": [
+            {
+              "function": "main",
+              "line": 865,
+              "missing_lines": 83
+            },
+            {
+              "function": "run_stage",
+              "line": 425,
+              "missing_lines": 40
+            },
+            {
+              "function": "write_reports",
+              "line": 750,
+              "missing_lines": 25
+            },
+            {
+              "function": "reindex_existing_stage",
+              "line": 346,
+              "missing_lines": 20
+            },
+            {
+              "function": "stages_for_source",
+              "line": 651,
+              "missing_lines": 19
+            }
+          ]
+        },
+        {
+          "path": "apps/b13_closure_audit/main.py",
+          "missing_lines": 238,
+          "percent": 23.72,
+          "functions": [
+            {
+              "function": "audit_timings_and_limits",
+              "line": 165,
+              "missing_lines": 62
+            },
+            {
+              "function": "main",
+              "line": 630,
+              "missing_lines": 54
+            },
+            {
+              "function": "validate_package",
+              "line": 348,
+              "missing_lines": 48
+            },
+            {
+              "function": "evaluate",
+              "line": 456,
+              "missing_lines": 28
+            },
+            {
+              "function": "load_source_config",
+              "line": 137,
+              "missing_lines": 13
+            }
+          ]
+        },
+        {
+          "path": "apps/browser_characterization/main.py",
+          "missing_lines": 229,
+          "percent": 19.65,
+          "functions": [
+            {
+              "function": "browser_characterize_source",
+              "line": 255,
+              "missing_lines": 86
+            },
+            {
+              "function": "main",
+              "line": 437,
+              "missing_lines": 81
+            },
+            {
+              "function": "discover_browser_runtime",
+              "line": 171,
+              "missing_lines": 20
+            },
+            {
+              "function": "response_handler",
+              "line": 292,
+              "missing_lines": 17
+            },
+            {
+              "function": "common_system_browser_paths",
+              "line": 103,
+              "missing_lines": 13
+            }
+          ]
+        },
+        {
+          "path": "apps/b11_output_audit/main.py",
+          "missing_lines": 211,
+          "percent": 33.65,
+          "functions": [
+            {
+              "function": "audit_source",
+              "line": 432,
+              "missing_lines": 44
+            },
+            {
+              "function": "print_console",
+              "line": 747,
+              "missing_lines": 36
+            },
+            {
+              "function": "main",
+              "line": 835,
+              "missing_lines": 18
+            },
+            {
+              "function": "find_snapshot",
+              "line": 181,
+              "missing_lines": 13
+            },
+            {
+              "function": "render_markdown",
+              "line": 666,
+              "missing_lines": 12
+            }
+          ]
+        },
+        {
+          "path": "apps/b13_pipeline/main.py",
+          "missing_lines": 198,
+          "percent": 62.71,
+          "functions": [
+            {
+              "function": "command_plan",
+              "line": 1173,
+              "missing_lines": 38
+            },
+            {
+              "function": "command_run",
+              "line": 1262,
+              "missing_lines": 23
+            },
+            {
+              "function": "canonical_legacy_file",
+              "line": 241,
+              "missing_lines": 22
+            },
+            {
+              "function": "build_transtats_manifest",
+              "line": 315,
+              "missing_lines": 16
+            },
+            {
+              "function": "project_success",
+              "line": 387,
+              "missing_lines": 16
+            }
+          ]
+        },
+        {
+          "path": "apps/b12_datax_package/main.py",
+          "missing_lines": 193,
+          "percent": 28.25,
+          "functions": [
+            {
+              "function": "build_package",
+              "line": 300,
+              "missing_lines": 71
+            },
+            {
+              "function": "main",
+              "line": 639,
+              "missing_lines": 35
+            },
+            {
+              "function": "verify_package",
+              "line": 575,
+              "missing_lines": 26
+            },
+            {
+              "function": "choose_legacy_file",
+              "line": 112,
+              "missing_lines": 24
+            },
+            {
+              "function": "choose_special_manifest",
+              "line": 162,
+              "missing_lines": 12
+            }
+          ]
+        },
+        {
+          "path": "src/site_validation/core.py",
+          "missing_lines": 191,
+          "percent": 37.58,
+          "functions": [
+            {
+              "function": "run",
+              "line": 312,
+              "missing_lines": 58
+            },
+            {
+              "function": "_sitemap_candidates",
+              "line": 248,
+              "missing_lines": 47
+            },
+            {
+              "function": "_robots",
+              "line": 224,
+              "missing_lines": 21
+            }
+          ]
+        },
+        {
+          "path": "apps/b10_targeted_remediation/main.py",
+          "missing_lines": 187,
+          "percent": 0.0,
+          "functions": [
+            {
+              "function": "main",
+              "line": 189,
+              "missing_lines": 103
+            },
+            {
+              "function": "baseline_candidates",
+              "line": 81,
+              "missing_lines": 16
+            },
+            {
+              "function": "stream_process",
+              "line": 153,
+              "missing_lines": 11
+            }
+          ]
+        },
+        {
+          "path": "apps/source_evidence_audit/main.py",
+          "missing_lines": 184,
+          "percent": 36.33,
+          "functions": [
+            {
+              "function": "main",
+              "line": 398,
+              "missing_lines": 80
+            },
+            {
+              "function": "audit_ready_candidate",
+              "line": 165,
+              "missing_lines": 33
+            },
+            {
+              "function": "collect_text_artifacts",
+              "line": 245,
+              "missing_lines": 28
+            },
+            {
+              "function": "extract_error_excerpts",
+              "line": 281,
+              "missing_lines": 13
+            }
+          ]
+        },
+        {
+          "path": "apps/source_recovery/main.py",
+          "missing_lines": 178,
+          "percent": 25.21,
+          "functions": [
+            {
+              "function": "main",
+              "line": 272,
+              "missing_lines": 82
+            },
+            {
+              "function": "summarize_variant",
+              "line": 183,
+              "missing_lines": 22
+            },
+            {
+              "function": "classify_exception",
+              "line": 105,
+              "missing_lines": 20
+            },
+            {
+              "function": "probe_url",
+              "line": 128,
+              "missing_lines": 16
+            },
+            {
+              "function": "resolve_host",
+              "line": 37,
+              "missing_lines": 14
+            }
+          ]
+        },
+        {
+          "path": "apps/source_mapping/main.py",
+          "missing_lines": 173,
+          "percent": 38.21,
+          "functions": [
+            {
+              "function": "main",
+              "line": 540,
+              "missing_lines": 66
+            },
+            {
+              "function": "inspect_probe_output",
+              "line": 120,
+              "missing_lines": 35
+            },
+            {
+              "function": "probe_source",
+              "line": 301,
+              "missing_lines": 31
+            },
+            {
+              "function": "classify_probe",
+              "line": 211,
+              "missing_lines": 18
+            }
+          ]
+        },
+        {
+          "path": "apps/custom_policy_probe/main.py",
+          "missing_lines": 160,
+          "percent": 19.19,
+          "functions": [
+            {
+              "function": "main",
+              "line": 314,
+              "missing_lines": 73
+            },
+            {
+              "function": "inspect_transtats_forms",
+              "line": 143,
+              "missing_lines": 58
+            },
+            {
+              "function": "probe_cadexco",
+              "line": 71,
+              "missing_lines": 21
+            },
+            {
+              "function": "route_handler",
+              "line": 160,
+              "missing_lines": 10
+            }
+          ]
+        }
+      ],
+      "previous_continuation_pass": {
+        "passed": 638,
+        "seconds": 84.75
+      },
+      "coverage_json": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-continuation-final2-20261022-coverage.json",
+      "last_focused": {
+        "passed": 51,
+        "seconds": 21.49,
+        "scope": "resume + deadlines + async integration"
+      },
+      "command": ".venv/Scripts/python.exe -B -m pytest -q -p no:cacheprovider --basetemp <TEMP>/datax-continuation-final2-20261022-tests --cov=src --cov=apps --cov-report= --cov-report=json:<TEMP>/datax-continuation-final2-20261022-coverage.json --durations=5"
+    },
+    "changed_since_continuation_baseline": [
+      {
+        "path": "src/execution/checkpointed_batch.py",
+        "before_sha256": "32b1bfae5dfaab3befb20a51f6d2b7df64be0da26e880ba133a860b4d3c335f7",
+        "after_sha256": "6328afe006e9925fc4e4ad5be50a552e75e70e7ff6987f52dd29c5fd8871a190"
+      },
+      {
+        "path": "src/prospector_externo/application/cadence_evaluator.py",
+        "before_sha256": "dbefbb49dc1359d50cb59767a43dd78dbc015d1e0835863395bfcd60f02badfe",
+        "after_sha256": "f6e558b2c730e6beed0f3330fea432a73cb1fe9eadead63d339371bb9f59eeaf"
+      },
+      {
+        "path": "src/prospector_externo/application/catalog_service.py",
+        "before_sha256": "6e7537510fdd92d8c0ab79e7ba4900e89d18bbefbf23f08103aae9a542c076f2",
+        "after_sha256": "d69fbe559fa96c0cbc677e35d2bec171c506da97db70f5e6080a91ff1963af03"
+      },
+      {
+        "path": "src/prospector_externo/application/catalog_sync.py",
+        "before_sha256": "23c38f888c33df8ef25d159ba056f9283975ca4e1e9cd93691dab3218e36d06e",
+        "after_sha256": "9ffb7519b8352bfcd3de38f8699cd683db11d5e62e76d7deb4d06fbecd2b14de"
+      },
+      {
+        "path": "src/prospector_externo/application/dispatcher.py",
+        "before_sha256": "a38732727a9aebf871134e0fb9072e5d1ad1e74ff8cd3229bb56fadff7a44168",
+        "after_sha256": "ea9403e7814fd776dcb64e69a825b67b7f39f3e7f2e8f2ae1a2ae315a0495e13"
+      },
+      {
+        "path": "src/prospector_externo/application/orchestrator.py",
+        "before_sha256": "cfe4884e3da578fe8b3135c1fbf1da415d8eca60510447741d9607bb2cd53891",
+        "after_sha256": "699f5f77f0b9be7292a20c096f0d4c38bf3e261c388c297d2953506c03a38c98"
+      },
+      {
+        "path": "src/prospector_externo/domain/discovery.py",
+        "before_sha256": "d379d3d2bc9741d043e2c45f47a3037e9e254e8c3acaa94d6e672aebb974a35b",
+        "after_sha256": "8b3bd16d04202487d8b11327cf71bbb35bd02c958ee29611ba8e28cd7142ea60"
+      },
+      {
+        "path": "src/prospector_externo/domain/discovery_intelligence.py",
+        "before_sha256": "64df4d2f57db21dda492dc5bc2076de334a14d03d50a5c03a9763dc5d36bd9a6",
+        "after_sha256": "7f2b4943647b8191af6ffb2f0e7e3337f8be17d462bd371233d7c8bc54dc191d"
+      },
+      {
+        "path": "src/prospector_externo/domain/health.py",
+        "before_sha256": "b97265b94104b2842e611a72a17c0364cf2fe494500ac3d35bc05f65d6876cf3",
+        "after_sha256": "8bd7b3ea596ed72e0ec6e4ded307221c148f70426e646275fac48f7e545991fd"
+      },
+      {
+        "path": "src/prospector_externo/domain/models.py",
+        "before_sha256": "ef4095e2fd592580b5879bb2f3cfa061032cea9280c48933e791be41bbf55589",
+        "after_sha256": "bf444546d334582b6640d90a0f1a9957623813b5bd221953f8dc907e678ce273"
+      },
+      {
+        "path": "src/prospector_externo/domain/observations.py",
+        "before_sha256": "abf0ec83b95436730f64bb74364cab2cd0ef8e0f86930272bd2cb917c6139590",
+        "after_sha256": "ea21b9da018cdd83e79ca3c601b70b5f8f9f9cbb4181d10e9910385c522ad657"
+      },
+      {
+        "path": "src/prospector_externo/infrastructure/browser_driver.py",
+        "before_sha256": "1c36b3c49bfdc40fdf5d2b179d526fba8f0f74ba8a2178a870e689585f5679c1",
+        "after_sha256": "09c55c6b3557feb613b5a3a3b18d1a7314535416373a286327cdb5168215fc68"
+      },
+      {
+        "path": "src/prospector_externo/kernel/workflow_port.py",
+        "before_sha256": "be177af28e44bb0830444abe334b304d95091c5dceff682c17b1d00cd401f60c",
+        "after_sha256": "875f6a5d57f7995984d8b146980110239e77619c4c942158a14839be2fd85393"
+      },
+      {
+        "path": "src/prospector_externo/ports/catalog_repository.py",
+        "before_sha256": "cd4aa0bb879453b222533c7e4554d1a5c70a1c30d70d551902a13ee3e618b5f6",
+        "after_sha256": "6c0e82290e6b09be3ca943431bac824f87d6b16ea443e46d65c9587d954be1b6"
+      },
+      {
+        "path": "src/prospector_externo/workflows/api_workflow.py",
+        "before_sha256": "6a600d2a91cd08b12e6b841e64e411fe75e41fd61b9a0cdb4e42b6e552cee5fa",
+        "after_sha256": "fc3ad934cad23c9ddd45106e15134f2b5d26513104774a99d58bf869b94b782f"
+      },
+      {
+        "path": "src/prospector_externo/workflows/base.py",
+        "before_sha256": "4240b9f528a36028c11c57fb1a1acaa8b9abbc406fd03d505b44f083dc5a8387",
+        "after_sha256": "c5114c94863af7416a57f92b2515e37ae1659cd4caaad325cb79b9e6ac9b5e3f"
+      },
+      {
+        "path": "src/prospector_externo/workflows/commented_html.py",
+        "before_sha256": "733cc9e53e2cb7a858b50b10db6206865c843881f82f80db343d866b9d48c98e",
+        "after_sha256": "340c2fa6e523390d45ad6ef0fb3881e5cd7b55b69fd6ecf9204220debba43535"
+      },
+      {
+        "path": "src/prospector_externo/workflows/custom_workflow.py",
+        "before_sha256": "007c8f0d5ea2cc543a177540e4774447869ad372da4566ca728caa5ee15062e0",
+        "after_sha256": "88098ecc90044645344cc4b279a0723b6b540e7c160d84c0ef128d87ca12fca4"
+      },
+      {
+        "path": "src/prospector_externo/workflows/html_workflow.py",
+        "before_sha256": "78cf5f86e5a92e5f5aade296dfaf34f9babaafc29979d1318ecd5828abcc4923",
+        "after_sha256": "29ea5ebe838041d2b48d9cbf42312c2feb8404ee0a101c0f1a08bcf8fac07234"
+      },
+      {
+        "path": "src/prospector_externo/workflows/javascript_workflow.py",
+        "before_sha256": "89a24434bea4d268766da8b7ee9145f9934da90ce35f2714029a3cc2ef796e63",
+        "after_sha256": "4ac2059f61b22acb05879d6d44850e25f56eec2c0eedc6c9cc5fe133249aebf7"
+      },
+      {
+        "path": "src/prospector_externo/adapters/persistence/local_json_adapter.py",
+        "before_sha256": "3d5d07bd2893957d19fff66f24c748e6573b879e5f5feb642eca4f932f836fc6",
+        "after_sha256": "2fdac22d61cd6ee53a1de33bea43633558ff8ef6d9c26d2a75a594453466a273"
+      },
+      {
+        "path": "src/prospector_externo/adapters/persistence/mongo_adapter.py",
+        "before_sha256": "7914b9b8c5266ae96aad6059e5a978db395a94e2851805c442c1e3869c625fed",
+        "after_sha256": "35664edddf6036ce2a7a5d4065bc53bd3322712a20790590a96d3464d42f5846"
+      },
+      {
+        "path": "apps/crawler_batch/main.py",
+        "before_sha256": "b43caea7237779730d258b08807d82f1b93f48daad14a9ad6d53b67ffbafaea8",
+        "after_sha256": "a3d3ca6bf2ddad2592b8280cf5e0ad3bfa64896229f00e7700204ab747db718a"
+      },
+      {
+        "path": "tests/test_local_json_adapter.py",
+        "before_sha256": "33485b44eeefcebe382a2e98fbca53f6cd509d41f5a6eac71bcb39331302886d",
+        "after_sha256": "e2f74ec5959101cd46a1d8ab9ee96895f6c6d7e097d8bd752f11c110763245d5"
+      },
+      {
+        "path": "tests/test_mongo_persistence_adapter.py",
+        "before_sha256": "0c36c340a63bd661b02c7d34f2ac3bea9594c2925b7828913ce6bba2e3e847ab",
+        "after_sha256": "21e113b02144c642f484f0cef63248108588dd2034cc2094ba79240b80f7347c"
+      },
+      {
+        "path": "config/source_execution_map.yaml",
+        "before_sha256": "6311630355ed35e472514dd4a9bae85008d2891ebafa44d519dd17d570a102d2",
+        "after_sha256": "c1d13afb74889288db3b5e3a95d48514181e45263009d4e1b1aabe5da687bb5f"
+      },
+      {
+        "path": "docs/final_delivery_summary.md",
+        "before_sha256": "aaccf20b70d3b17fbc33c684fb120a0a103e98c1dd468f75b8c52eb091fa786a",
+        "after_sha256": "9ac8f575e8a997decb11daadd58793410e96241727473d971cdb60a5b9dc71fd"
+      },
+      {
+        "path": "docs/audit/20261022_validation.json",
+        "before_sha256": "9f381f6d7474636563277a6e4967af1d33f37cfc2c266d205e15f8df962f1554",
+        "after_sha256": null,
+        "note": "Self-referential evidence file; final digest omitted intentionally"
+      },
+      {
+        "path": "README.md",
+        "before_sha256": "b26924dad8ede664ca55d6569d2d693318844eb8a12739790d4066f91c99c719",
+        "after_sha256": "df0b48f578065ba79c97177fd822bbdb1a79b8b1b2b6e7391eea31fb2758def5"
+      }
+    ],
+    "new_tests": [
+      "tests/test_browser_real_30_pages.py",
+      "tests/test_continuation_catalog_safety.py",
+      "tests/test_continuation_cli_flows.py",
+      "tests/test_discovery_checkpoint_resume.py",
+      "tests/test_physical_acquisition_reuse.py",
+      "tests/test_source_runtime_deadline.py"
+    ],
+    "retirement_manifest": {
+      "path": "docs/audit/20261022_retirement_manifest.json",
+      "files": 48,
+      "bytes": 383027,
+      "executed": false
+    },
+    "secret_review": {
+      "scope": "src/apps/config/tests/ops/docs/README/pyproject; three high-confidence signatures only",
+      "findings": [],
+      "production_credential_audit": false
+    },
+    "measurements": "docs/audit/20261022_continuation_measurements.json",
+    "blockers": [
+      "Docker Desktop Linux engine unavailable",
+      "Mongo real unavailable",
+      "PowerShell script policy; no bypass attempted",
+      "MEFP TLS_TECHNICAL_HOLD",
+      "UnifiedSearchDocument canonical contract absent",
+      "coverage global below 80%"
+    ],
+    "git_final": {
+      "branch": "fix/prospector-cierre",
+      "head": "7a7caead651529297737db941d84511b0f6533bf",
+      "status_counts": {
+        " M": 63,
+        "??": 1101
+      },
+      "paths_by_prefix": {
+        "output/": 881,
+        ".runtime/": 141,
+        ".patch": 31,
+        "src/": 32,
+        "apps/": 6,
+        "tests/": 35,
+        "docs/": 4,
+        "config/": 4
+      },
+      "staged": false,
+      "commits_created": false,
+      "pushes": 0,
+      "diff_check_exit_code": 0
+    },
+    "hu_matrix": [
+      {
+        "id": "01",
+        "status": "PARTIAL",
+        "limitation": "Función probada; usa Pydantic, mientras el DoD particular pide stdlib/dataclasses y el transversal acepta Pydantic. Acordar esta contradicción, sin reescribir modelos."
+      },
+      {
+        "id": "02",
+        "status": "PASS",
+        "limitation": "Añadido primer fallo persistido y suspensión al confirmar otro tras >24 h; éxito completo resetea. No se inventa fallo por tiempo transcurrido. Clasificación legal/crítica propuesta no certificada."
+      },
+      {
+        "id": "03",
+        "status": "PASS",
+        "limitation": "Se añadió la excepción nombrada, compatible con ValueError."
+      },
+      {
+        "id": "04",
+        "status": "PARTIAL",
+        "limitation": "Reanuda cola y conserva RAW con presupuesto idéntico; quedan 142 pendientes en el canario. No prueba todos los PDFs del portal."
+      },
+      {
+        "id": "05",
+        "status": "PASS",
+        "limitation": "Falta nueva certificación completa del portal BBV; el contrato de extracción sí está probado."
+      },
+      {
+        "id": "06",
+        "status": "PASS",
+        "limitation": "TRANSTATS conserva trabajo de adquisición; no se simula una descarga de formulario."
+      },
+      {
+        "id": "07",
+        "status": "PASS",
+        "limitation": "Inspección limitada por bytes/entradas; hijos sin URL directa siguen en RAW."
+      },
+      {
+        "id": "08",
+        "status": "PASS",
+        "limitation": "El batch aplica slots; B13 invoca una fuente por subprocess secuencialmente. No atribuirle concurrencia entre fuentes."
+      },
+      {
+        "id": "09",
+        "status": "PASS",
+        "limitation": "Cliente síncrono antiguo no equivale al runtime efectivo. No se habilitó override de robots."
+      },
+      {
+        "id": "10",
+        "status": "PASS",
+        "limitation": "Evidencia JSON; transacción multifichero y Mongo real quedan fuera de esta certificación."
+      },
+      {
+        "id": "11",
+        "status": "PASS",
+        "limitation": "REST usa `execution_status` y métricas bajo `coverage`; documentar esta forma frente a ejemplos conceptuales `status`."
+      },
+      {
+        "id": "12",
+        "status": "PARTIAL",
+        "limitation": "Contrato local probado. Autenticación/TLS de producción y `/search/export-index` pendientes; no crear el esquema del Bridge."
+      },
+      {
+        "id": "13",
+        "status": "PASS",
+        "limitation": "PASS funcional del fixture local: un contexto máximo, assets y host externo bloqueados, método javascript. Muestreo entre páginas no demuestra un techo absoluto ni certifica OOM en producción."
+      },
+      {
+        "id": "14",
+        "status": "EXTERNAL_BLOCKER",
+        "limitation": "Motor/servidor no disponible. Ejecutar pruebas reales de índices, colisiones, replay y corte a mitad de escrituras en base aislada."
+      },
+      {
+        "id": "15",
+        "status": "EXTERNAL_BLOCKER",
+        "limitation": "Build/arranque y tiempo hasta /health requieren Docker activo; no fueron medidos."
+      },
+      {
+        "id": "16",
+        "status": "PARTIAL",
+        "limitation": "DryRun real bloqueado por política de ejecución de Windows. Resolver firma/aprobación del script y decisión DevOps; bloqueo solo mismo archivo/host."
+      },
+      {
+        "id": "17",
+        "status": "PARTIAL",
+        "limitation": "Corregido: fallo/parcial/vacío rompe la secuencia; exige cinco éxitos nuevos. Umbrales/28 días y replay probados. DoR: aprobación de valores de la Decisión 1.1 sigue pendiente."
+      },
+      {
+        "id": "18",
+        "status": "PARTIAL",
+        "limitation": "Añadido wait_for, RAW al timeout y cancelación externa diferenciada. Default conservado: 250 URLs, depth 2, 900 s; falta aprobar Decisión 1.3/500 URLs. Limpieza de browser puede extender el deadline hasta sus timeouts de I/O."
+      },
+      {
+        "id": "19",
+        "status": "PASS",
+        "limitation": "Fingerprint en Source/snapshot/observación; cambio de alcance resetea ausencias. Histórico sin perfil establece baseline sin sumar. Parciales/fallos/reanudados no confirman ausencias."
+      },
+      {
+        "id": "20",
+        "status": "PASS",
+        "limitation": "Offline, hash de URL; no de contenido ni prueba de existencia. Aprobación del consumidor pendiente como DoR."
+      },
+      {
+        "id": "21",
+        "status": "FAIL",
+        "limitation": "MEFP no está en las 39 físicas y sigue TLS_TECHNICAL_HOLD. Canary FINRURAL parcial; no certificar cinco SUCCESS actuales."
+      },
+      {
+        "id": "22",
+        "status": "PARTIAL",
+        "limitation": "Escenario JSON probado. Repetir con Mongo y contenedor; owners de otros hosts no se recuperan por suposición."
+      }
+    ],
+    "checks": {
+      "python_ast_files": 246,
+      "historical_annex_text_sha256": "39febaf92ff56e21b5b4b901722ec215d551071859f0cadd295e0df13a86dcfa",
+      "annex_unchanged": true,
+      "git_diff_check": 0,
+      "post_doc_contract_tests": {
+        "passed": 22,
+        "warnings": 2,
+        "seconds": 2.8
+      },
+      "retirement_manifest_verified": 48,
+      "last_code_full_suite_passed": true
+    },
+    "new_artifacts": [
+      {
+        "path": "tests/test_browser_real_30_pages.py",
+        "sha256": "4aa6cf1641d0cfe8c2638856b188181824676675dd89cc2fe8613139aca31920"
+      },
+      {
+        "path": "tests/test_continuation_catalog_safety.py",
+        "sha256": "a6b64e884621936b3cc4e22b08aa844a83dd403a3114b4733673813a57a8c671"
+      },
+      {
+        "path": "tests/test_continuation_cli_flows.py",
+        "sha256": "87f62cf21cd25ef32372cb4129b8da59ad8e41aaae3317544be3891321f65230"
+      },
+      {
+        "path": "tests/test_discovery_checkpoint_resume.py",
+        "sha256": "9adbcf980ab72002229a85ee3c80cc5ab861c1387692fd9fd1ba61c8dc3651e7"
+      },
+      {
+        "path": "tests/test_physical_acquisition_reuse.py",
+        "sha256": "48f21c4f826d6f3c4300a270c71b0a53270f2fdd46243918cf51e79e0e82b900"
+      },
+      {
+        "path": "tests/test_source_runtime_deadline.py",
+        "sha256": "423c0584ed5fd57fdabc24967d94cd2318adbd278862eec0bc1af1c21a8a667f"
+      },
+      {
+        "path": "docs/audit/20261022_continuation_measurements.json",
+        "sha256": "2588b7c4ebd05922880238c1ffa95cc67635a8309a7ca02de4a8f873bcf9431e"
+      },
+      {
+        "path": "docs/audit/20261022_retirement_manifest.json",
+        "sha256": "f36ec2e5b294c056155272e142d43ce19ba940c1d06c5d3a15fddda9401d46d3"
+      }
+    ],
+    "hu_summary": {
+      "PASS": 12,
+      "PARTIAL": 7,
+      "EXTERNAL_BLOCKER": 2,
+      "FAIL": 1
+    }
+  }
+}

@@ -305,6 +305,11 @@ def main() -> int:
 
     for index, logical_id in enumerate(selected, 1):
         state_row = state["sources"][logical_id]
+        hold = mapping_index[logical_id].get("acquisition_hold")
+        if hold:
+            state_row.update({"status": "SKIPPED_POLICY", "policy_hold": hold})
+            atomic_json(state_path, state)
+            continue
         previous = state_row.get("status")
 
         if args.resume and previous == "SUCCESS":

@@ -48,7 +48,7 @@ def _rows():
 
 def test_canonical_hosts_are_promoted():
     raw, rows = _rows()
-    assert len(raw["sources"]) == 35
+    assert len(raw["sources"]) == 39
 
     for source_id, expected in EXPECTED.items():
         row = rows[source_id]

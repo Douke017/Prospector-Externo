@@ -17,9 +17,10 @@ import tempfile
 import unicodedata
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlparse, urlsplit
 
 from pydantic import BaseModel, Field
+from prospector_externo.domain.normalizer import UrlNormalizer
 
 from prospector_externo.domain.projection import (
     DataxProjection,
@@ -165,9 +166,25 @@ class LegacyStatsJsonExporter:
 
     @staticmethod
     def _download_url(representation: ProjectedRepresentation) -> str:
-        # El legacy consumía la URL publicada real. ``raw_url`` preserva queries
-        # observadas que una normalización podría haber reordenado/limpiado.
-        return (representation.raw_url or representation.url).strip()
+        # Conservar la URL original si es absoluta y segura: puede incluir
+        # parámetros de descarga significativos que el normalizador no preserva.
+        # Un href relativo (o con espacios) no es consumible por DATAX.
+        # En ese caso usar la URL canónica resuelta durante discovery.
+        for candidate in (representation.raw_url, representation.url):
+            encoded = UrlNormalizer.encode_download_url(candidate)
+            if encoded is not None:
+                # raw_url must not move the download outside its resolved target.
+                target = urlsplit(representation.url)
+                original = urlsplit(encoded)
+                original_port = original.port if original.port is not None else (443 if original.scheme == "https" else 80)
+                target_port = target.port if target.port is not None else (443 if target.scheme == "https" else 80)
+                if ((original.scheme, original.hostname, original_port, original.path)
+                        != (target.scheme, target.hostname, target_port, target.path)):
+                    continue
+                return encoded
+        raise ValueError(
+            f"No hay URL HTTP absoluta válida para recurso {representation.resource_key!r}"
+        )
 
     @classmethod
     def _record(

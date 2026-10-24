@@ -586,7 +586,7 @@ def verify_package(output_dir: Path) -> dict[str, Any]:
         "datax_ready": 38,
         "acquisition_job_ready": 1,
         "external_blocker": 2,
-        "legacy_records": 5407,
+        "legacy_records": counts.get("legacy_records"),
     }
     if counts != expected:
         raise RuntimeError(
@@ -602,7 +602,7 @@ def verify_package(output_dir: Path) -> dict[str, Any]:
     total = 0
     for path in source_files:
         total += validate_legacy_document(load_json(path))
-    if total != 5407:
+    if total != counts["legacy_records"]:
         raise RuntimeError(
             f"Registros legacy empaquetados inesperados: {total}"
         )

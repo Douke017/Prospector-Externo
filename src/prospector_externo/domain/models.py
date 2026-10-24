@@ -2,8 +2,8 @@
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
-from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Literal, Optional, Tuple
+from pydantic import BaseModel, Field, model_validator
 import uuid
 
 
@@ -79,8 +79,8 @@ class SourceConfig(BaseModel):
     max_depth: int = 2
     max_urls: int = 250
     max_resources: int = 1000
-    max_runtime_seconds: float = 900.0
-    max_requests: int = 250
+    max_runtime_seconds: float = Field(default=900.0, gt=0, allow_inf_nan=False)
+    max_requests: int = Field(default=250, gt=0)
     max_query_variants: int = 25
     max_consecutive_errors: int = 5
     allowed_hosts: List[str] = Field(default_factory=list)
@@ -102,6 +102,9 @@ class SourceConfig(BaseModel):
 
     # API discovery bounded. Solo operaciones públicas GET y evidencia explícita.
     discover_apis: bool = True
+    # Alcance explícitamente acotado: solo se consultan seeds curadas y
+    # NUNCA se interpreta su agotamiento como cobertura completa del sitio.
+    api_seed_scope: Literal["default", "curated"] = "default"
     max_api_endpoints: int = 200
     max_api_response_bytes: int = 2_000_000
     follow_api_pagination: bool = True
@@ -113,6 +116,13 @@ class SourceConfig(BaseModel):
     max_api_document_depth: int = 1
     max_api_document_bytes: int = 2_000_000
 
+    # Descubrimiento opcional y acotado de miembros ZIP/TAR en RAM.
+    inspect_archives: bool = True
+    max_archive_inspections: int = Field(default=2, ge=0)
+    max_archive_bytes: int = Field(default=4_000_000, gt=0)
+    max_archive_entries: int = Field(default=200, gt=0)
+    max_archive_uncompressed_bytes: int = Field(default=32_000_000, gt=0)
+
     # Browser workflow bounded.
     max_browser_pages: int = 15
 
@@ -122,6 +132,15 @@ class SourceConfig(BaseModel):
     # Contrato opcional de agrupamiento downstream. El crawler no lo ejecuta;
     # se aplica en la etapa offline de proyección DATAX.
     grouping_contract: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_curated_api_seeds(self) -> "SourceConfig":
+        if self.api_seed_scope == "curated":
+            if self.workflow != "api":
+                raise ValueError("api_seed_scope=curated exige workflow=api")
+            if not self.seeds:
+                raise ValueError("api_seed_scope=curated exige seeds explícitas")
+        return self
 
 
 class DiscoveredUrl(BaseModel):
@@ -154,6 +173,8 @@ class ResourceCandidate(BaseModel):
     period_label: Optional[str] = None
     content_hash: Optional[str] = None
     change_status: ChangeStatus = ChangeStatus.NEW
+    # Ausencias consecutivas verificadas en recorridos completos comparables.
+    consecutive_absences: int = Field(default=0, ge=0)
     discovered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # Evidencia adicional del discovery bruto.
@@ -172,10 +193,17 @@ class Snapshot(BaseModel):
     snapshot_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     source_id: str
     run_id: str
+    discovery_profile_fingerprint: Optional[str] = None
+    discovery_cycle_id: Optional[str] = None
     captured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     resources_hash: str
     total_resources: int
+    # Los snapshots legacy sin estado explícito se leen como anteriormente.
+    execution_status: Optional[str] = None
     resources: List[ResourceCandidate] = Field(default_factory=list)
+    # Inventario RAW de paginas/enlaces de esta corrida, incluso sin recursos.
+    # Campo opcional compatible con snapshots anteriores al Batch 6A.
+    discovered_urls: List[DiscoveredUrl] = Field(default_factory=list)
 
 
 class Source(BaseModel):
@@ -185,6 +213,17 @@ class Source(BaseModel):
     workflow: str
     health_status: str = "ACTIVE"
     update_category: str = "DAILY"
+    # Conservados entre corridas para evitar reiniciar las máquinas de estado.
+    # Los catálogos anteriores, sin estos campos, siguen siendo compatibles.
+    consecutive_failures: int = Field(default=0, ge=0)
+    first_failure_at: Optional[datetime] = None
+    consecutive_no_change_count: int = Field(default=0, ge=0)
+    weekly_no_change_count: int = Field(default=0, ge=0)
+    weekly_no_change_since_at: Optional[datetime] = None
+    last_policy_run_id: Optional[str] = None
+    # Identifica la última reconciliación materializada; None indica catálogo legacy.
+    catalog_last_run_id: Optional[str] = None
+    catalog_scope_fingerprint: Optional[str] = None
     next_eligible_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_run_id: Optional[str] = None
     last_run_at: Optional[datetime] = None

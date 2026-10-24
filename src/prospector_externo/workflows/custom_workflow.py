@@ -78,6 +78,7 @@ class CustomWorkflow(BaseWorkflow):
 
         workflow = ApiWorkflow()
         workflow.bind_http_session(self._session())
+        self._active_subworkflow = workflow
 
         logger.info(
             "Iniciando CustomWorkflow data_endpoint para [%s] con %d endpoint(s)",

@@ -42,7 +42,10 @@ class ApiWorkflow(BaseWorkflow):
     def _seed_urls(config: SourceConfig) -> List[str]:
         ordered: List[str] = []
         seen: Set[str] = set()
-        for raw in [config.entrypoint, *config.seeds]:
+        # La URL pública/canónica de una fuente curada no es una semilla API.
+        # Evita consumir presupuesto en páginas de portal/config sin datasets.
+        seeds = config.seeds if config.api_seed_scope == "curated" else [config.entrypoint, *config.seeds]
+        for raw in seeds:
             normalized = UrlNormalizer.normalize(raw, base_url=config.entrypoint)
             if normalized and normalized not in seen:
                 seen.add(normalized)
@@ -434,6 +437,7 @@ class ApiWorkflow(BaseWorkflow):
         coverage = CoverageStats()
         discovered: List[DiscoveredUrl] = []
         resources: List[ResourceCandidate] = []
+        self._capture_partial(resources, discovered, coverage)
         seen_resource_keys: Set[str] = set()
         by_key: Dict[str, ResourceCandidate] = {}
         successful_documents = 0
@@ -656,7 +660,11 @@ class ApiWorkflow(BaseWorkflow):
         coverage.api_documentation_found = len(docs_found)
         coverage.requests_total = session.requests_used
         if coverage.stop_reason is None:
-            coverage.stop_reason = "API_SEEDS_EXHAUSTED"
+            coverage.stop_reason = (
+                "CURATED_API_SEEDS_EXHAUSTED"
+                if config.api_seed_scope == "curated"
+                else "API_SEEDS_EXHAUSTED"
+            )
 
         if successful_documents == 0 and coverage.urls_failed > 0:
             return ExtractionResult(

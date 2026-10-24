@@ -242,6 +242,11 @@ def test_batch_exit_code_propagates_failed_sources():
     assert report_exit_code(
         SimpleNamespace(sources_failed=1)
     ) == 2
+    from prospector_externo.domain.observations import ExecutionStatus
+    assert report_exit_code(SimpleNamespace(
+        sources_failed=0,
+        source_results=[SimpleNamespace(execution_status=ExecutionStatus.PARTIAL_SUCCESS)],
+    )) == 3
 
 
 def test_operational_custom_configs_are_declarative():

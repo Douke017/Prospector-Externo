@@ -1,293 +1,141 @@
-# Prospector Externo de DATAX (`prospector_externo`)
+# Prospector Externo DATAX
 
-> **Sistema:** Prospector Externo y Catálogo de Inventario Bruto  
-> **Estilo Arquitectónico:** Monolito Modular — Arquitectura Hexagonal (Ports & Adapters) + Microkernel de Workflows (Plugin Architecture)  
-> **Versión Actual:** 2.0.0  
-> **Estado:** Core Hexagonal, Microkernel y Concurrencia Bulkhead implementados y validados.
+Monolito modular con puertos hexagonales y registro de workflows. B13 ejecuta adquisición → RAW/snapshot → proyección → legacy → paquete; la API consulta el catálogo JSON compartido. Mongo es un backend opcional cuya operación real sigue pendiente de aceptación. Este repositorio entrega referencias y metadatos; no certifica disponibilidad remota ni descarga documentos para el consumidor.
 
----
+## Estado de entrega al 24/10/2026
 
-## 1. Visión General
+- 52 identidades lógicas: 45 operativas (incluye FDTA retenida) y 7 status-only; 39 configuraciones físicas.
+- Las siete corridas existentes cubren las 39 físicas: **8 SUCCESS, 25 PARTIAL_SUCCESS, 4 FAILED, 2 EXTERNAL_BLOCKER**. `READY` describe preparación del paquete, no exhaustividad.
+- Catálogo compartido verificado: **39 fuentes, 10.815 referencias RAW**. No sumar registros de paquetes independientes como si fueran un conjunto único.
+- BBV: 1.000 RAW / 931 seleccionados; FINRURAL: 203 RAW / 135 seleccionados. Revisión offline conjunta: **1.066 registros**, sin sustituir el ZIP histórico de 780.
+- QA final offline: **763 PASS, 1 SKIP, 80,79 %** de cobertura `src/ + apps/`. Matriz HU: 12 PASS / 7 PARTIAL / 2 EXTERNAL_BLOCKER / 1 FAIL, con alcance funcional y pendientes de producción.
 
-El **Prospector Externo** es el sistema de DATAX diseñado para explorar portales estatales, financieros y regulatorios, descubrir URLs de páginas y recursos públicos descargables (PDF, XLSX, CSV, ZIP), y generar un **inventario bruto trazable** con detección de cambios y control de cadencia.
+La [guía de entrega](docs/final_delivery_summary.md#cierre-de-entrega-verificado--24102026) contiene la matriz de 52 identidades, resultados por corrida, contratos, hashes, límites y comandos Git propuestos. [Evidencia del cierre](docs/audit/20261024_delivery_closure.json). Los antecedentes permanecen en esa guía.
 
-### Principios Fundamentales del Sistema:
-* **Sin almacenamiento de binarios en disco:** El catálogo registra metadatos y cabeceras mediante solicitudes HTTP `HEAD` (con fallback a `GET` streaming mínimo si el servidor responde 405/501).
-* **Inspección transitoria de comprimidos en RAM:** Los contenedores `.zip` y `.tar` se descargan transitoriamente en memoria RAM para registrar los archivos internos que contienen y se liberan de inmediato sin tocar el disco.
-* **Microkernel de Workflows:** La estrategia de navegación no es un crawler universal monolítico; cada fuente utiliza un plugin especializado (`html`, `commented_html`, `javascript`, `api`, `custom`) configurado de forma declarativa.
-* **Concurrencia con Aislamiento Bulkhead (`AsyncWorkerPool`):** Separación estricta entre workers HTTP livianos y workers de navegador pesados (Playwright) para prevenir saturación y proteger la memoria del sistema.
+## 1. Recibir e instalar el código en Windows
 
----
+Usar Python 3.13.2 para reproducir el entorno de QA de esta entrega. `pyproject.toml` declara `>=3.9`; no se certificaron todas las versiones admitidas. Desde la raíz del clon:
 
-## 2. Diagramas Arquitectónicos
-
-### 2.1 Arquitectura Hexagonal y Puertos & Adaptadores
-
-```mermaid
-graph TD
-    subgraph Apps ["Capa de Entrada (Inbound Applications)"]
-        BatchApp["apps.crawler_batch (CLI Efímero)"]
-        APIApp["apps.catalog_api (FastAPI Persistente)"]
-    end
-
-    subgraph Application ["Capa de Aplicación & Orquestación"]
-        Orchestrator["RunOrchestrator"]
-        StatusGate["SourceStatusGate (Elegibilidad)"]
-        Dispatcher["SourceDispatcher"]
-        CatalogSvc["CatalogApplicationService"]
-        CadenceEval["CadencePolicyEvaluator"]
-        Aggregator["ResultAggregator"]
-        ReportBuilder["RunReportBuilder"]
-    end
-
-    subgraph Kernel ["Microkernel de Workflows (Plugins)"]
-        WorkflowPort["SourceWorkflow (Puerto Abstracto)"]
-        Registry["WorkflowRegistry"]
-        Workflows["Plugins: html, commented_html, javascript, api, custom"]
-    end
-
-    subgraph Domain ["Núcleo del Dominio (Puro)"]
-        Entities["Source, Snapshot, ResourceCandidate"]
-        HealthSM["HealthStateMachine (ACTIVE/WARNING/SUSPENDED)"]
-        Cadence["CadenceState (DAILY/WEEKLY/MONTHLY)"]
-        Normalizer["UrlNormalizer & Hash SHA-256"]
-    end
-
-    subgraph Infrastructure ["Infraestructura & Concurrencia"]
-        WorkerPool["AsyncWorkerPool (Bulkhead HTTP vs Browser)"]
-        HttpClient["ResilientHttpClient (Robots, Rate Limit, Fallback)"]
-        ArchiveExt["ArchiveExtractor (Inspección RAM)"]
-        PlaywrightDrv["PlaywrightDriver (Throttling anti-OOM)"]
-    end
-
-    subgraph Adapters ["Puertos y Adaptadores de Persistencia"]
-        CatPort["CatalogRepositoryPort"]
-        RepPort["RunReportRepositoryPort"]
-        LocalAdapter["LocalJsonRepositoryAdapter (output/<source_id>/)"]
-        MongoAdapter["MongoPersistenceAdapter (7 Colecciones)"]
-    end
-
-    BatchApp --> Orchestrator
-    Orchestrator --> StatusGate
-    Orchestrator --> Dispatcher
-    Dispatcher --> Registry
-    Registry --> Workflows
-    Workflows --> WorkerPool
-    Workflows --> HttpClient
-    Workflows --> ArchiveExt
-    Orchestrator --> CatalogSvc
-    CatalogSvc --> CatPort
-    Orchestrator --> CadenceEval
-    Orchestrator --> ReportBuilder
-    ReportBuilder --> RepPort
-    CatPort -.-> LocalAdapter
-    CatPort -.-> MongoAdapter
-    APIApp --> CatPort
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e '.[dev]'
 ```
 
-### 2.2 Flujo de Ejecución de una Corrida (Run Pipeline)
+La instalación requiere acceso al repositorio de dependencias; no se ejecutó durante este cierre. No es necesario activar el entorno ni cambiar ExecutionPolicy para invocar su Python. API JSON usa las dependencias base; Playwright/browser y Mongo requieren sus extras e infraestructura cuando se autorice validarlos. No se entrega `.venv` ni se presupone que Docker está activo.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor CLI as apps.crawler_batch
-    participant Orch as RunOrchestrator
-    participant Gate as SourceStatusGate
-    participant Pool as AsyncWorkerPool (Bulkhead)
-    participant Disp as SourceDispatcher
-    participant WF as SourceWorkflow (Plugin)
-    participant Cat as CatalogApplicationService
-    participant Repo as LocalJsonRepositoryAdapter
-    participant Cad as CadencePolicyEvaluator
-    participant RepBuilder as RunReportBuilder
+## 2. Recibir los datos por separado
 
-    CLI->>Orch: run_batch(config, force)
-    Orch->>Gate: evaluate_eligibility(source_state)
-    Note over Orch,Pool: Despacho concurrente de fuentes elegibles
-    Orch->>Pool: submit_workflow(process_source, config)
-    Pool->>Disp: dispatch(config)
-    Disp->>WF: run(config)
-    WF-->>Disp: ExtractionResult (recursos, urls descubiertas)
-    Note over Cat,Repo: Checkpoint incremental con lock thread-safe
-    Orch->>Cat: reconcile_and_checkpoint(result)
-    Cat->>Repo: save_snapshot(Snapshot)
-    Repo-->>Cat: mapa_<source>.json, _tree.json, _compact.json
-    Orch->>Cad: evaluate_and_update(observation)
-    Orch->>RepBuilder: build(run_id, observations)
-    RepBuilder->>Repo: save_report(RunReport)
-    Orch-->>CLI: RunReport consolidado
+Un clon de Git entrega código/configuración/documentación/tests; **no incluye `output/catalog`, `.runtime` ni paquetes ZIP**. Recibir del responsable:
+
+- `output/data-transfer/20261024-cierre/catalog-json-20261024.zip`: **2.309.382 bytes**, 195 archivos JSON, 30.575.382 bytes sin comprimir. SHA-256 `1a70ad7d05b31114cf9993dbf7f207240ff0a3c7378e60d2f9e034dd9eea45fd`.
+- Opcionalmente los paquetes DATAX por corrida de la [tabla de entrega](docs/final_delivery_summary.md#paquetes-verificados-y-transferencia). Sus manifests están dentro del ZIP. La revisión de 1.066 registros es la vigente para BBV/FINRURAL.
+
+Colocar el ZIP recibido en `output/data-transfer/20261024-cierre/`. Comprobar y extraer a un destino nuevo para conservar cualquier catálogo existente:
+
+```powershell
+$archive = '.\output\data-transfer\20261024-cierre\catalog-json-20261024.zip'
+if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne '1a70ad7d05b31114cf9993dbf7f207240ff0a3c7378e60d2f9e034dd9eea45fd') { throw 'SHA-256 incorrecto' }
+$restore = '.\output\received-20261024'
+if (Test-Path -LiteralPath $restore) { throw 'Usar otro destino nuevo' }
+.\.venv\Scripts\python.exe -B -m zipfile -t $archive
+.\.venv\Scripts\python.exe -B -m zipfile -e $archive $restore
 ```
 
----
+Resultado: `output/received-20261024/catalog/state/sources.json` y el resto del catálogo. Se verificó una restauración y lectura API sin cambios en sus 195 archivos. Conserva snapshots, observaciones y reportes existentes; metadatos históricos de owners y `deliveries.json` pueden referirse al host original. La consulta API usa su nueva raíz relativa; este ZIP **no es una migración para reanudar procesos o pipelines de otro equipo**.
 
-## 3. Estructura Real del Proyecto
+El empaquetador B13 no exporta el catálogo global. El ZIP de transferencia se creó con `python -m zipfile`, sin un pipeline adicional, sin HTTP, logs ni `.runtime`. Para repetir la captura del catálogo en reposo, elegir un nombre NUEVO y ejecutar:
 
-```text
-crawler_finrural/
-├── apps/
-│   ├── crawler_batch/
-│   │   └── main.py                     # CLI Batch efímero de exploración
-│   └── catalog_api/
-│       └── main.py                     # API REST persistente de consulta (FastAPI)
-├── config/
-│   └── sources.yaml                    # Configuración unificada de fuentes activas
-├── src/
-│   └── prospector_externo/
-│       ├── domain/                     # Modelos y lógica de negocio pura
-│       │   ├── models.py               # Source, Snapshot, ResourceCandidate, DiscoveredUrl
-│       │   ├── observations.py         # SourceRunObservation, RunReport, CoverageStats
-│       │   ├── health.py               # HealthStateMachine (ACTIVE, WARNING, SUSPENDED)
-│       │   ├── cadence.py              # CadenceState (DAILY, WEEKLY, MONTHLY)
-│       │   └── normalizer.py           # UrlNormalizer (canonicalización estricta y hash)
-│       ├── kernel/                     # Contratos y Registro del Microkernel
-│       │   ├── workflow_port.py        # SourceWorkflow (Puerto abstracto)
-│       │   ├── contracts.py            # ExtractionResult DTO
-│       │   └── registry.py             # WorkflowRegistry (Resolución dinámica)
-│       ├── workflows/                  # Plugins de descubrimiento
-│       │   ├── base.py                 # BaseWorkflow con DiscoveryQueue y resolución paralela
-│       │   ├── html_workflow.py        # Plugin HTML estático (ej. FINRURAL)
-│       │   ├── commented_html.py       # Plugin HTML comentado (ej. BBV)
-│       │   ├── javascript_workflow.py  # Plugin dinámico con Playwright gobernado
-│       │   ├── api_workflow.py         # Plugin para portales con endpoints JSON
-│       │   └── custom_workflow.py      # Plugin extensible Template Method
-│       ├── ports/                      # Puertos salientes de persistencia
-│       │   ├── catalog_repository.py   # CatalogRepositoryPort
-│       │   └── run_report_repository.py# RunReportRepositoryPort
-│       ├── adapters/                   # Implementaciones de adaptadores
-│       │   ├── persistence/
-│       │   │   ├── local_json_adapter.py # Adaptador local de archivos JSON (output/<source>/)
-│       │   │   └── mongo_adapter.py      # Adaptador MongoDB (7 colecciones del documento)
-│       │   └── api/
-│       │       └── routes.py           # Controladores FastAPI de solo lectura
-│       ├── application/                # Servicios de aplicación y orquestación
-│       │   ├── status_gate.py          # SourceStatusGate
-│       │   ├── dispatcher.py           # SourceDispatcher
-│       │   ├── catalog_service.py      # CatalogApplicationService (Checkpointing)
-│       │   ├── cadence_evaluator.py    # CadencePolicyEvaluator
-│       │   ├── aggregator.py           # ResultAggregator
-│       │   ├── report_builder.py       # RunReportBuilder
-│       │   └── orchestrator.py         # RunOrchestrator con AsyncWorkerPool
-│       └── infrastructure/             # Adaptadores técnicos
-│           ├── http_client.py          # ResilientHttpClient (robots.txt, rate limit, fallback)
-│           ├── archive_extractor.py    # ArchiveExtractor (descompresión en memoria RAM)
-│           ├── browser_driver.py       # PlaywrightDriver (pool acotado anti-OOM)
-│           └── concurrency.py          # AsyncWorkerPool (Bulkhead HTTP vs Browser)
-├── tests/                              # Suite de 19 pruebas unitarias y de integración
-└── output/                             # Salidas particionadas por fuente y reportes
-    ├── finrural/                       # mapa_finrural.json, _tree.json, _compact.json
-    ├── bbv/                            # mapa_bbv.json, _tree.json, _compact.json
-    ├── reports/                        # Reportes históricos run_<id>.json
-    └── state/                          # Snapshots y observaciones maestras
+```powershell
+$archive = '.\output\data-transfer\20261024-cierre\catalog-json-nueva-captura.zip'
+if (Test-Path -LiteralPath $archive) { throw 'No sobrescribir una captura' }
+.\.venv\Scripts\python.exe -B -m zipfile -c $archive .\output\catalog
+Get-FileHash -LiteralPath $archive -Algorithm SHA256
 ```
 
----
+El hash publicado corresponde al ZIP entregado; una captura posterior debe llevar su propio hash. La API puede leer durante la captura, pero no debe haber un proceso de adquisición/sincronización escribiendo el catálogo. La captura de esta entrega se contrastó archivo por archivo con la línea base.
 
-## 4. Fuentes Configuradas Activas (`config/sources.yaml`)
+## 3. Servir el catálogo recibido
 
-Actualmente el sistema cuenta con dos fuentes completamente parametrizadas y operativas:
-
-1. **`finrural`**: Asociación de Instituciones Financieras de Desarrollo
-   * **Workflow:** `html`
-   * **Semillas:** Reporte financiero mensual y archivo histórico.
-   * **Cadencia:** `MONTHLY`
-   * **Filtros:** Exclusión de rutas de contenido institucional (`/historia/`, `/mision-y-vision/`, etc.).
-2. **`bbv`**: Bolsa Boliviana de Valores
-   * **Workflow:** `commented_html`
-   * **Semillas:** Estadísticas, memorias anuales, información financiera y hechos relevantes.
-   * **Cadencia:** `DAILY`
-
----
-
-## 5. Modos de Uso y Ejecución
-
-### 5.1 Ejecutar Proceso Batch de Exploración (Crawler)
-
-Ejecutar todas las fuentes configuradas respetando o forzando cadencia:
-```bash
-# Ejecutar evaluando elegibilidad de cadencia:
-.venv/bin/python3 -m apps.crawler_batch.main --config config/sources.yaml
-
-# Forzar ejecución inmediata de todas las fuentes:
-.venv/bin/python3 -m apps.crawler_batch.main --config config/sources.yaml --force
-
-# Ejecutar únicamente una fuente específica:
-.venv/bin/python3 -m apps.crawler_batch.main --config config/sources.yaml --source finrural --force
-.venv/bin/python3 -m apps.crawler_batch.main --config config/sources.yaml --source bbv --force
+```powershell
+.\.venv\Scripts\python.exe -m apps.catalog_api.main --backend json --catalog-dir .\output\received-20261024\catalog --host 127.0.0.1 --port 8000
 ```
 
-### 5.2 Ejecutar la API del Catálogo (FastAPI)
+Si se trabaja con el catálogo original de este checkout, usar `--catalog-dir .\output\catalog`. El directorio explícito debe contener `state/sources.json` o el CLI rechaza arrancar. No hace falta una nueva carga para consultar los datos recibidos. Detener con Ctrl+C.
 
-Iniciar el servicio de consulta de solo lectura:
-```bash
-.venv/bin/python3 -m apps.catalog_api.main
-```
-O mediante Uvicorn:
-```bash
-.venv/bin/uvicorn apps.catalog_api.main:app --host 0.0.0.0 --port 8000 --reload
-```
+Swagger: http://127.0.0.1:8000/docs · OpenAPI: http://127.0.0.1:8000/openapi.json
 
-#### Endpoints Disponibles (Sección 14.2):
-* `GET /catalog/sources`: Catálogo de fuentes y su estado de salud operativo (`ACTIVE`, `WARNING`, `SUSPENDED`).
-* `GET /catalog/sources/{source_id}`: Detalle operativo y metadatos de una fuente.
-* `GET /catalog/resources?source_id={id}`: Consulta de recursos descubiertos con filtros básicos.
-* `GET /runs`: Listado histórico de corridas ejecutadas.
-* `GET /runs/{run_id}/report`: Reporte de corrida estructurado (`RunReport`) con métricas de cobertura.
-* `GET /sources/{source_id}/observations`: Historial de observaciones y cambios (`CHANGED`, `NO_CHANGE`) de una fuente.
+| Método y endpoint | Contrato efectivo |
+|---|---|
+| `GET /health` | 200 `{"status":"UP","service":"catalog-api-facade"}`; 503 si falla la comprobación del repositorio |
+| `GET /catalog/sources` | Array `Source[]`; `limit=1..500`, `offset>=0` opcionales; orden por identidad al paginar |
+| `GET /catalog/sources/{source_id}` | Una fuente; 404 si no existe |
+| `GET /catalog/resources?source_id=bbv` | Array RAW `ResourceCandidate[]`, excluye REMOVED; filtro antes de paginar, `limit=1..500`, `offset>=0`. Sin paginación conserva la lista legacy |
+| `GET /catalog/sources/{source_id}/projection` | `schema_version=datax-projection-1.0`, `run_id`, `resources_hash`, totales, `families[].periods[].representations[]` seleccionados y `decisions` con exclusiones. Completa, sin paginación; 404 sin fuente/snapshot |
+| `GET /runs?limit=20` | Reportes recientes `RunReport[]`; máximo 100 |
+| `GET /runs/{run_id}` | Estado `Run`, sin hostname/PID del owner; 404 si no existe |
+| `GET /runs/{run_id}/report` | `RunReport`, resultados con `execution_status` y métricas `coverage`; 404 si no existe |
+| `GET /sources/{source_id}/observations?limit=20` | Observaciones; máximo 50; puede devolver lista vacía |
+| `POST /mapping/inspect` | `{"url":"https://example.org/data.csv"}` o `{"resource":{"url":"https://example.org/data.csv"}}`; normalización, tipo inferido, SHA de URL, `hash_basis=normalized_url`, `inspection_mode=offline_url_only` |
 
----
+Parámetros/payload inválidos →422; métodos no implementados →405. El `run_id` de REST es el **crawl_run_id**, no el `pipeline_run_id` que agrupa fuentes/artefactos B13. Una fuente fallida puede conservar RAW anterior: revisar fechas, observaciones y `run_id`, no inferir adquisición nueva del número de recursos.
 
-## 6. Persistencia y Contratos de Salida (Sección 10 y 16)
+La proyección REST usa agrupamiento técnico por defecto; una exportación puede aplicar `config/grouping/{fuente}.yaml`. BCB demuestra esa diferencia: **585 seleccionados REST frente a 537 legacy exportados**, sobre el mismo snapshot; 48 quedan fuera del contrato de agrupamiento de exportación. No son resultados intercambiables. No hay `/search/export-index` ni `UnifiedSearchDocument` acordados; frontend/Bridge/Interno quedan fuera del alcance.
 
-Siguiendo el modelo de datos de la arquitectura (equivalente a las colecciones `snapshots`, `resource_candidates` y `run_reports` en MongoDB), el adaptador de persistencia local genera en `output/`:
+Validación del consumidor, con la API encendida en otra terminal:
 
-* **Snapshot de Inventario Bruto (`output/<source_id>/mapa_<source_id>.json`):** Catálogo de recursos candidatos descubiertos (`ResourceCandidate`), metadatos de cabeceras HTTP, vigencia temporal inferida y hash de integridad SHA-256.
-* **Reporte de Corrida (`output/reports/run_<id>.json`):** Registro formal de auditoría (`RunReport`) con las métricas de cobertura (`CoverageStats`), fuentes procesadas, omitidas o fallidas y resultado de novedades (`CHANGED` / `NO_CHANGE`).
-* *Vistas complementarias locales:* Para compatibilidad con visores de prototipos previos, el adaptador local también exporta proyecciones en árbol (`_tree.json`) y compacta (`_compact.json`).
-
----
-
-## 7. Rendimiento y Concurrencia (Benchmark)
-
-Gracias a la integración del **`AsyncWorkerPool`** con aislamiento Bulkhead y paralelización de solicitudes `HEAD`, el rendimiento se optimizó drásticamente:
-
-| Métrica | Modo Secuencial Anterior | Con `AsyncWorkerPool` | Factor de Mejora |
-| :--- | :---: | :---: | :---: |
-| **Tiempo Corrida Batch (2 Fuentes)** | **7 min 49 s** | **1 min 36 s** | **~5x más rápido** ⚡ |
-| **FINRURAL (130 recursos en 30 páginas)** | ~2 min 39 s | **~37 s** | ~4.3x |
-| **BBV (235 recursos en 30 páginas)** | ~5 min 10 s | **~58 s** | ~5.3x |
-| **Concurrencia entre Fuentes** | Serial (1 por 1) | **Paralela al unísono** | Multidominio |
-| **Consulta de Cabeceras HTTP** | Serial (1s delay forzado) | **Pool concurrente (8 workers)** | Keep-alive |
-
----
-
-## 8. Suite de Pruebas Automatizadas
-
-El proyecto cuenta con **19 pruebas unitarias y de integración** que cubren el 100% de las capas arquitectónicas:
-
-```bash
-.venv/bin/pytest tests/ -v
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+(Invoke-RestMethod 'http://127.0.0.1:8000/catalog/resources?source_id=bbv').Count
+(Invoke-RestMethod http://127.0.0.1:8000/catalog/sources/bbv/projection).total_selected_resources
+(Invoke-RestMethod http://127.0.0.1:8000/catalog/sources/finrural/projection).total_selected_resources
 ```
 
-```text
-tests/test_archive_extractor.py::test_is_archive PASSED                  [  5%]
-tests/test_archive_extractor.py::test_inspect_zip_archive_bytes PASSED   [ 10%]
-tests/test_archive_extractor.py::test_inspect_tar_archive_bytes PASSED   [ 15%]
-tests/test_async_worker_pool.py::test_async_worker_pool_bulkhead_isolation PASSED [ 21%]
-tests/test_async_worker_pool.py::test_async_worker_pool_run_parallel PASSED [ 26%]
-tests/test_catalog_api.py::test_catalog_api_routes PASSED                [ 31%]
-tests/test_domain_health_and_cadence.py::test_health_state_machine_success_and_failure PASSED [ 36%]
-tests/test_domain_health_and_cadence.py::test_cadence_conservative_adaptation PASSED [ 42%]
-tests/test_domain_models.py::test_resource_candidate_model PASSED        [ 47%]
-tests/test_domain_models.py::test_snapshot_immutability_and_dump PASSED  [ 52%]
-tests/test_domain_models.py::test_source_model_validation PASSED         [ 57%]
-tests/test_domain_models.py::test_source_config_defaults PASSED          [ 63%]
-tests/test_local_json_adapter.py::test_local_json_adapter_snapshot_export PASSED [ 68%]
-tests/test_local_json_adapter.py::test_local_json_adapter_run_report PASSED [ 73%]
-tests/test_orchestrator_hexagonal.py::test_orchestrator_incremental_runs_and_change_detection PASSED [ 78%]
-tests/test_sources_config.py::test_sources_yaml_structure PASSED         [ 84%]
-tests/test_url_normalizer.py::test_url_normalization PASSED              [ 89%]
-tests/test_url_normalizer.py::test_url_hash_deterministic PASSED         [ 94%]
-tests/test_workflow_registry.py::test_registry_resolution PASSED         [100%]
+Esperado: UP, 1000, 931, 135. Los enlaces son referencias: estas consultas no prueban que un servidor remoto permita descargarlos.
 
-======================== 19 passed in 0.40s ========================
+## 4. Comandos operativos existentes
+
+Durante este cierre **no se ejecutó adquisición**. Los siguientes comandos documentan la operación futura cuando corresponda; no son necesarios para arrancar la API sobre el ZIP recibido. B13 procesa las fuentes **secuencialmente por subprocess**; no hay una medición de velocidad global ni adquisición paralela certificada.
+
+Plan sin red ni escrituras:
+
+```powershell
+.\.venv\Scripts\python.exe -m apps.b13_pipeline.main plan --mode incremental --source-ids finrural,bbv --catalog-dir .\output\catalog --json
 ```
+
+Carga inicial con ID NUEVO, actualización con otro ID y recuperación de la misma selección/mismo catálogo:
+
+```powershell
+.\.venv\Scripts\python.exe -m apps.b13_pipeline.main run --mode initial --run-id nueva-carga-01 --source-ids finrural,bbv --catalog-dir .\output\catalog
+.\.venv\Scripts\python.exe -m apps.b13_pipeline.main run --mode incremental --run-id nueva-actualizacion-01 --source-ids finrural,bbv --catalog-dir .\output\catalog
+.\.venv\Scripts\python.exe -m apps.b13_pipeline.main run --run-id nueva-actualizacion-01 --resume --catalog-dir .\output\catalog
+```
+
+No reutilizar IDs históricos como IDs nuevos. Sin `--source-ids` se consideran las 45 operativas; FDTA conserva `IDENTITY_UNVERIFIED_FDTA_ICCO`. Las siete status-only no se adquieren. `--resume` protege modo, selección, catálogo y fingerprints; una adquisición completa no se reabre por copiar evidencia. API/custom reinician semillas; HTML/comentarios/JavaScript tienen cursor durable. Los cinco alias habilitados conservan identidad y procedencia, sin certificar una exportación lógica nueva por compartir evidencia física.
+
+Empaquetar los exports corregidos existentes, sin adquisiciones HTTP ni sobrescritura del paquete histórico:
+
+```powershell
+.\.venv\Scripts\python.exe -B -m apps.b13_pipeline.main package-offline --run-id carga-20261023-171007 --projection-dir output/resource-quality/carga-20261023-171007/reprojection-verified --catalog-dir output/catalog
+```
+
+Genera otra revisión con el mismo empaquetador B13 y `schema_version=1.0.0`; exige snapshots/exports de origen coherentes, no basta el ZIP del catálogo recibido. La revisión ya entregada es `20261023T221057_2179de3cbbaa`: ZIP `output/b13-pipeline/carga-20261023-171007/datax-package/datax_package_20261023T221057_2179de3cbbaa.zip`, SHA-256 `e836c1c1fe2550a12ec67d52704e0923336d14d9d4c4e196cbd747aacf65d995`. Manifest en `datax-package/revisions/20261023T221057_2179de3cbbaa/manifest.json`. No se repitió el empaquetado B13 en este cierre.
+
+`apps.catalog_sync` valida/importa evidencias JSON hacia Mongo, sin recrawl; `--check` es offline y `--commit` escribe en Mongo. No es una herramienta de transferencia del catálogo JSON. No se ejecutó importación ni despliegue.
+
+## 5. QA y pendientes de aceptación
+
+Repetir tests offline con una carpeta TEMP nueva; dejar `DATAX_BROWSER_INTEGRATION` sin activar:
+
+```powershell
+$env:PYTHONDONTWRITEBYTECODE = '1'
+Remove-Item Env:DATAX_BROWSER_INTEGRATION -ErrorAction SilentlyContinue
+$qa = Join-Path $env:TEMP ('datax-qa-' + [guid]::NewGuid().ToString('N').Substring(0,8))
+New-Item -ItemType Directory -Path $qa | Out-Null
+.\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider --basetemp (Join-Path $qa 't') --cov=src --cov=apps --cov-report=term --cov-fail-under=80
+```
+
+La suite usa mocks y fixtures localhost; la prueba de Chromium real de 30 páginas es opt-in y se omite. Los tests de Mongo/Compose/scheduler verifican contratos o fakes y no certifican infraestructura real. HU-14/15 siguen EXTERNAL_BLOCKER; HU-21 FAIL por falta de cinco SUCCESS actuales y MEFP bajo hold. Quedan decisiones sobre Pydantic/dataclasses, 250 vs 500 URLs y cadencia.
+
+**HU-16 / Decisión 1.2:** los scripts `ops/run_scheduled_batch.ps1` y `register_windows_scheduler.ps1` son opt-in, no se activaron ni se certificaron en operación. El bloqueo por archivo solo cubre el mismo host/directorio, no coordinación multinodo. El wrapper histórico ejecuta el batch directo, no B13; no asumir que genera paquetes DATAX. Docker/Mongo reales y aceptación del consumidor requieren su propia validación; no bloquean la entrega del código desarrollado.
+
+La selección exacta propuesta está en [docs/git_stage_selection.txt](docs/git_stage_selection.txt). Excluye datos, entorno, runtime y temporales. No se creó rama, no hay stage, commit ni push ejecutados por este cierre.

@@ -17,7 +17,7 @@ from urllib.parse import urlparse, urlunparse
 import yaml
 
 
-URL_KEYS = ("normalized_url", "raw_url", "url", "url_descarga", "download_url")
+URL_KEYS = ("normalized_url", "url", "url_descarga", "download_url", "raw_url")
 
 
 def canonical_host(url: str) -> str:

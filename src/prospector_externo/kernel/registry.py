@@ -6,6 +6,10 @@ from typing import Dict, Type, Optional
 from prospector_externo.kernel.workflow_port import SourceWorkflow
 
 
+class WorkflowNotFoundError(ValueError):
+    """La configuración solicita una estrategia que no está registrada."""
+
+
 class WorkflowRegistry:
     """Administra y resuelve las implementaciones de SourceWorkflow registradas."""
 
@@ -25,7 +29,7 @@ class WorkflowRegistry:
         key = name.lower()
         if key not in cls._registry:
             available = list(cls._registry.keys())
-            raise ValueError(f"Workflow '{name}' no registrado. Disponibles: {available}")
+            raise WorkflowNotFoundError(f"Workflow '{name}' no registrado. Disponibles: {available}")
         return cls._registry[key]()
 
     @classmethod

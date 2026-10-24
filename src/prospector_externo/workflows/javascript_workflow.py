@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Set
 
 from prospector_externo.domain.discovery import DiscoveryFrontier, StopReason
@@ -26,6 +27,8 @@ class JavascriptWorkflow(BaseWorkflow):
     HTTP compartido, de modo que robots, redirects, budgets y politeness siguen
     siendo política central del Prospector.
     """
+
+    supports_discovery_resume = True
 
     def __init__(self) -> None:
         super().__init__()
@@ -61,13 +64,19 @@ class JavascriptWorkflow(BaseWorkflow):
             config.source_id,
         )
 
-        coverage = CoverageStats()
-        discovered_urls: List[DiscoveredUrl] = []
-        resources: List[ResourceCandidate] = []
-        seen_resource_keys: Set[str] = set()
+        frontier, pagination, resources, discovered_urls, coverage = self._open_discovery(config)
+        seen_resource_keys: Set[str] = {resource.resource_key for resource in resources}
         session = self._session()
-        frontier = DiscoveryFrontier(config)
-        frontier.seed(config.seeds or [config.entrypoint])
+        if isinstance(self.browser_driver, PlaywrightDriver):
+            self.browser_driver.allowed_hosts = session.allowed_redirect_hosts
+        self._capture_partial(resources, discovered_urls, coverage, frontier=frontier, pagination=pagination)
+
+        def checkpoint(finished=False):
+            self._checkpoint_discovery(config=config, frontier=frontier, pagination=pagination,
+                                       resources=resources, discovered_urls=discovered_urls,
+                                       coverage=coverage, finished=finished)
+
+        checkpoint()
 
         if not self.browser_driver.is_available():
             msg = (
@@ -83,20 +92,36 @@ class JavascriptWorkflow(BaseWorkflow):
                 coverage=coverage,
             )
 
+        # Playwright sync mantiene greenlets asociados al hilo que los creó.
+        # Executor exclusivo: start, render y close ocurren en el MISMO hilo.
+        browser_executor = ThreadPoolExecutor(
+            max_workers=1, thread_name_prefix=f"prospector-js-{config.source_id}"
+        )
+        loop = asyncio.get_running_loop()
         successful_pages = 0
+        # Solo las navegaciones efectivamente enviadas al navegador consumen
+        # max_browser_pages. Un HTTP_404/403 en preflight consume presupuesto
+        # HTTP y se informa en cobertura, pero no abrió Chromium.
+        browser_attempts = 0
         last_error = None
         page_limit_reached = False
 
         try:
-            while successful_pages + coverage.urls_failed < config.max_browser_pages:
+            while browser_attempts < config.max_browser_pages:
+                checkpoint()
                 if session.budget.remaining <= 0:
-                    frontier.stop_reason = StopReason.REQUEST_BUDGET
-                    last_error = "REQUEST_BUDGET_EXCEEDED"
+                    if frontier.pending_count:
+                        frontier.stop_reason = StopReason.REQUEST_BUDGET
+                        last_error = "REQUEST_BUDGET_EXCEEDED"
+                    elif frontier.stop_reason is None:
+                        frontier.stop_reason = StopReason.QUEUE_EXHAUSTED
                     break
 
                 item = frontier.pop()
                 if item is None:
                     break
+
+                checkpoint()  # El DOM en vuelo se reproduce tras un corte.
 
                 # Preflight read-only. Además de comprobar reachability, aplica
                 # robots/redirect/politeness antes de abrir el navegador.
@@ -105,11 +130,14 @@ class JavascriptWorkflow(BaseWorkflow):
                     conditional=False,
                     accept="text/html,application/xhtml+xml;q=0.9,*/*;q=0.1",
                 )
-                frontier.mark_visited(item)
                 coverage.pages_visited += 1
                 coverage.requests_total = session.requests_used
 
                 if error:
+                    if error in {"ROBOTS_DISALLOWED", "HTTP_404", "HTTP_410"}:
+                        frontier.mark_visited(item)
+                    else:
+                        frontier.defer(item)
                     last_error = error
                     self._record_error(coverage, error)
                     logger.warning(
@@ -123,12 +151,15 @@ class JavascriptWorkflow(BaseWorkflow):
                         break
                     continue
 
+                browser_attempts += 1
                 try:
-                    dom_html, render_error = await asyncio.to_thread(
+                    dom_html, render_error = await loop.run_in_executor(
+                        browser_executor,
                         self.browser_driver.fetch_dynamic_dom,
                         item.normalized_url,
                     )
                 except Exception as exc:
+                    frontier.defer(item)
                     last_error = self._render_exception_code(exc)
                     self._record_error(coverage, last_error)
                     logger.error(
@@ -139,6 +170,7 @@ class JavascriptWorkflow(BaseWorkflow):
                     )
                     continue
                 if render_error or not dom_html:
+                    frontier.defer(item)
                     last_error = render_error or "EMPTY_DYNAMIC_DOM"
                     self._record_error(coverage, "PLAYWRIGHT_ERROR")
                     logger.warning(
@@ -150,6 +182,7 @@ class JavascriptWorkflow(BaseWorkflow):
                     continue
 
                 successful_pages += 1
+                frontier.mark_visited(item)
                 discovered_urls.append(
                     DiscoveredUrl(
                         normalized_url=item.normalized_url,
@@ -184,18 +217,24 @@ class JavascriptWorkflow(BaseWorkflow):
                         )
 
             if (
-                successful_pages + coverage.urls_failed
-                >= config.max_browser_pages
+                browser_attempts >= config.max_browser_pages
                 and frontier.pending_count > 0
             ):
                 page_limit_reached = True
 
         finally:
-            self.browser_driver.close()
+            # El cierre entra a la misma cola que los renders. Incluso si hay
+            # cancelación, no se llama a Playwright desde el hilo del event loop.
+            close_future = loop.run_in_executor(browser_executor, self.browser_driver.close)
+            try:
+                await asyncio.shield(close_future)
+            finally:
+                browser_executor.shutdown(wait=False, cancel_futures=False)
 
         coverage.resources_found = len(resources)
         coverage.urls_discovered = frontier.discovered_count
         coverage.urls_rejected = frontier.rejected_count
+        coverage.resources_limit_reached = frontier.rejection_count("MAX_RESOURCES")
         coverage.urls_pending = frontier.pending_count
         coverage.spider_traps_blocked = frontier.spider_traps_blocked
         coverage.query_variants_blocked = frontier.query_variants_blocked
@@ -204,7 +243,14 @@ class JavascriptWorkflow(BaseWorkflow):
         if page_limit_reached:
             coverage.stop_reason = "BROWSER_PAGE_LIMIT"
         elif frontier.stop_reason is not None:
-            coverage.stop_reason = frontier.stop_reason
+            coverage.stop_reason = frontier.stop_reason.value
+        elif frontier.pending_count == 0:
+            coverage.stop_reason = "QUEUE_EXHAUSTED"
+
+        await self._inspect_archive_candidates(
+            config=config, resources=resources, coverage=coverage,
+        )
+        checkpoint(finished=True)
 
         logger.info(
             "JavascriptWorkflow finalizado para [%s]: %d recursos hallados.",
@@ -219,6 +265,7 @@ class JavascriptWorkflow(BaseWorkflow):
                 resources=resources,
                 discovered_urls=discovered_urls,
                 coverage=coverage,
+                metadata=self._discovery_metadata,
                 failure_code=last_error or "PLAYWRIGHT_ERROR",
                 error_message=(
                     "No se pudo renderizar ninguna página dinámica "
@@ -232,4 +279,5 @@ class JavascriptWorkflow(BaseWorkflow):
             resources=resources,
             discovered_urls=discovered_urls,
             coverage=coverage,
+            metadata=self._discovery_metadata,
         )

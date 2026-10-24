@@ -74,6 +74,14 @@ def main() -> int:
         default="output/checkpointed",
     )
     run_cmd.add_argument(
+        "--catalog-dir",
+        default=str(Path(__file__).resolve().parents[2] / "output"),
+        help="Directorio compartido de state/ y reports/ de la Catalog API.",
+    )
+    run_cmd.add_argument("--force", action="store_true")
+    run_cmd.add_argument("--source-ids", default=None, help="IDs lógicos separados por coma")
+    run_cmd.add_argument("--eligible-only", action="store_true", help="Evalúa salud/cadencia antes de adquirir")
+    run_cmd.add_argument(
         "--report",
         default=".runtime/checkpointed_batch/latest.json",
     )
@@ -146,10 +154,15 @@ def main() -> int:
         store=store,
         work_dir=Path(args.work_dir) / checkpoint["run_id"],
         output_root=Path(args.output_dir) / checkpoint["run_id"],
+        catalog_dir=Path(args.catalog_dir) if args.backend != "mongo" else None,
+        force=args.force,
         execution_map=execution_map,
         max_sources=args.max_sources,
         fail_fast=args.fail_fast,
         python_executable=sys.executable,
+        selected_source_ids=args.source_ids.split(",") if args.source_ids else None,
+        respect_eligibility=args.eligible_only,
+        resume=args.resume,
     )
 
     write_report(Path(args.report), report)
@@ -160,6 +173,7 @@ def main() -> int:
     print("=" * 78)
     print(f"Ejecutadas:    {len(report['executed_source_ids'])}")
     print(f"Exitosas:      {report['succeeded']}")
+    print(f"Parciales:     {report['partial']}")
     print(f"Fallidas:      {report['failed']}")
     print(
         "Pendientes/retry: "
@@ -169,7 +183,7 @@ def main() -> int:
     print()
     print(f"JSON: {args.report}")
 
-    return 0 if report["failed"] == 0 else 2
+    return 0 if report["failed"] == 0 and report["partial"] == 0 else 2
 
 
 if __name__ == "__main__":

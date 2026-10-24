@@ -154,6 +154,27 @@ class ApiDetector:
     """Detección conservadora de formatos y referencias API."""
 
     @staticmethod
+    def auxiliary_reason(url: str) -> Optional[str]:
+        """Known CMS infrastructure, not a blanket WordPress/API exclusion.
+
+        Keep these references in discovery/RAW for provenance and navigation.
+        Media, custom routes and extensionless downloads remain candidates.
+        """
+        parsed = urlparse(url)
+        path = parsed.path.rstrip("/")
+        routes = [value.rstrip("/") for key, value in parse_qsl(parsed.query)
+                  if key == "rest_route"]
+        if (path.endswith("/wp-json") and not routes) or "" in routes:
+            return "api_service_index_not_dataset"
+        if path.endswith("/wp-json/oembed/1.0/embed") or "/oembed/1.0/embed" in routes:
+            return "api_auxiliary_oembed"
+        if re.search(r"/wp-json/wp/v2/(?:pages|posts|users)(?:/\d+)?$", path) or any(
+            re.fullmatch(r"/wp/v2/(?:pages|posts|users)(?:/\d+)?", route) for route in routes
+        ):
+            return "api_cms_metadata_not_dataset"
+        return None
+
+    @staticmethod
     def _content_type(headers: Optional[Mapping[str, str]]) -> str:
         if not headers:
             return ""
@@ -301,6 +322,31 @@ class ApiDetector:
         if api_format == "topojson":
             objects = data.get("objects")
             return len(objects) if isinstance(objects, dict) else None
+        # UNData Data Commons Observation API: sus registros no son una lista
+        # raíz, sino series bajo byVariable/byEntity/orderedFacets/observations.
+        # Solo reconocer esta forma explícita; un JSON de configuración del
+        # portal NO equivale a observaciones estadísticas.
+        if api_format == "json" and isinstance(data.get("byVariable"), dict):
+            total = 0
+            for variable in data["byVariable"].values():
+                if not isinstance(variable, dict):
+                    continue
+                entities = variable.get("byEntity")
+                if not isinstance(entities, dict):
+                    continue
+                for entity in entities.values():
+                    if not isinstance(entity, dict):
+                        continue
+                    facets = entity.get("orderedFacets")
+                    if not isinstance(facets, list):
+                        continue
+                    for facet in facets:
+                        if not isinstance(facet, dict):
+                            continue
+                        observations = facet.get("observations")
+                        if isinstance(observations, list):
+                            total += len(observations)
+            return total
         for key in ("features", "items", "data", "results", "records"):
             value = data.get(key)
             if isinstance(value, list):

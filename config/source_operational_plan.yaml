@@ -5,28 +5,26 @@ generated_at_utc: '2026-09-19T01:36:24.747408+00:00'
 custom_sources_resolved: 8
 b8_closed: true
 summary_by_operational_status:
-  ACCESS_RESTRICTED: 1
-  ARCHIVE_ONLY: 1
   IDENTITY_UNRESOLVED: 1
-  NO_PUBLIC_DATA_EVIDENCE: 3
+  NO_PUBLIC_DATA_EVIDENCE: 1
   NO_PUBLIC_DATA_SCOPE: 1
   OPERATIONAL_CUSTOM_DATA_API: 1
   OPERATIONAL_CUSTOM_FORM_RESOURCE: 1
   OPERATIONAL_DATA_API: 1
   OPERATIONAL_HTML_API_DISCOVERY: 8
-  OPERATIONAL_HTTP_HTML: 23
+  OPERATIONAL_HTTP_HTML: 27
   OPERATIONAL_HTTP_HTML_CURATED: 1
   OPERATIONAL_JAVASCRIPT: 6
   RETIRED_HISTORICAL_SOURCE: 3
   TLS_TECHNICAL_HOLD: 1
 summary_by_next_phase:
-  B10_STATUS: 11
-  OPERATIONAL_CONFIG: 41
+  B10_STATUS: 7
+  OPERATIONAL_CONFIG: 45
 summary_by_workflow:
-  UNRESOLVED: 10
+  UNRESOLVED: 7
   api: 1
   custom: 2
-  html: 33
+  html: 36
   javascript: 6
 sources:
 - source_id: anapo
@@ -222,7 +220,7 @@ sources:
   logical_code: FMI
   name: Fondo Monetario Internacional
   historical_entrypoint: https://www.imf.org
-  effective_entrypoint: https://www.imf.org
+  effective_entrypoint: https://data.imf.org/en/datasets/IMF.RES%3AWEO
   lifecycle: CURRENT_ACCESS_RESTRICTED
   physical_probe_source_id: fmi
   baseline_status: EXECUTION_ERROR
@@ -234,13 +232,14 @@ sources:
   browser_status: null
   resource_count: 0
   api_quality: null
-  operational_status: ACCESS_RESTRICTED
-  workflow_strategy: null
+  operational_status: OPERATIONAL_HTTP_HTML
+  workflow_strategy: html
   discover_apis: false
   browser_required: false
   custom_required: false
-  next_phase: B10_STATUS
-  decision_note: Acceso restringido observado; no intentar bypass.
+  next_phase: OPERATIONAL_CONFIG
+  decision_note: 'Lote 12C: datos WEO oficiales, 8 registros temporales; 4 enlaces con cabeceras HTTP 200. Requiere revalidar
+    limpieza de URL con lote 12D y live batch antes de cierre.'
 - source_id: mefp
   logical_code: MEFP
   name: Ministerio de Economía y Finanzas Públicas
@@ -518,13 +517,14 @@ sources:
   browser_status: BROWSER_GENERIC_NETWORK_EVIDENCE
   resource_count: 0
   api_quality: null
-  operational_status: NO_PUBLIC_DATA_EVIDENCE
-  workflow_strategy: null
+  operational_status: OPERATIONAL_HTTP_HTML
+  workflow_strategy: html
   discover_apis: false
   browser_required: false
   custom_required: false
-  next_phase: B10_STATUS
-  decision_note: B8 no encontró evidencia pública suficiente de datasets o recursos descargables.
+  next_phase: OPERATIONAL_CONFIG
+  decision_note: 'Lote 12C: 106 registros DATAX; 4 PDF confirmados por HTTP 200; 1 URL de recorrido fallida. Promocion a discovery
+    HTML, pendiente de live batch final.'
   b8_status: CUSTOM_NO_DATA_EVIDENCE
   b8_route: B10_STATUS
   operational_config: null
@@ -669,13 +669,14 @@ sources:
   browser_status: null
   resource_count: 0
   api_quality: null
-  operational_status: ARCHIVE_ONLY
+  operational_status: OPERATIONAL_HTTP_HTML
   workflow_strategy: html
   discover_apis: false
   browser_required: false
   custom_required: false
-  next_phase: B10_STATUS
-  decision_note: Fuente discontinuada con archivo histórico; no tratar como portal live actual.
+  next_phase: OPERATIONAL_CONFIG
+  decision_note: 'Lote 12C: archivo historico Doing Business del Banco Mundial, 1 ZIP de datos verificado por HTTP 200 y 1
+    registro DATAX. Solo archivo, no publicacion vigente.'
 - source_id: sabsa
   logical_code: SABSA
   name: Servicios de Aeropuertos Bolivianos S.A.
@@ -880,14 +881,14 @@ sources:
   browser_status: null
   resource_count: 0
   api_quality: null
-  operational_status: NO_PUBLIC_DATA_EVIDENCE
-  workflow_strategy: null
+  operational_status: OPERATIONAL_HTTP_HTML
+  workflow_strategy: html
   discover_apis: false
   browser_required: false
   custom_required: false
-  next_phase: B10_STATUS
-  decision_note: La identidad institucional fue reconciliada, pero el sitio actual no expuso evidencia pública suficiente
-    de datos.
+  next_phase: OPERATIONAL_CONFIG
+  decision_note: 'Lote 12C: 23 registros DATAX y 23 referencias PDF; verificacion HEAD restringida por robots.txt. Promocion
+    a discovery HTML sin bypass, pendiente de live batch final.'
   b8_status: CUSTOM_NO_DATA_EVIDENCE
   b8_route: B10_STATUS
   operational_config: null

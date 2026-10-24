@@ -185,8 +185,9 @@ def audit_ready_candidate(row: dict[str, Any]) -> dict[str, Any]:
         }
 
     crawl_dir_value = stage.get("crawl_output_dir")
-    crawl_dir = Path(crawl_dir_value) if isinstance(crawl_dir_value, str) else Path()
-    resources = extract_unique_resources(crawl_dir)
+    # Una ruta ausente no autoriza inventariar el directorio del proceso.
+    crawl_dir = Path(crawl_dir_value) if isinstance(crawl_dir_value, str) and crawl_dir_value else None
+    resources = extract_unique_resources(crawl_dir) if crawl_dir is not None else []
 
     ext_counts = Counter(item["extension"] or "(none)" for item in resources)
     api_resources = [item for item in resources if item["api"]]

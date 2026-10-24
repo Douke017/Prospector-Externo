@@ -1,0 +1,1627 @@
+{
+  "schema_version": "datax-operational-closure-1.0",
+  "baseline_directory": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-baseline-20261022-alw63fp1",
+  "global_crawl_executed": false,
+  "fixture_evidence_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\operational_evidence.json",
+  "fixture_evidence_sha256": "a2c67cf3b88ff0f34773209c20f25f52ec6b37256d8efcdfa4bbfb3321835c56",
+  "fixture_project": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0",
+  "physical_crawled": 2,
+  "server_calls": {
+    "/robots.txt": 3,
+    "/alpha": 1,
+    "/next": 1,
+    "/bravo": 1
+  },
+  "fixture_native_api_startup_seconds": 1.370115599995188,
+  "fixture_api_process_closed": true,
+  "fixture_modes": {
+    "initial": {
+      "pipeline_run_id": "initial",
+      "status": "PARTIAL",
+      "catalog_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\catalog",
+      "package": null,
+      "timings": {
+        "crawl_seconds": 1.7385188000043854,
+        "mongo_sync_seconds": null,
+        "package_seconds": 1.1999996786471456e-05,
+        "projection_seconds": 0.43877790000260575,
+        "total_seconds": 2.267829399999755
+      },
+      "sources": [
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\alpha\\downstream\\legacy_estadisticas.json",
+          "classification": "DATAX_READY",
+          "coverage_complete": false,
+          "crawl_run_id": "run_20261023_043945_e56813",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha",
+          "execution_status": "PARTIAL_SUCCESS",
+          "failure_code": "REQUEST_BUDGET_REACHED",
+          "legacy_records": 1,
+          "logical_source_id": "alpha",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 1,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\reports\\run_run_20261023_043945_e56813.json",
+          "requests_this_attempt": 2,
+          "requests_total": 2,
+          "selection_status": "SELECTED",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\state\\snapshots\\alpha_run_20261023_043945_e56813.json",
+          "stop_reason": "REQUEST_BUDGET_REACHED",
+          "telemetry": {
+            "cpu_seconds_sampled": 0.984375,
+            "finished_at": "2026-10-23T04:39:46.255586+00:00",
+            "measurement": "sampled_process_tree",
+            "rss_peak_sampled_bytes": 60563456,
+            "samples": 12,
+            "started_at": "2026-10-23T04:39:44.975399+00:00",
+            "wall_seconds": 1.2801902999999584
+          },
+          "urls_failed": 0,
+          "urls_pending": 1
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "classification": "PENDING",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias",
+          "execution_status": null,
+          "failure_code": null,
+          "legacy_records": 0,
+          "logical_source_id": "alpha_alias",
+          "physical_source_id": null,
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "ALREADY_COMPLETED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "classification": "PENDING",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo",
+          "execution_status": null,
+          "failure_code": null,
+          "legacy_records": 0,
+          "logical_source_id": "bravo",
+          "physical_source_id": null,
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "ALREADY_COMPLETED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "classification": "EXTERNAL_BLOCKER",
+          "coverage_complete": null,
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\fdta_valles",
+          "execution_status": "SKIPPED",
+          "failure_code": "IDENTITY_UNVERIFIED_FDTA_ICCO",
+          "legacy_records": 0,
+          "logical_source_id": "fdta_valles",
+          "physical_source_id": "alpha",
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "HELD",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        }
+      ],
+      "batch_report": {
+        "acquisition_holds": {
+          "fdta_valles": "IDENTITY_UNVERIFIED_FDTA_ICCO"
+        },
+        "acquisitions_executed": 1,
+        "acquisitions_reused": [],
+        "candidate_count": 1,
+        "executed_source_ids": [
+          "alpha"
+        ],
+        "failed": 0,
+        "legacy_config_unverified": [],
+        "partial": 1,
+        "recovered_interrupted": [],
+        "remaining_resume_candidates": [
+          "alpha_alias",
+          "bravo",
+          "alpha"
+        ],
+        "run_id": "initial",
+        "skipped_eligibility": {},
+        "succeeded": 0
+      }
+    },
+    "resumed": {
+      "pipeline_run_id": "initial",
+      "status": "READY",
+      "catalog_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\catalog",
+      "package": {
+        "cross_physical_duplicate_groups": 0,
+        "duplicate_groups": 1,
+        "legacy_records": 5,
+        "package_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\b13-pipeline\\initial\\datax-package\\latest",
+        "package_ready": true,
+        "zip_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\b13-pipeline\\initial\\datax-package\\datax_package.zip",
+        "zip_sha256": "ceebdd19fb7d5a0781e46ac199224b7fdc690d4c31ba1873c1f689b36b7380cb"
+      },
+      "timings": {
+        "crawl_seconds": 3.2609528999964823,
+        "mongo_sync_seconds": null,
+        "package_seconds": 0.06290699999954086,
+        "projection_seconds": 1.2729324999963865,
+        "total_seconds": 4.689155399995798
+      },
+      "sources": [
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\alpha\\downstream\\legacy_estadisticas.json",
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043948_063b5b",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha",
+          "execution_status": "SUCCESS",
+          "failure_code": null,
+          "legacy_records": 2,
+          "logical_source_id": "alpha",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 2,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\reports\\run_run_20261023_043948_063b5b.json",
+          "requests_this_attempt": 2,
+          "requests_total": 2,
+          "selection_status": "SELECTED",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\state\\snapshots\\alpha_run_20261023_043948_063b5b.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "cpu_seconds_sampled": 0.921875,
+            "finished_at": "2026-10-23T04:39:48.851731+00:00",
+            "measurement": "sampled_process_tree",
+            "rss_peak_sampled_bytes": 60989440,
+            "samples": 12,
+            "started_at": "2026-10-23T04:39:47.541640+00:00",
+            "wall_seconds": 1.310094600004959
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": "alpha",
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\alpha\\downstream\\legacy_estadisticas.json",
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043948_063b5b",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias",
+          "execution_status": "SUCCESS",
+          "failure_code": null,
+          "legacy_records": 2,
+          "logical_source_id": "alpha_alias",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 2,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\reports\\run_run_20261023_043948_063b5b.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "ALREADY_COMPLETED",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\state\\snapshots\\alpha_run_20261023_043948_063b5b.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\bravo\\downstream\\legacy_estadisticas.json",
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043949_a514d1",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo",
+          "execution_status": "SUCCESS",
+          "failure_code": null,
+          "legacy_records": 1,
+          "logical_source_id": "bravo",
+          "pages_visited": 1,
+          "physical_source_id": "bravo",
+          "projection_error": null,
+          "raw_resource_count": 1,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\reports\\run_run_20261023_043949_a514d1.json",
+          "requests_this_attempt": 2,
+          "requests_total": 2,
+          "selection_status": "SELECTED",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\state\\snapshots\\bravo_run_20261023_043949_a514d1.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "cpu_seconds_sampled": 0.984375,
+            "finished_at": "2026-10-23T04:39:50.378122+00:00",
+            "measurement": "sampled_process_tree",
+            "rss_peak_sampled_bytes": 60878848,
+            "samples": 13,
+            "started_at": "2026-10-23T04:39:48.965417+00:00",
+            "wall_seconds": 1.4127082000049995
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "classification": "EXTERNAL_BLOCKER",
+          "coverage_complete": null,
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\fdta_valles",
+          "execution_status": "SKIPPED",
+          "failure_code": "IDENTITY_UNVERIFIED_FDTA_ICCO",
+          "legacy_records": 0,
+          "logical_source_id": "fdta_valles",
+          "physical_source_id": "alpha",
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "HELD",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        }
+      ],
+      "batch_report": {
+        "acquisition_holds": {
+          "fdta_valles": "IDENTITY_UNVERIFIED_FDTA_ICCO"
+        },
+        "acquisitions_executed": 2,
+        "acquisitions_reused": [
+          {
+            "acquisition_reused_from": "alpha",
+            "crawler_run_id": "run_20261023_043948_063b5b",
+            "logical_source_id": "alpha_alias",
+            "physical_source_id": "alpha"
+          }
+        ],
+        "candidate_count": 3,
+        "executed_source_ids": [
+          "alpha",
+          "alpha_alias",
+          "bravo"
+        ],
+        "failed": 0,
+        "legacy_config_unverified": [],
+        "partial": 0,
+        "recovered_interrupted": [],
+        "remaining_resume_candidates": [],
+        "run_id": "initial",
+        "skipped_eligibility": {},
+        "succeeded": 3
+      }
+    },
+    "incremental": {
+      "pipeline_run_id": "incremental",
+      "status": "READY",
+      "catalog_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\catalog",
+      "package": {
+        "cross_physical_duplicate_groups": 0,
+        "duplicate_groups": 1,
+        "legacy_records": 5,
+        "package_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\b13-pipeline\\incremental\\datax-package\\latest",
+        "package_ready": true,
+        "zip_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\b13-pipeline\\incremental\\datax-package\\datax_package.zip",
+        "zip_sha256": "86500ea17e1e7924de924e1122874df689f594b76fa43a3eda49a56d540fde90"
+      },
+      "timings": {
+        "crawl_seconds": 0.41456230000039795,
+        "mongo_sync_seconds": null,
+        "package_seconds": 0.061194400004751515,
+        "projection_seconds": 0.0213177000041469,
+        "total_seconds": 0.5816981000025407
+      },
+      "sources": [
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "classification": "EXTERNAL_BLOCKER",
+          "coverage_complete": null,
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\incremental\\fdta_valles",
+          "execution_status": "SKIPPED",
+          "failure_code": "IDENTITY_UNVERIFIED_FDTA_ICCO",
+          "legacy_records": 0,
+          "logical_source_id": "fdta_valles",
+          "physical_source_id": "alpha",
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "HELD",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\alpha\\downstream\\legacy_estadisticas.json",
+          "artifact_reused": true,
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043948_063b5b",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha",
+          "execution_status": "SKIPPED",
+          "failure_code": null,
+          "legacy_records": 2,
+          "logical_source_id": "alpha",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 2,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\reports\\run_run_20261023_043948_063b5b.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "SKIPPED",
+          "skip_reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\state\\snapshots\\alpha_run_20261023_043948_063b5b.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\alpha\\downstream\\legacy_estadisticas.json",
+          "artifact_reused": true,
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043948_063b5b",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias",
+          "execution_status": "SKIPPED",
+          "failure_code": null,
+          "legacy_records": 2,
+          "logical_source_id": "alpha_alias",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 2,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\reports\\run_run_20261023_043948_063b5b.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "SKIPPED",
+          "skip_reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\state\\snapshots\\alpha_run_20261023_043948_063b5b.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\bravo\\downstream\\legacy_estadisticas.json",
+          "artifact_reused": true,
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043949_a514d1",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo",
+          "execution_status": "SKIPPED",
+          "failure_code": null,
+          "legacy_records": 1,
+          "logical_source_id": "bravo",
+          "pages_visited": 1,
+          "physical_source_id": "bravo",
+          "projection_error": null,
+          "raw_resource_count": 1,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\reports\\run_run_20261023_043949_a514d1.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "SKIPPED",
+          "skip_reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:50.202040+00:00",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\state\\snapshots\\bravo_run_20261023_043949_a514d1.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "artifact_reused": false,
+          "artifact_status": "NO_VERIFIED_PREVIOUS_DELIVERY",
+          "classification": "SKIPPED",
+          "coverage_complete": null,
+          "execution_status": "SKIPPED",
+          "legacy_records": 0,
+          "logical_source_id": "paused",
+          "physical_source_id": "paused",
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "SKIPPED",
+          "skip_reason": "SUSPENDED: Fuente suspendida por fallos persistentes acumulados",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        }
+      ],
+      "batch_report": {
+        "acquisition_holds": {
+          "fdta_valles": "IDENTITY_UNVERIFIED_FDTA_ICCO"
+        },
+        "acquisitions_executed": 0,
+        "acquisitions_reused": [],
+        "candidate_count": 0,
+        "executed_source_ids": [],
+        "failed": 0,
+        "legacy_config_unverified": [],
+        "partial": 0,
+        "recovered_interrupted": [],
+        "remaining_resume_candidates": [],
+        "run_id": "incremental",
+        "skipped_eligibility": {
+          "alpha": {
+            "physical_source_id": "alpha",
+            "reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00"
+          },
+          "alpha_alias": {
+            "physical_source_id": "alpha",
+            "reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00"
+          },
+          "bravo": {
+            "physical_source_id": "bravo",
+            "reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:50.202040+00:00"
+          },
+          "paused": {
+            "physical_source_id": "paused",
+            "reason": "SUSPENDED: Fuente suspendida por fallos persistentes acumulados"
+          }
+        },
+        "succeeded": 0
+      }
+    },
+    "resume_incremental": {
+      "pipeline_run_id": "incremental",
+      "status": "READY",
+      "catalog_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\catalog",
+      "package": {
+        "cross_physical_duplicate_groups": 0,
+        "duplicate_groups": 1,
+        "legacy_records": 5,
+        "package_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\b13-pipeline\\incremental\\datax-package\\revisions\\20261023T043953_d3316d5bd431",
+        "package_ready": true,
+        "zip_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\b13-pipeline\\incremental\\datax-package\\datax_package_20261023T043953_d3316d5bd431.zip",
+        "zip_sha256": "b9795f76d00e3af503e049f8cb96fdc9cd72795ae86933fb2a88c6a9be07cbb7"
+      },
+      "timings": {
+        "crawl_seconds": 0.38885750000190455,
+        "mongo_sync_seconds": null,
+        "package_seconds": 0.05226140000013402,
+        "projection_seconds": 0.01424080000288086,
+        "total_seconds": 0.540234899999632
+      },
+      "sources": [
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "classification": "EXTERNAL_BLOCKER",
+          "coverage_complete": null,
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\incremental\\fdta_valles",
+          "execution_status": "SKIPPED",
+          "failure_code": "IDENTITY_UNVERIFIED_FDTA_ICCO",
+          "legacy_records": 0,
+          "logical_source_id": "fdta_valles",
+          "physical_source_id": "alpha",
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "HELD",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\alpha\\downstream\\legacy_estadisticas.json",
+          "artifact_reused": true,
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043948_063b5b",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha",
+          "execution_status": "SKIPPED",
+          "failure_code": null,
+          "legacy_records": 2,
+          "logical_source_id": "alpha",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 2,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\reports\\run_run_20261023_043948_063b5b.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "SKIPPED",
+          "skip_reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha\\state\\snapshots\\alpha_run_20261023_043948_063b5b.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\alpha\\downstream\\legacy_estadisticas.json",
+          "artifact_reused": true,
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043948_063b5b",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias",
+          "execution_status": "SKIPPED",
+          "failure_code": null,
+          "legacy_records": 2,
+          "logical_source_id": "alpha_alias",
+          "pages_visited": 1,
+          "physical_source_id": "alpha",
+          "projection_error": null,
+          "raw_resource_count": 2,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\reports\\run_run_20261023_043948_063b5b.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "SKIPPED",
+          "skip_reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\alpha_alias\\state\\snapshots\\alpha_run_20261023_043948_063b5b.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\bravo\\downstream\\legacy_estadisticas.json",
+          "artifact_reused": true,
+          "classification": "DATAX_READY",
+          "coverage_complete": true,
+          "crawl_run_id": "run_20261023_043949_a514d1",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo",
+          "execution_status": "SKIPPED",
+          "failure_code": null,
+          "legacy_records": 1,
+          "logical_source_id": "bravo",
+          "pages_visited": 1,
+          "physical_source_id": "bravo",
+          "projection_error": null,
+          "raw_resource_count": 1,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\reports\\run_run_20261023_043949_a514d1.json",
+          "requests_this_attempt": 0,
+          "requests_total": 2,
+          "selection_status": "SKIPPED",
+          "skip_reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:50.202040+00:00",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-tests\\test_production_cli_initial_re0\\output\\checkpointed\\initial\\bravo\\state\\snapshots\\bravo_run_20261023_043949_a514d1.json",
+          "stop_reason": "QUEUE_EXHAUSTED",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          },
+          "urls_failed": 0,
+          "urls_pending": 0
+        },
+        {
+          "acquisition_reused_from": null,
+          "artifact": null,
+          "artifact_reused": false,
+          "artifact_status": "NO_VERIFIED_PREVIOUS_DELIVERY",
+          "classification": "SKIPPED",
+          "coverage_complete": null,
+          "execution_status": "SKIPPED",
+          "legacy_records": 0,
+          "logical_source_id": "paused",
+          "physical_source_id": "paused",
+          "raw_resource_count": null,
+          "requests_this_attempt": 0,
+          "selection_status": "SKIPPED",
+          "skip_reason": "SUSPENDED: Fuente suspendida por fallos persistentes acumulados",
+          "telemetry": {
+            "measurement": "NO_MEDIDO"
+          }
+        }
+      ],
+      "batch_report": {
+        "acquisition_holds": {
+          "fdta_valles": "IDENTITY_UNVERIFIED_FDTA_ICCO"
+        },
+        "acquisitions_executed": 0,
+        "acquisitions_reused": [],
+        "candidate_count": 0,
+        "executed_source_ids": [],
+        "failed": 0,
+        "legacy_config_unverified": [],
+        "partial": 0,
+        "recovered_interrupted": [],
+        "remaining_resume_candidates": [],
+        "run_id": "incremental",
+        "skipped_eligibility": {
+          "alpha": {
+            "physical_source_id": "alpha",
+            "reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00"
+          },
+          "alpha_alias": {
+            "physical_source_id": "alpha",
+            "reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:48.653672+00:00"
+          },
+          "bravo": {
+            "physical_source_id": "bravo",
+            "reason": "NOT_DUE: Próxima evaluación programada para 2026-10-24T04:39:50.202040+00:00"
+          },
+          "paused": {
+            "physical_source_id": "paused",
+            "reason": "SUSPENDED: Fuente suspendida por fallos persistentes acumulados"
+          }
+        },
+        "succeeded": 0
+      }
+    }
+  },
+  "fixture_api_statuses": {
+    "health": 200,
+    "docs": 200,
+    "openapi": 200,
+    "catalog": 200,
+    "run": 200,
+    "report": 200,
+    "observations": 200,
+    "mapping": 200,
+    "missing": 404,
+    "invalid": 422,
+    "write": 405,
+    "isolated_corruption_health": 503
+  },
+  "qa": {
+    "passed": 696,
+    "skipped": 1,
+    "warnings": 2,
+    "seconds": 126.8,
+    "exit_code": 0,
+    "totals": {
+      "covered_lines": 12174,
+      "num_statements": 15169,
+      "percent_covered": 80.25578482431274,
+      "percent_covered_display": "80",
+      "missing_lines": 2995,
+      "excluded_lines": 11,
+      "percent_statements_covered": 80.25578482431274,
+      "percent_statements_covered_display": "80"
+    },
+    "scope": [
+      "src",
+      "apps"
+    ],
+    "new_exclusions": false,
+    "full_coverage_json": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-verified-coverage.json",
+    "full_coverage_sha256": "e420e0bce21d5621ab99ff4a7f5814c5d82a09bda203f6298bf1d8880a476ffc"
+  },
+  "browser": {
+    "browser_launches": 2,
+    "max_contexts": 1,
+    "active_contexts": 0,
+    "peak_sampled_rss_bytes": 367529984,
+    "blocked_request_types": {
+      "stylesheet": 30,
+      "image": 30,
+      "media": 30,
+      "font": 30
+    },
+    "blocked_scope": 30,
+    "wall_seconds": 56.143,
+    "resources": 30,
+    "pages": 30,
+    "failure_code": null,
+    "server_calls": {
+      "/robots.txt": 1,
+      "/page/0": 2,
+      "/page/1": 2,
+      "/page/2": 2,
+      "/page/3": 2,
+      "/page/4": 2,
+      "/page/5": 2,
+      "/page/6": 2,
+      "/page/7": 2,
+      "/page/8": 2,
+      "/page/9": 2,
+      "/page/10": 2,
+      "/page/11": 2,
+      "/page/12": 2,
+      "/page/13": 2,
+      "/page/14": 2,
+      "/page/15": 2,
+      "/page/16": 2,
+      "/page/17": 2,
+      "/page/18": 2,
+      "/page/19": 2,
+      "/page/20": 2,
+      "/page/21": 2,
+      "/page/22": 2,
+      "/page/23": 2,
+      "/page/24": 2,
+      "/page/25": 2,
+      "/page/26": 2,
+      "/page/27": 2,
+      "/page/28": 2,
+      "/page/29": 2
+    },
+    "passed": 1,
+    "test_seconds": 57.15
+  },
+  "infrastructure": {
+    "checked_at_utc": "2026-10-23T04:25:25.599000+00:00",
+    "docker": "BLOCKED",
+    "mongo": "BLOCKED",
+    "docker_error": "open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+    "mongo_ports": {
+      "27017": "timed out",
+      "27018": "timed out"
+    }
+  },
+  "public_canary": {
+    "project": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6",
+    "fixture_only": false,
+    "physical_sources_crawled": 1,
+    "source_ids": [
+      "bbv"
+    ],
+    "attempts": [
+      {
+        "attempt": 1,
+        "exit_code": 3,
+        "command": [
+          "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\.venv\\Scripts\\python.exe",
+          "-B",
+          "-m",
+          "apps.b13_pipeline.main",
+          "--project-dir",
+          "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6",
+          "run",
+          "--run-id",
+          "bbv_canary",
+          "--source-ids",
+          "bbv",
+          "--catalog-dir",
+          "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\catalog",
+          "--mode",
+          "initial"
+        ],
+        "wall_seconds": 11.056380500005616,
+        "pipeline_run_id": "bbv_canary",
+        "status": "READY",
+        "timings": {
+          "crawl_seconds": 9.97090400000161,
+          "mongo_sync_seconds": null,
+          "package_seconds": 0.11303899999620626,
+          "projection_seconds": 0.42476280000119004,
+          "total_seconds": 10.72900149999623
+        },
+        "source": {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv\\bbv\\downstream\\legacy_estadisticas.json",
+          "classification": "DATAX_READY",
+          "coverage_complete": false,
+          "crawl_run_id": "run_20261023_041908_446133",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv",
+          "execution_status": "PARTIAL_SUCCESS",
+          "failure_code": "REQUEST_BUDGET_REACHED",
+          "legacy_records": 49,
+          "logical_source_id": "bbv",
+          "pages_visited": 3,
+          "physical_source_id": "bbv",
+          "projection_error": null,
+          "raw_resource_count": 49,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv\\reports\\run_run_20261023_041908_446133.json",
+          "requests_this_attempt": 4,
+          "requests_total": 4,
+          "selection_status": "SELECTED",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv\\state\\snapshots\\bbv_run_20261023_041908_446133.json",
+          "stop_reason": "REQUEST_BUDGET_REACHED",
+          "telemetry": {
+            "cpu_seconds_sampled": 1.3125,
+            "finished_at": "2026-10-23T04:19:16.652360+00:00",
+            "measurement": "sampled_process_tree",
+            "rss_peak_sampled_bytes": 66363392,
+            "samples": 83,
+            "started_at": "2026-10-23T04:19:07.402098+00:00",
+            "wall_seconds": 9.250266999995802
+          },
+          "urls_failed": 0,
+          "urls_pending": 24
+        },
+        "paths": {
+          "attempt": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\.runtime\\b13_pipeline\\bbv_canary\\attempts\\20261023T041906_5a8665e7268c",
+          "catalog": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\catalog",
+          "log": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\.runtime\\b13_pipeline\\bbv_canary\\checkpointed_batch.log",
+          "state": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\.runtime\\b13_pipeline\\bbv_canary\\state.json"
+        },
+        "package": {
+          "cross_physical_duplicate_groups": 0,
+          "duplicate_groups": 0,
+          "legacy_records": 49,
+          "package_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\b13-pipeline\\bbv_canary\\datax-package\\latest",
+          "package_ready": true,
+          "zip_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\b13-pipeline\\bbv_canary\\datax-package\\datax_package.zip",
+          "zip_sha256": "ef1b68aa28a548bb2e387c3ebcc8848a09825ab7cf932b572a97da4a77cdc2a4"
+        }
+      },
+      {
+        "attempt": 2,
+        "exit_code": 3,
+        "command": [
+          "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\.venv\\Scripts\\python.exe",
+          "-B",
+          "-m",
+          "apps.b13_pipeline.main",
+          "--project-dir",
+          "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6",
+          "run",
+          "--run-id",
+          "bbv_canary",
+          "--source-ids",
+          "bbv",
+          "--catalog-dir",
+          "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\catalog",
+          "--mode",
+          "initial",
+          "--resume"
+        ],
+        "wall_seconds": 21.681111999998393,
+        "pipeline_run_id": "bbv_canary",
+        "status": "READY",
+        "timings": {
+          "crawl_seconds": 20.408830099993793,
+          "mongo_sync_seconds": null,
+          "package_seconds": 0.14833259999431903,
+          "projection_seconds": 0.5840016000001924,
+          "total_seconds": 21.36375830000179
+        },
+        "source": {
+          "acquisition_reused_from": null,
+          "artifact": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv\\bbv\\downstream\\legacy_estadisticas.json",
+          "classification": "DATAX_READY",
+          "coverage_complete": false,
+          "crawl_run_id": "run_20261023_041919_b3dc76",
+          "evidence_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv",
+          "execution_status": "PARTIAL_SUCCESS",
+          "failure_code": "REQUEST_BUDGET_REACHED",
+          "legacy_records": 73,
+          "logical_source_id": "bbv",
+          "pages_visited": 3,
+          "physical_source_id": "bbv",
+          "projection_error": null,
+          "raw_resource_count": 73,
+          "report_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv\\reports\\run_run_20261023_041919_b3dc76.json",
+          "requests_this_attempt": 4,
+          "requests_total": 4,
+          "selection_status": "SELECTED",
+          "snapshot_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\checkpointed\\bbv_canary\\bbv\\state\\snapshots\\bbv_run_20261023_041919_b3dc76.json",
+          "stop_reason": "REQUEST_BUDGET_REACHED",
+          "telemetry": {
+            "cpu_seconds_sampled": 1.203125,
+            "finished_at": "2026-10-23T04:19:38.105149+00:00",
+            "measurement": "sampled_process_tree",
+            "rss_peak_sampled_bytes": 70062080,
+            "samples": 178,
+            "started_at": "2026-10-23T04:19:18.299572+00:00",
+            "wall_seconds": 19.805590400006622
+          },
+          "urls_failed": 0,
+          "urls_pending": 23
+        },
+        "paths": {
+          "attempt": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\.runtime\\b13_pipeline\\bbv_canary\\attempts\\20261023T041917_bad0f78cc31c",
+          "catalog": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\catalog",
+          "log": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\.runtime\\b13_pipeline\\bbv_canary\\checkpointed_batch.log",
+          "state": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\.runtime\\b13_pipeline\\bbv_canary\\state.json"
+        },
+        "package": {
+          "cross_physical_duplicate_groups": 0,
+          "duplicate_groups": 0,
+          "legacy_records": 73,
+          "package_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\b13-pipeline\\bbv_canary\\datax-package\\revisions\\20261023T041938_4db122a8a26a",
+          "package_ready": true,
+          "zip_path": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\b13-pipeline\\bbv_canary\\datax-package\\datax_package_20261023T041938_4db122a8a26a.zip",
+          "zip_sha256": "c92716680e0329e1fa74632efd3d06bc562db658827758b99ec709c2833885ba"
+        }
+      }
+    ],
+    "package_checks": [
+      {
+        "attempt": 1,
+        "manifest": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\b13-pipeline\\bbv_canary\\datax-package\\latest\\manifest.json",
+        "legacy_records": 49,
+        "checksums_valid": true,
+        "zip_valid": true,
+        "zip_sha256": "ef1b68aa28a548bb2e387c3ebcc8848a09825ab7cf932b572a97da4a77cdc2a4"
+      },
+      {
+        "attempt": 2,
+        "manifest": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\output\\b13-pipeline\\bbv_canary\\datax-package\\revisions\\20261023T041938_4db122a8a26a\\manifest.json",
+        "legacy_records": 73,
+        "checksums_valid": true,
+        "zip_valid": true,
+        "zip_sha256": "c92716680e0329e1fa74632efd3d06bc562db658827758b99ec709c2833885ba"
+      }
+    ],
+    "api": {
+      "command": [
+        "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\.venv\\Scripts\\python.exe",
+        "-B",
+        "-m",
+        "apps.catalog_api.main",
+        "--backend",
+        "json",
+        "--catalog-dir",
+        "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\catalog",
+        "--port",
+        "57854"
+      ],
+      "startup_seconds": 2.004768700004206,
+      "catalog_dir": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-host-i0al94p6\\catalog",
+      "responses": {
+        "/health": {
+          "status_code": 200,
+          "body": {
+            "status": "UP",
+            "service": "catalog-api-facade"
+          }
+        },
+        "/docs": {
+          "status_code": 200,
+          "body": {
+            "served": true
+          }
+        },
+        "/openapi.json": {
+          "status_code": 200,
+          "body": {
+            "served": true
+          }
+        },
+        "/catalog/sources": {
+          "status_code": 200,
+          "body": [
+            {
+              "source_id": "bbv",
+              "name": "Bolsa Boliviana de Valores (BBV)",
+              "entrypoint": "https://www.bbv.com.bo",
+              "workflow": "commented_html",
+              "health_status": "ACTIVE",
+              "update_category": "DAILY",
+              "consecutive_failures": 0,
+              "first_failure_at": null,
+              "consecutive_no_change_count": 0,
+              "weekly_no_change_count": 0,
+              "weekly_no_change_since_at": null,
+              "last_policy_run_id": "run_20261023_041919_b3dc76",
+              "catalog_last_run_id": "run_20261023_041919_b3dc76",
+              "catalog_scope_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+              "next_eligible_at": "2026-10-23T08:19:37.873474Z",
+              "last_run_id": "run_20261023_041919_b3dc76",
+              "last_run_at": "2026-10-23T04:19:37.873474Z",
+              "created_at": "2026-10-23T04:19:16.483296Z",
+              "updated_at": "2026-10-23T04:19:37.873474Z"
+            }
+          ]
+        },
+        "/catalog/sources/bbv": {
+          "status_code": 200,
+          "body": {
+            "source_id": "bbv",
+            "name": "Bolsa Boliviana de Valores (BBV)",
+            "entrypoint": "https://www.bbv.com.bo",
+            "workflow": "commented_html",
+            "health_status": "ACTIVE",
+            "update_category": "DAILY",
+            "consecutive_failures": 0,
+            "first_failure_at": null,
+            "consecutive_no_change_count": 0,
+            "weekly_no_change_count": 0,
+            "weekly_no_change_since_at": null,
+            "last_policy_run_id": "run_20261023_041919_b3dc76",
+            "catalog_last_run_id": "run_20261023_041919_b3dc76",
+            "catalog_scope_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+            "next_eligible_at": "2026-10-23T08:19:37.873474Z",
+            "last_run_id": "run_20261023_041919_b3dc76",
+            "last_run_at": "2026-10-23T04:19:37.873474Z",
+            "created_at": "2026-10-23T04:19:16.483296Z",
+            "updated_at": "2026-10-23T04:19:37.873474Z"
+          }
+        },
+        "/catalog/resources?source_id=bbv&limit=2&offset=0": {
+          "status_code": 200,
+          "body": [
+            {
+              "resource_key": "0291d871e03e7be00a8ad50d4d578b1dc804f0aac201836f0439cb04fbe5ceab",
+              "url": "https://www.bbv.com.bo/wp-content/uploads/2025/07/EEFF-BBV.pdf",
+              "source_id": "bbv",
+              "title": "Descargar",
+              "file_extension": ".pdf",
+              "content_type": null,
+              "content_length_bytes": null,
+              "last_modified_header": null,
+              "etag": null,
+              "discovered_from_url": "https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera-2024/",
+              "extracted_from_archive": null,
+              "period_label": "2025-06",
+              "content_hash": null,
+              "change_status": "NEW",
+              "consecutive_absences": 0,
+              "discovered_at": "2026-10-23T04:19:23.076403Z",
+              "raw_url": "https://www.bbv.com.bo/wp-content/uploads/2025/07/EEFF-BBV.pdf",
+              "discovery_method": "commented_html_link",
+              "anchor_text": "Descargar",
+              "context_text": "Estados Financieros de Junio 2025 30/06/2025 17/07/2025 Descargar",
+              "http_status": null,
+              "resource_type": "file",
+              "api": null
+            },
+            {
+              "resource_key": "04cb29f99a3387ca54547fe5a003606d6f9d791c2c7d5e82194f1fff119378a0",
+              "url": "https://www.bbv.com.bo/wp-content/uploads/2025/03/BBV-Memoria-2023-05-FINAL-1.pdf",
+              "source_id": "bbv",
+              "title": "2023 23",
+              "file_extension": ".pdf",
+              "content_type": null,
+              "content_length_bytes": null,
+              "last_modified_header": null,
+              "etag": null,
+              "discovered_from_url": "https://www.bbv.com.bo/acerca-de-la-bolsa/memorias-anuales/",
+              "extracted_from_archive": null,
+              "period_label": "2023",
+              "content_hash": null,
+              "change_status": "UNCHANGED",
+              "consecutive_absences": 0,
+              "discovered_at": "2026-10-23T04:19:14.406781Z",
+              "raw_url": "https://www.bbv.com.bo/wp-content/uploads/2025/03/BBV-Memoria-2023-05-FINAL-1.pdf",
+              "discovery_method": "commented_html_link",
+              "anchor_text": "2023 23",
+              "context_text": "2004 04 2005 05 2006 06 2007 07 2008 08 2009 09 2010 10 2011 11 2012 12 2013 13 2014 14 2015 15 2016 16 2017 17 2018 18 2019 19 2020 20 2021 21 2022 22 2023 23 2024 24 2025 25",
+              "http_status": null,
+              "resource_type": "file",
+              "api": null
+            }
+          ]
+        },
+        "/runs": {
+          "status_code": 200,
+          "body": [
+            {
+              "run_id": "run_20261023_041919_b3dc76",
+              "started_at": "2026-10-23T04:19:19.060899Z",
+              "finished_at": "2026-10-23T04:19:38.001601Z",
+              "sources_selected": 1,
+              "sources_processed": 1,
+              "sources_skipped": 0,
+              "sources_failed": 0,
+              "sources_with_changes": 1,
+              "sources_without_changes": 0,
+              "source_results": [
+                {
+                  "observation_id": "dc211461-994a-4d1b-bec2-8d51ab26cebd",
+                  "source_id": "bbv",
+                  "run_id": "run_20261023_041919_b3dc76",
+                  "discovery_cycle_id": "64bb24d3ca28482f9c3eead293ebb8d3",
+                  "discovery_profile_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+                  "resume_status": "RESTORED",
+                  "workflow": "commented_html",
+                  "execution_status": "PARTIAL_SUCCESS",
+                  "content_status": "CHANGED",
+                  "failure_code": "REQUEST_BUDGET_REACHED",
+                  "skip_reason": null,
+                  "robots_override_applied": false,
+                  "robots_override_reason": null,
+                  "coverage": {
+                    "pages_visited": 3,
+                    "resumed_from_checkpoint": true,
+                    "urls_visited_before_resume": 3,
+                    "urls_discovered": 102,
+                    "resources_found": 73,
+                    "urls_rejected": 40,
+                    "urls_failed": 0,
+                    "urls_pending": 23,
+                    "resources_limit_reached": 0,
+                    "requests_total": 4,
+                    "http_403": 0,
+                    "http_429": 0,
+                    "timeouts": 0,
+                    "robots_disallowed": 0,
+                    "sitemap_documents": 0,
+                    "sitemap_urls": 0,
+                    "sitemap_errors": 0,
+                    "spider_traps_blocked": 0,
+                    "query_variants_blocked": 0,
+                    "pagination_pages": 0,
+                    "pagination_families_stopped": 0,
+                    "api_endpoints": 0,
+                    "api_documentation_found": 0,
+                    "openapi_documents": 0,
+                    "api_non_get_operations_skipped": 0,
+                    "api_auth_required": 0,
+                    "api_unresolved_operations": 0,
+                    "api_pages_visited": 0,
+                    "api_records_sampled": 0,
+                    "api_pagination_stopped": 0,
+                    "api_documents_probed": 0,
+                    "api_document_errors": 0,
+                    "archive_inspected": 0,
+                    "archive_members_found": 0,
+                    "archive_inspection_errors": 0,
+                    "archive_inspection_deferred": 0,
+                    "stop_reason": "REQUEST_BUDGET_REACHED"
+                  },
+                  "next_eligible_at": null,
+                  "observed_at": "2026-10-23T04:19:37.873474Z"
+                }
+              ]
+            },
+            {
+              "run_id": "run_20261023_041908_446133",
+              "started_at": "2026-10-23T04:19:08.310548Z",
+              "finished_at": "2026-10-23T04:19:16.576622Z",
+              "sources_selected": 1,
+              "sources_processed": 1,
+              "sources_skipped": 0,
+              "sources_failed": 0,
+              "sources_with_changes": 1,
+              "sources_without_changes": 0,
+              "source_results": [
+                {
+                  "observation_id": "a64d2385-d0ac-4f9b-98cf-f051a428e0a2",
+                  "source_id": "bbv",
+                  "run_id": "run_20261023_041908_446133",
+                  "discovery_cycle_id": "64bb24d3ca28482f9c3eead293ebb8d3",
+                  "discovery_profile_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+                  "resume_status": "NO_CHECKPOINT_RESTART",
+                  "workflow": "commented_html",
+                  "execution_status": "PARTIAL_SUCCESS",
+                  "content_status": "CHANGED",
+                  "failure_code": "REQUEST_BUDGET_REACHED",
+                  "skip_reason": null,
+                  "robots_override_applied": false,
+                  "robots_override_reason": null,
+                  "coverage": {
+                    "pages_visited": 3,
+                    "resumed_from_checkpoint": false,
+                    "urls_visited_before_resume": 0,
+                    "urls_discovered": 76,
+                    "resources_found": 49,
+                    "urls_rejected": 24,
+                    "urls_failed": 0,
+                    "urls_pending": 24,
+                    "resources_limit_reached": 0,
+                    "requests_total": 4,
+                    "http_403": 0,
+                    "http_429": 0,
+                    "timeouts": 0,
+                    "robots_disallowed": 0,
+                    "sitemap_documents": 0,
+                    "sitemap_urls": 0,
+                    "sitemap_errors": 0,
+                    "spider_traps_blocked": 0,
+                    "query_variants_blocked": 0,
+                    "pagination_pages": 0,
+                    "pagination_families_stopped": 0,
+                    "api_endpoints": 0,
+                    "api_documentation_found": 0,
+                    "openapi_documents": 0,
+                    "api_non_get_operations_skipped": 0,
+                    "api_auth_required": 0,
+                    "api_unresolved_operations": 0,
+                    "api_pages_visited": 0,
+                    "api_records_sampled": 0,
+                    "api_pagination_stopped": 0,
+                    "api_documents_probed": 0,
+                    "api_document_errors": 0,
+                    "archive_inspected": 0,
+                    "archive_members_found": 0,
+                    "archive_inspection_errors": 0,
+                    "archive_inspection_deferred": 0,
+                    "stop_reason": "REQUEST_BUDGET_REACHED"
+                  },
+                  "next_eligible_at": null,
+                  "observed_at": "2026-10-23T04:19:16.483197Z"
+                }
+              ]
+            }
+          ]
+        },
+        "/sources/bbv/observations?limit=2": {
+          "status_code": 200,
+          "body": [
+            {
+              "observation_id": "dc211461-994a-4d1b-bec2-8d51ab26cebd",
+              "source_id": "bbv",
+              "run_id": "run_20261023_041919_b3dc76",
+              "discovery_cycle_id": "64bb24d3ca28482f9c3eead293ebb8d3",
+              "discovery_profile_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+              "resume_status": "RESTORED",
+              "workflow": "commented_html",
+              "execution_status": "PARTIAL_SUCCESS",
+              "content_status": "CHANGED",
+              "failure_code": "REQUEST_BUDGET_REACHED",
+              "skip_reason": null,
+              "robots_override_applied": false,
+              "robots_override_reason": null,
+              "coverage": {
+                "pages_visited": 3,
+                "resumed_from_checkpoint": true,
+                "urls_visited_before_resume": 3,
+                "urls_discovered": 102,
+                "resources_found": 73,
+                "urls_rejected": 40,
+                "urls_failed": 0,
+                "urls_pending": 23,
+                "resources_limit_reached": 0,
+                "requests_total": 4,
+                "http_403": 0,
+                "http_429": 0,
+                "timeouts": 0,
+                "robots_disallowed": 0,
+                "sitemap_documents": 0,
+                "sitemap_urls": 0,
+                "sitemap_errors": 0,
+                "spider_traps_blocked": 0,
+                "query_variants_blocked": 0,
+                "pagination_pages": 0,
+                "pagination_families_stopped": 0,
+                "api_endpoints": 0,
+                "api_documentation_found": 0,
+                "openapi_documents": 0,
+                "api_non_get_operations_skipped": 0,
+                "api_auth_required": 0,
+                "api_unresolved_operations": 0,
+                "api_pages_visited": 0,
+                "api_records_sampled": 0,
+                "api_pagination_stopped": 0,
+                "api_documents_probed": 0,
+                "api_document_errors": 0,
+                "archive_inspected": 0,
+                "archive_members_found": 0,
+                "archive_inspection_errors": 0,
+                "archive_inspection_deferred": 0,
+                "stop_reason": "REQUEST_BUDGET_REACHED"
+              },
+              "next_eligible_at": null,
+              "observed_at": "2026-10-23T04:19:37.873474Z"
+            },
+            {
+              "observation_id": "a64d2385-d0ac-4f9b-98cf-f051a428e0a2",
+              "source_id": "bbv",
+              "run_id": "run_20261023_041908_446133",
+              "discovery_cycle_id": "64bb24d3ca28482f9c3eead293ebb8d3",
+              "discovery_profile_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+              "resume_status": "NO_CHECKPOINT_RESTART",
+              "workflow": "commented_html",
+              "execution_status": "PARTIAL_SUCCESS",
+              "content_status": "CHANGED",
+              "failure_code": "REQUEST_BUDGET_REACHED",
+              "skip_reason": null,
+              "robots_override_applied": false,
+              "robots_override_reason": null,
+              "coverage": {
+                "pages_visited": 3,
+                "resumed_from_checkpoint": false,
+                "urls_visited_before_resume": 0,
+                "urls_discovered": 76,
+                "resources_found": 49,
+                "urls_rejected": 24,
+                "urls_failed": 0,
+                "urls_pending": 24,
+                "resources_limit_reached": 0,
+                "requests_total": 4,
+                "http_403": 0,
+                "http_429": 0,
+                "timeouts": 0,
+                "robots_disallowed": 0,
+                "sitemap_documents": 0,
+                "sitemap_urls": 0,
+                "sitemap_errors": 0,
+                "spider_traps_blocked": 0,
+                "query_variants_blocked": 0,
+                "pagination_pages": 0,
+                "pagination_families_stopped": 0,
+                "api_endpoints": 0,
+                "api_documentation_found": 0,
+                "openapi_documents": 0,
+                "api_non_get_operations_skipped": 0,
+                "api_auth_required": 0,
+                "api_unresolved_operations": 0,
+                "api_pages_visited": 0,
+                "api_records_sampled": 0,
+                "api_pagination_stopped": 0,
+                "api_documents_probed": 0,
+                "api_document_errors": 0,
+                "archive_inspected": 0,
+                "archive_members_found": 0,
+                "archive_inspection_errors": 0,
+                "archive_inspection_deferred": 0,
+                "stop_reason": "REQUEST_BUDGET_REACHED"
+              },
+              "next_eligible_at": null,
+              "observed_at": "2026-10-23T04:19:16.483197Z"
+            }
+          ]
+        },
+        "/runs/run_20261023_041919_b3dc76": {
+          "status_code": 200,
+          "body": {
+            "run_id": "run_20261023_041919_b3dc76",
+            "pipeline_run_id": "bbv_canary",
+            "started_at": "2026-10-23T04:19:19.060899Z",
+            "status": "PARTIAL",
+            "finished_at": "2026-10-23T04:19:38.001601Z",
+            "selected_source_ids": [
+              "bbv"
+            ],
+            "sources_selected": 1,
+            "sources_processed": 1,
+            "sources_failed": 0,
+            "sources_skipped": 0,
+            "failure_code": null,
+            "legacy_inferred": false
+          }
+        },
+        "/runs/run_20261023_041919_b3dc76/report": {
+          "status_code": 200,
+          "body": {
+            "run_id": "run_20261023_041919_b3dc76",
+            "started_at": "2026-10-23T04:19:19.060899Z",
+            "finished_at": "2026-10-23T04:19:38.001601Z",
+            "sources_selected": 1,
+            "sources_processed": 1,
+            "sources_skipped": 0,
+            "sources_failed": 0,
+            "sources_with_changes": 1,
+            "sources_without_changes": 0,
+            "source_results": [
+              {
+                "observation_id": "dc211461-994a-4d1b-bec2-8d51ab26cebd",
+                "source_id": "bbv",
+                "run_id": "run_20261023_041919_b3dc76",
+                "discovery_cycle_id": "64bb24d3ca28482f9c3eead293ebb8d3",
+                "discovery_profile_fingerprint": "49fed637001a0fc5ab28b71a287ebd165a38c053efe2f65fc70134952c231cb3",
+                "resume_status": "RESTORED",
+                "workflow": "commented_html",
+                "execution_status": "PARTIAL_SUCCESS",
+                "content_status": "CHANGED",
+                "failure_code": "REQUEST_BUDGET_REACHED",
+                "skip_reason": null,
+                "robots_override_applied": false,
+                "robots_override_reason": null,
+                "coverage": {
+                  "pages_visited": 3,
+                  "resumed_from_checkpoint": true,
+                  "urls_visited_before_resume": 3,
+                  "urls_discovered": 102,
+                  "resources_found": 73,
+                  "urls_rejected": 40,
+                  "urls_failed": 0,
+                  "urls_pending": 23,
+                  "resources_limit_reached": 0,
+                  "requests_total": 4,
+                  "http_403": 0,
+                  "http_429": 0,
+                  "timeouts": 0,
+                  "robots_disallowed": 0,
+                  "sitemap_documents": 0,
+                  "sitemap_urls": 0,
+                  "sitemap_errors": 0,
+                  "spider_traps_blocked": 0,
+                  "query_variants_blocked": 0,
+                  "pagination_pages": 0,
+                  "pagination_families_stopped": 0,
+                  "api_endpoints": 0,
+                  "api_documentation_found": 0,
+                  "openapi_documents": 0,
+                  "api_non_get_operations_skipped": 0,
+                  "api_auth_required": 0,
+                  "api_unresolved_operations": 0,
+                  "api_pages_visited": 0,
+                  "api_records_sampled": 0,
+                  "api_pagination_stopped": 0,
+                  "api_documents_probed": 0,
+                  "api_document_errors": 0,
+                  "archive_inspected": 0,
+                  "archive_members_found": 0,
+                  "archive_inspection_errors": 0,
+                  "archive_inspection_deferred": 0,
+                  "stop_reason": "REQUEST_BUDGET_REACHED"
+                },
+                "next_eligible_at": null,
+                "observed_at": "2026-10-23T04:19:37.873474Z"
+              }
+            ]
+          }
+        },
+        "POST /mapping/inspect": {
+          "status_code": 200,
+          "body": {
+            "normalized_url": "https://www.bbv.com.bo/wp-content/uploads/2026/10/Tarifario_vigente.pdf",
+            "file_extension": ".pdf",
+            "resource_type": "file",
+            "url_sha256": "1bbbfa6a2cdf420a74ce5bf4209fb3f6b4f1846593cc996ceb19e29b5f4611f2",
+            "hash_basis": "normalized_url",
+            "inspection_mode": "offline_url_only"
+          }
+        }
+      },
+      "resource_count": 73,
+      "negative_statuses": {
+        "missing": 404,
+        "invalid_limit": 422,
+        "write_catalog": 405
+      },
+      "process_closed": true
+    },
+    "first_package_preserved": true
+  },
+  "sandbox_public_attempt": {
+    "project": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-public-20261022-6vedf2s3",
+    "exit_code": 2,
+    "status": "FAILED",
+    "failure_code": "ROBOTS_UNREACHABLE",
+    "preserved": true,
+    "note": "Reattempt outside sandbox used a NEW host-owned directory because sandbox/host TEMP ACLs prevent shared access; no TLS/robots controls disabled."
+  },
+  "git_final": {
+    "branch": "fix/prospector-cierre",
+    "head": "7a7caead651529297737db941d84511b0f6533bf",
+    "tracked_modified": 70,
+    "untracked": 1118,
+    "index_empty": true,
+    "commits": 0,
+    "pushes": 0,
+    "historical_deletions": 0,
+    "untracked_by_root": {
+      ".dockerignore": 1,
+      ".patch12e": 11,
+      ".patch12f": 4,
+      ".patch12g": 8,
+      ".patch12h": 5,
+      ".patch12i": 3,
+      ".runtime": 141,
+      "BACKLOG_USER_STORIES.md": 1,
+      "CODEX_CIERRE_OPERATIVO_UN_COMANDO_Y_API_DATAX.md": 1,
+      "CODEX_CONTINUACION_CIERRE_PROSPECTOR_EXTERNO_DATAX.md": 1,
+      "CODEX_DATAX_MASTER_PROMPT_EN.md": 1,
+      "CODEX_EJECUCION_AUTONOMA_HASTA_CIERRE_DATAX.md": 1,
+      "DATAX_AUDITORIA_Y_PLAN_CIERRE_52_20261015.md": 1,
+      "Dockerfile.api": 1,
+      "Dockerfile.batch": 1,
+      "INSTRUCCIONES_12D.txt": 1,
+      "INSTRUCCIONES_12E.txt": 1,
+      "INSTRUCCIONES_12F.txt": 1,
+      "INSTRUCCIONES_12G.txt": 1,
+      "INSTRUCCIONES_12H.txt": 1,
+      "INSTRUCCIONES_12I.txt": 1,
+      "INSTRUCCIONES_DATAX_12B.txt": 1,
+      "INSTRUCCIONES_DATAX_12C.txt": 1,
+      "apply_batch_12D_urls_exportacion.py": 1,
+      "apply_batch_12E_fuentes.py": 1,
+      "apply_batch_12F_navegacion.py": 1,
+      "apply_batch_12G_sincronizacion.py": 1,
+      "apply_batch_12H_checkpoint_parcial.py": 1,
+      "apply_batch_12I_mapping_inspect.py": 1,
+      "apps": 2,
+      "docker-compose.yml": 1,
+      "docs": 5,
+      "documento-arquitectura-prospector-externo.md": 1,
+      "ops": 2,
+      "output": 881,
+      "src": 1,
+      "tests": 28,
+      "validar_exportacion_fuentes_12C.py": 1,
+      "validar_rescate_fuentes_12B.py": 1
+    }
+  },
+  "baseline_comparison": {
+    "files_copied": 349,
+    "own_changes": [
+      {
+        "path": "README.md",
+        "baseline_sha256": "1f6991b30e633094af349278174a0c11e177baac92dfc72ffe40634041ec8f15",
+        "current_sha256": "a04ed79ca38f2504b87d4c632b86bbd0bc4710ac8980fd266032471f4d0988f2"
+      },
+      {
+        "path": "apps/b13_pipeline/main.py",
+        "baseline_sha256": "b551fb10a81e281ef59062065b4c799b398e0b52756944f42281db266f7ad67f",
+        "current_sha256": "6fd04d2a8166eca088b0d1ba53703bd51428232064da642d364b48a3a0f5299d"
+      },
+      {
+        "path": "apps/catalog_api/main.py",
+        "baseline_sha256": "2510e8008a4a854356f20c61bb8e026de5b9727e1d6f5242e94a8406b0222b6e",
+        "current_sha256": "1b6ec3b640d54fd376c74f8c9615b6c7285c643a59f2ed58c48c00653afdf65a"
+      },
+      {
+        "path": "apps/checkpointed_batch/main.py",
+        "baseline_sha256": "b0d6ebc691ca45ea7885d2b7965a56edc410da87e88b6d4f4f2312fd50c0b3ae",
+        "current_sha256": "0ae11763f8ae715e1fd632cce80870387b316a97a2091b887e938a16345c723e"
+      },
+      {
+        "path": "docs/final_delivery_summary.md",
+        "baseline_sha256": "cedbde6486040706f2ef7835431a08ffde12ee626e9f5fe34df324af6af2cc96",
+        "current_sha256": "f6fbd0901b822c3d5b7585b1ed443e6f7da6a740bb56c1c9f08f2d0671cd875d"
+      },
+      {
+        "path": "src/execution/checkpointed_batch.py",
+        "baseline_sha256": "0699111a02d3052bfbc6fbaca80a11d3a4b78d30310659594b122fffcb466ce5",
+        "current_sha256": "3c912d5ed1383b56c3c1b9b27dd3e9c5cddc1694d7e0a7dd5cb59b2c5d58c210"
+      },
+      {
+        "path": "src/persistence/model.py",
+        "baseline_sha256": "9e6f07b6dbca3998c622237ac0d29a35733e4a1187a21b5e729e8a002fb86d58",
+        "current_sha256": "982c763f81b599274341ea7a1f44046e0905b11d3ea093038bac433073efd47d"
+      },
+      {
+        "path": "tests/test_catalog_api.py",
+        "baseline_sha256": "29b62a7585bc3760863a1068f1fa87effe8af03d45033119f9abf9e9f500765b",
+        "current_sha256": "299af953615b697c6d9e140ed0c8b3188134c17b31887b050d013dce986ab11b"
+      },
+      {
+        "path": "tests/test_checkpointed_batch_batch9b.py",
+        "baseline_sha256": "4faa93185624609a54399a08cd6770166307f26c59a3d9808a210502e55fccae",
+        "current_sha256": "0f4b2edcb1f9356cb03a2e7af989217d30ffba198a4e0c8d1409c4d1979cd04b"
+      },
+      {
+        "path": "tests/test_operational_single_command_e2e.py",
+        "baseline_sha256": null,
+        "current_sha256": "4057d1888f51c4e999a2a956a9c16154062c68ecfe62e465ad17b2a99c69102a"
+      }
+    ]
+  },
+  "preservation": {
+    "retirement_files_verified": 48,
+    "retirement_all_hashes_unchanged": true,
+    "historical_zip_sha256": "f52bf8d1f62d887420517f3d60dd8911f9d3ca5ebf258d5cf58f8369f7326e70",
+    "historical_annex_sha256": "39febaf92ff56e21b5b4b901722ec215d551071859f0cadd295e0df13a86dcfa"
+  },
+  "document_validation": {
+    "hu_rows": 22,
+    "operational_gate_rows": 10,
+    "control_characters": false,
+    "diff_check_exit_code": 0,
+    "powershell_blocks": 14,
+    "powershell_parse_errors": 0,
+    "python_changed_files_parse": true,
+    "manual_acceptance_operations": 5,
+    "read_back_complete": true
+  },
+  "final_handoff": {
+    "path": "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\docs\\final_delivery_summary.md",
+    "sha256": "f6fbd0901b822c3d5b7585b1ed443e6f7da6a740bb56c1c9f08f2d0671cd875d"
+  },
+  "updated_at_utc": "2026-10-23T04:44:26.632214+00:00",
+  "qa_previous_operational": {
+    "passed": 696,
+    "skipped": 1,
+    "warnings": 2,
+    "seconds": 150.63,
+    "exit_code": 0,
+    "totals": {
+      "covered_lines": 12171,
+      "num_statements": 15166,
+      "percent_covered": 80.25187920348147,
+      "percent_covered_display": "80",
+      "missing_lines": 2995,
+      "excluded_lines": 11,
+      "percent_statements_covered": 80.25187920348147,
+      "percent_statements_covered_display": "80"
+    },
+    "scope": [
+      "src",
+      "apps"
+    ],
+    "new_exclusions": false,
+    "full_coverage_json": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-operational-final-coverage.json",
+    "full_coverage_sha256": "1067233f0402293589cf97d7440be49f361ac469b7d8cf934428e37d4bb0f496"
+  },
+  "json_cli_overrides_unreachable_mongo_env": true,
+  "api_help_ignores_unreachable_mongo_env": true
+}

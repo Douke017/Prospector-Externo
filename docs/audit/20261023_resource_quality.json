@@ -1,0 +1,223 @@
+{
+  "run_id": "carga-20261023-171007",
+  "mode": "offline_no_remote_verification",
+  "sources": {
+    "bbv": {
+      "snapshot_run_id": "run_20261023_211309_f27290",
+      "resources_hash": "174ae3568b91f9100526af698f644f90a6c99fd36aa5260767ed97fc43e84079",
+      "raw_before_after": [
+        1000,
+        1000
+      ],
+      "selected_before_after": [
+        577,
+        931
+      ],
+      "changes": {
+        "removed": 69,
+        "added": 423
+      },
+      "invalid_url_causes": {
+        "path_ascii_spaces_only": 423
+      },
+      "invalid_url_whitespace_components": {
+        "path": 423
+      },
+      "api_categories": {
+        "oembed": 68,
+        "prospectus_download": 95,
+        "rating_download": 37
+      },
+      "api_selected_before_after": [
+        200,
+        132
+      ],
+      "api_old_formats": {
+        "json": 34,
+        "api": 166
+      },
+      "exclusion_reasons_after": {
+        "api_auxiliary_oembed": 68,
+        "invalid_download_url": 1
+      },
+      "url_changes_for_retained": 0,
+      "raw_http_count": 1000,
+      "http_projection_matches_offline": true,
+      "raw_pagination_matches": true,
+      "legacy_record_changes": {
+        "added": 423,
+        "removed": 69,
+        "retained_identical": 508
+      },
+      "canonical_url_collisions_after": 0,
+      "rejected_discovery_methods": {
+        "commented_html_link": 423
+      },
+      "rejected_formats": {
+        ".pdf": 423
+      },
+      "old_invalid_url_still_rejected": 0
+    },
+    "finrural": {
+      "snapshot_run_id": "run_20261023_211011_2f85bf",
+      "resources_hash": "64b609f331ff512fd203b36155aba0796a3c6b035ec39a9bec8d8260c225cf15",
+      "raw_before_after": [
+        203,
+        203
+      ],
+      "selected_before_after": [
+        203,
+        135
+      ],
+      "changes": {
+        "removed": 68
+      },
+      "invalid_url_causes": {},
+      "invalid_url_whitespace_components": {},
+      "api_categories": {
+        "service_index": 1,
+        "cms_metadata": 23,
+        "oembed": 44
+      },
+      "api_selected_before_after": [
+        68,
+        0
+      ],
+      "api_old_formats": {
+        "json": 46,
+        "api": 22
+      },
+      "exclusion_reasons_after": {
+        "api_auxiliary_oembed": 44,
+        "api_cms_metadata_not_dataset": 23,
+        "api_service_index_not_dataset": 1
+      },
+      "url_changes_for_retained": 0,
+      "raw_http_count": 203,
+      "http_projection_matches_offline": true,
+      "raw_pagination_matches": true,
+      "legacy_record_changes": {
+        "added": 0,
+        "removed": 68,
+        "retained_identical": 135
+      },
+      "canonical_url_collisions_after": 0,
+      "rejected_discovery_methods": {},
+      "rejected_formats": {},
+      "old_invalid_url_still_rejected": 0
+    }
+  },
+  "protected_file_count": 50,
+  "api_compatibility": {
+    "existing_paths_unchanged": 8,
+    "existing_schemas_unchanged": 17,
+    "added_paths": [
+      "/catalog/sources/{source_id}/projection"
+    ]
+  },
+  "legacy_records_before": 780,
+  "legacy_records_after": 1066,
+  "record_changes": {
+    "removed": 137,
+    "added": 423
+  },
+  "protected_history_unchanged": true,
+  "review_date": "2026-10-23",
+  "timezone": "America/La_Paz",
+  "delivery_status": "FOCUSED_CORRECTION_ONLY_NOT_FINAL_DELIVERY",
+  "availability_claim": "No remote document or endpoint availability verification was performed; selection is reference eligibility only.",
+  "diagnosis": {
+    "historical_space_rejections": 423,
+    "path_ascii_space_only": 423,
+    "whitespace_other_components": 0,
+    "other_whitespace_characters": 0,
+    "other_causes_among_original_423": 0,
+    "previously_selected_ambiguous_backslash_url_removed": 1,
+    "backslash_resource_key": "e764cdfcc6a565c5fdf7e13d6cb2141acfdd8d1bb2c9b7640ce790c6ea05f656",
+    "bbv_api_format_166_included_oembed": 34,
+    "bbv_json_format_additional_oembed": 34
+  },
+  "membership_changes": 560,
+  "previous_legacy_records_retained_identical": 643,
+  "net_record_change": 286,
+  "validation": {
+    "specific_tests": {
+      "passed": 173,
+      "warnings": 2,
+      "log": "output/resource-quality/carga-20261023-171007/tests-specific-verified.log"
+    },
+    "global_tests": {
+      "passed": 745,
+      "skipped": 1,
+      "skip_reason": "Opt-in real Chromium integration test; no browser workflow change",
+      "warnings": 2,
+      "duration_seconds": 169.01,
+      "coverage_scope": [
+        "src",
+        "apps"
+      ],
+      "coverage_threshold_percent": 80,
+      "coverage_percent": 80.38984051978736,
+      "covered_lines": 12249,
+      "total_statements": 15237,
+      "log": "output/resource-quality/carga-20261023-171007/tests-global-verified.log",
+      "coverage": "output/resource-quality/carga-20261023-171007/coverage-verified.json"
+    },
+    "initial_global_regression": {
+      "test": "test_openapi_workflow_never_executes_discovered_operations",
+      "cause": "Generic path encoding escaped an unresolved {id} template",
+      "correction": "Reject placeholders as concrete download URLs while retaining template in discovery; full suite rerun successfully"
+    },
+    "contract": {
+      "tool": "FastAPI TestClient / ASGI",
+      "json_backend": "PASS",
+      "mongo_backend": "PASS_WITH_FAKE_ONLY",
+      "raw_filter_and_pagination": "PASS_ALL_HISTORICAL_RAW_ROWS",
+      "existing_openapi_paths_and_schemas": "EXACTLY_UNCHANGED",
+      "custom_grouping": "New read route uses default technical grouping; optional export grouping remains separate"
+    },
+    "zip_integrity": "PASS"
+  },
+  "historical_zip": {
+    "path": "output/b13-pipeline/carga-20261023-171007/datax-package/datax_package.zip",
+    "sha256": "8ff69dacabcce41c8f24381aa95617d12ff9acddc546e383d2578f0e32fad8af",
+    "record_count": 780
+  },
+  "artifacts": {
+    "isolated_reprojection": "output/resource-quality/carga-20261023-171007/reprojection-verified",
+    "individual_changes": [
+      "output/resource-quality/carga-20261023-171007/reprojection-verified/bbv/changes.json",
+      "output/resource-quality/carga-20261023-171007/reprojection-verified/finrural/changes.json"
+    ],
+    "all_api_classifications": [
+      "output/resource-quality/carga-20261023-171007/reprojection-verified/bbv/api_classification.json",
+      "output/resource-quality/carga-20261023-171007/reprojection-verified/finrural/api_classification.json"
+    ],
+    "hash_baseline": "output/resource-quality/carga-20261023-171007/historical_sha256_before.json",
+    "hash_after": "output/resource-quality/carga-20261023-171007/reprojection-verified/historical_sha256_after.json",
+    "openapi_before": "output/resource-quality/carga-20261023-171007/openapi_before.json",
+    "openapi_after": "output/resource-quality/carga-20261023-171007/reprojection-verified/openapi_after.json"
+  },
+  "files_modified_or_added": [
+    "src/prospector_externo/domain/normalizer.py",
+    "src/prospector_externo/domain/api_discovery.py",
+    "src/prospector_externo/domain/projection.py",
+    "src/prospector_externo/application/legacy_stats_exporter.py",
+    "src/prospector_externo/adapters/api/routes.py",
+    "tests/test_resource_quality.py",
+    "tests/test_batch12d_url_safety.py",
+    "ops/reproject_resource_quality.py",
+    "README.md",
+    "docs/final_delivery_summary.md",
+    "docs/audit/20261023_resource_quality.json"
+  ],
+  "constraints": {
+    "crawling_executed": false,
+    "history_modified": false,
+    "scheduler_activated": false,
+    "tls_or_robots_disabled": false,
+    "internal_frontend_bridge_modified": false,
+    "commit_or_push": false,
+    "file_deletion_commands": false
+  }
+}

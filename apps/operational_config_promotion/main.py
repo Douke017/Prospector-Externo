@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import copy
 import importlib
-import inspect
 import json
 from collections import Counter, OrderedDict
 from pathlib import Path
@@ -278,16 +277,9 @@ def validate_runtime_source_model(
             "validated": 0,
         }
 
-    candidates = []
-    for _, cls in inspect.getmembers(module, inspect.isclass):
-        model_fields = getattr(cls, "model_fields", None)
-        if isinstance(model_fields, dict):
-            names = set(model_fields)
-            if "source_id" in names and (
-                "entrypoint" in names
-                or "workflow" in names
-            ):
-                candidates.append(cls)
+    # Source es estado persistido y acepta campos distintos del perfil runtime.
+    # Aceptarlo como alternativa ocultaba límites inválidos en SourceConfig.
+    candidates = [module.SourceConfig] if hasattr(module, "SourceConfig") else []
 
     if not candidates:
         return {
@@ -333,6 +325,7 @@ def build_candidate(
     current: dict[str, Any],
     plan: dict[str, Any],
     inventory: Any,
+    previous_execution_map: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     current_rows = source_rows(current)
     op_rows = operational_rows(plan)
@@ -402,10 +395,21 @@ def build_candidate(
                 }
             )
 
-    if len(map_rows) != 41:
+    if len(map_rows) != len(op_rows):
         raise ValueError(
-            f"Se esperaban 41 mappings lógicos, generados {len(map_rows)}"
+            f"Se esperaban {len(op_rows)} mappings lógicos, generados {len(map_rows)}"
         )
+
+    previous = {row["logical_source_id"]: row
+                for row in (previous_execution_map or {}).get("sources", [])}
+    for row in map_rows:
+        policy = previous.get(row["logical_source_id"], {})
+        if any(key in policy for key in ("reuse_acquisition", "acquisition_hold")):
+            if policy.get("config_source_id") != row["config_source_id"]:
+                raise ValueError(f"MAPPING_POLICY_REVIEW_REQUIRED {row['logical_source_id']}")
+            for key in ("reuse_acquisition", "acquisition_hold"):
+                if key in policy:
+                    row[key] = policy[key]
 
     mapped_logical = {
         row["logical_source_id"]
@@ -427,7 +431,7 @@ def build_candidate(
 
     execution_map = {
         "schema_version": "source-execution-map-1.0",
-        "logical_operational_sources": 41,
+        "logical_operational_sources": len(op_rows),
         "physical_config_sources": len(output_rows),
         "sources": map_rows,
     }
@@ -494,6 +498,8 @@ def main() -> int:
         "--report",
         required=True,
     )
+    parser.add_argument("--existing-map", default="config/source_execution_map.yaml",
+                        help="Conserva políticas de identidad y reúso del mapa vigente.")
     args = parser.parse_args()
 
     current = load_yaml(Path(args.current_sources))
@@ -515,6 +521,7 @@ def main() -> int:
         current,
         plan,
         inventory,
+        previous_execution_map=load_yaml(Path(args.existing_map)) if Path(args.existing_map).is_file() else None,
     )
 
     output_sources = Path(args.output_sources)

@@ -1,6 +1,6 @@
 schema_version: source-execution-map-1.0
-logical_operational_sources: 41
-physical_config_sources: 35
+logical_operational_sources: 45
+physical_config_sources: 39
 sources:
 - logical_source_id: anapo
   logical_code: ANAPO
@@ -15,6 +15,7 @@ sources:
   workflow_strategy: html
   operational_status: OPERATIONAL_HTTP_HTML
 - logical_source_id: aps_soat
+  reuse_acquisition: true
   logical_code: APS/SOAT
   config_source_id: aps
   physical_probe_source_id: aps
@@ -27,12 +28,14 @@ sources:
   workflow_strategy: html
   operational_status: OPERATIONAL_HTTP_HTML
 - logical_source_id: asfi
+  reuse_acquisition: true
   logical_code: ASFI
   config_source_id: asfi_valores
   physical_probe_source_id: asfi_valores
   workflow_strategy: html
   operational_status: OPERATIONAL_HTTP_HTML
 - logical_source_id: asfi_finrural
+  reuse_acquisition: true
   logical_code: ASFI - FINRURAL
   config_source_id: asfi_valores
   physical_probe_source_id: asfi_valores
@@ -45,6 +48,7 @@ sources:
   workflow_strategy: html
   operational_status: OPERATIONAL_HTTP_HTML
 - logical_source_id: asfi_bcb
+  reuse_acquisition: true
   logical_code: ASFI - BCB
   config_source_id: bcb
   physical_probe_source_id: bcb
@@ -129,6 +133,7 @@ sources:
   workflow_strategy: html
   operational_status: OPERATIONAL_HTML_API_DISCOVERY
 - logical_source_id: fdta_valles
+  acquisition_hold: IDENTITY_UNVERIFIED_FDTA_ICCO
   logical_code: FDTA-Valles
   config_source_id: icco
   physical_probe_source_id: icco
@@ -147,6 +152,7 @@ sources:
   workflow_strategy: html
   operational_status: OPERATIONAL_HTTP_HTML
 - logical_source_id: mdryt
+  reuse_acquisition: true
   logical_code: MDRyT
   config_source_id: mdryt_oap
   physical_probe_source_id: mdryt_oap
@@ -248,3 +254,27 @@ sources:
   physical_probe_source_id: transtats
   workflow_strategy: custom
   operational_status: OPERATIONAL_CUSTOM_FORM_RESOURCE
+- logical_source_id: ibch
+  logical_code: IBCH
+  config_source_id: ibch
+  physical_probe_source_id: ibch
+  workflow_strategy: html
+  operational_status: OPERATIONAL_HTTP_HTML
+- logical_source_id: fam
+  logical_code: FAM
+  config_source_id: fam
+  physical_probe_source_id: fam
+  workflow_strategy: html
+  operational_status: OPERATIONAL_HTTP_HTML
+- logical_source_id: otros_historicos
+  logical_code: OTROS HISTORICOS
+  config_source_id: otros_historicos
+  physical_probe_source_id: otros_historicos
+  workflow_strategy: html
+  operational_status: OPERATIONAL_HTTP_HTML
+- logical_source_id: fmi
+  logical_code: FMI
+  config_source_id: fmi
+  physical_probe_source_id: fmi
+  workflow_strategy: html
+  operational_status: OPERATIONAL_HTTP_HTML

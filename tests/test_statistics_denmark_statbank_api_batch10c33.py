@@ -43,4 +43,4 @@ def test_statistics_denmark_api_host_is_explicitly_allowed():
 
 def test_physical_source_count_is_preserved():
     raw = _load()
-    assert len(raw["sources"]) == 35
+    assert len(raw["sources"]) == 39

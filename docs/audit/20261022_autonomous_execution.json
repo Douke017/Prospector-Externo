@@ -1,0 +1,719 @@
+{
+  "at_utc": "2026-10-23T01:24:35.541955+00:00",
+  "baseline_directory": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-autonomous-baseline-20261022-jjcua9pn",
+  "public_canaries": [
+    {
+      "source": "bbv",
+      "attempt": 1,
+      "wall_seconds": 7.865,
+      "cpu_seconds": 0.781,
+      "rss_after_bytes": 62111744,
+      "run_id": "run_20261023_012413_93d0e1",
+      "status": "PARTIAL_SUCCESS",
+      "failure_code": "REQUEST_BUDGET_REACHED",
+      "coverage": {
+        "pages_visited": 3,
+        "resumed_from_checkpoint": false,
+        "urls_visited_before_resume": 0,
+        "urls_discovered": 76,
+        "resources_found": 49,
+        "urls_rejected": 24,
+        "urls_failed": 0,
+        "urls_pending": 24,
+        "resources_limit_reached": 0,
+        "requests_total": 4,
+        "http_403": 0,
+        "http_429": 0,
+        "timeouts": 0,
+        "robots_disallowed": 0,
+        "sitemap_documents": 0,
+        "sitemap_urls": 0,
+        "sitemap_errors": 0,
+        "spider_traps_blocked": 0,
+        "query_variants_blocked": 0,
+        "pagination_pages": 0,
+        "pagination_families_stopped": 0,
+        "api_endpoints": 0,
+        "api_documentation_found": 0,
+        "openapi_documents": 0,
+        "api_non_get_operations_skipped": 0,
+        "api_auth_required": 0,
+        "api_unresolved_operations": 0,
+        "api_pages_visited": 0,
+        "api_records_sampled": 0,
+        "api_pagination_stopped": 0,
+        "api_documents_probed": 0,
+        "api_document_errors": 0,
+        "archive_inspected": 0,
+        "archive_members_found": 0,
+        "archive_inspection_errors": 0,
+        "archive_inspection_deferred": 0,
+        "stop_reason": "REQUEST_BUDGET_REACHED"
+      },
+      "raw": 49,
+      "selected": 49,
+      "methods": {
+        "commented_html_link": 49
+      },
+      "error": "REQUEST_BUDGET_REACHED",
+      "folder": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-autonomous-public-20261022-8kvtmsf5\\bbv"
+    },
+    {
+      "source": "bbv",
+      "attempt": 2,
+      "wall_seconds": 13.176,
+      "cpu_seconds": 0.719,
+      "rss_after_bytes": 68599808,
+      "run_id": "run_20261023_012421_069f12",
+      "status": "PARTIAL_SUCCESS",
+      "failure_code": "REQUEST_BUDGET_REACHED",
+      "coverage": {
+        "pages_visited": 3,
+        "resumed_from_checkpoint": true,
+        "urls_visited_before_resume": 3,
+        "urls_discovered": 102,
+        "resources_found": 73,
+        "urls_rejected": 40,
+        "urls_failed": 0,
+        "urls_pending": 23,
+        "resources_limit_reached": 0,
+        "requests_total": 4,
+        "http_403": 0,
+        "http_429": 0,
+        "timeouts": 0,
+        "robots_disallowed": 0,
+        "sitemap_documents": 0,
+        "sitemap_urls": 0,
+        "sitemap_errors": 0,
+        "spider_traps_blocked": 0,
+        "query_variants_blocked": 0,
+        "pagination_pages": 0,
+        "pagination_families_stopped": 0,
+        "api_endpoints": 0,
+        "api_documentation_found": 0,
+        "openapi_documents": 0,
+        "api_non_get_operations_skipped": 0,
+        "api_auth_required": 0,
+        "api_unresolved_operations": 0,
+        "api_pages_visited": 0,
+        "api_records_sampled": 0,
+        "api_pagination_stopped": 0,
+        "api_documents_probed": 0,
+        "api_document_errors": 0,
+        "archive_inspected": 0,
+        "archive_members_found": 0,
+        "archive_inspection_errors": 0,
+        "archive_inspection_deferred": 0,
+        "stop_reason": "REQUEST_BUDGET_REACHED"
+      },
+      "raw": 73,
+      "selected": 73,
+      "methods": {
+        "commented_html_link": 73
+      },
+      "error": "REQUEST_BUDGET_REACHED",
+      "folder": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-autonomous-public-20261022-8kvtmsf5\\bbv"
+    },
+    {
+      "source": "mefp_probe",
+      "attempt": 1,
+      "wall_seconds": 0.578,
+      "cpu_seconds": 0.297,
+      "rss_after_bytes": 68685824,
+      "run_id": "run_20261023_012434_07a8b5",
+      "status": "FAILED",
+      "failure_code": "ROBOTS_UNREACHABLE",
+      "coverage": {
+        "pages_visited": 1,
+        "resumed_from_checkpoint": false,
+        "urls_visited_before_resume": 0,
+        "urls_discovered": 1,
+        "resources_found": 0,
+        "urls_rejected": 0,
+        "urls_failed": 1,
+        "urls_pending": 1,
+        "resources_limit_reached": 0,
+        "requests_total": 1,
+        "http_403": 0,
+        "http_429": 0,
+        "timeouts": 0,
+        "robots_disallowed": 0,
+        "sitemap_documents": 0,
+        "sitemap_urls": 0,
+        "sitemap_errors": 0,
+        "spider_traps_blocked": 0,
+        "query_variants_blocked": 0,
+        "pagination_pages": 0,
+        "pagination_families_stopped": 0,
+        "api_endpoints": 0,
+        "api_documentation_found": 0,
+        "openapi_documents": 0,
+        "api_non_get_operations_skipped": 0,
+        "api_auth_required": 0,
+        "api_unresolved_operations": 0,
+        "api_pages_visited": 0,
+        "api_records_sampled": 0,
+        "api_pagination_stopped": 0,
+        "api_documents_probed": 0,
+        "api_document_errors": 0,
+        "archive_inspected": 0,
+        "archive_members_found": 0,
+        "archive_inspection_errors": 0,
+        "archive_inspection_deferred": 0,
+        "stop_reason": "QUEUE_EXHAUSTED"
+      },
+      "raw": 0,
+      "selected": 0,
+      "methods": {},
+      "error": "ROBOTS_UNREACHABLE",
+      "folder": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-autonomous-public-20261022-8kvtmsf5\\mefp_probe"
+    }
+  ],
+  "mefp_tls": {
+    "host": "www.economiayfinanzas.gob.bo",
+    "verification": true,
+    "at_utc": "2026-10-23T01:24:35.466515+00:00",
+    "protocol": "TLSv1.3",
+    "cipher": [
+      "TLS_AES_256_GCM_SHA384",
+      "TLSv1.3",
+      256
+    ],
+    "certificate": {
+      "subject": [
+        [
+          [
+            "commonName",
+            "*.economiayfinanzas.gob.bo"
+          ]
+        ]
+      ],
+      "issuer": [
+        [
+          [
+            "countryName",
+            "GB"
+          ]
+        ],
+        [
+          [
+            "organizationName",
+            "Sectigo Limited"
+          ]
+        ],
+        [
+          [
+            "commonName",
+            "Sectigo Public Server Authentication CA DV R36"
+          ]
+        ]
+      ],
+      "version": 3,
+      "serialNumber": "9A7CF865E0222E405A844F86308F3C2A",
+      "notBefore": "Aug 14 00:00:00 2026 GMT",
+      "notAfter": "Feb 28 23:59:59 2027 GMT",
+      "subjectAltName": [
+        [
+          "DNS",
+          "*.economiayfinanzas.gob.bo"
+        ],
+        [
+          "DNS",
+          "economiayfinanzas.gob.bo"
+        ]
+      ],
+      "OCSP": [
+        "http://ocsp.sectigo.com"
+      ],
+      "caIssuers": [
+        "http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt"
+      ]
+    }
+  },
+  "infrastructure": {
+    "docker": "BLOCKED",
+    "mongo": "BLOCKED",
+    "checked_at_utc": "2026-10-23T00:58:22.655207+00:00",
+    "docker_error": "open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.",
+    "commands": [
+      "docker info --format {{json .ServerVersion}}",
+      "docker compose ps --all"
+    ],
+    "mongo_ports": {
+      "27017": "connection timed out",
+      "27018": "connection timed out"
+    }
+  },
+  "mefp_http_diagnostic": [
+    {
+      "url": "https://www.economiayfinanzas.gob.bo/robots.txt",
+      "verify": true,
+      "trust_env": true,
+      "error_type": "ConnectError",
+      "error": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1028)"
+    },
+    {
+      "url": "https://www.economiayfinanzas.gob.bo/robots.txt",
+      "verify": true,
+      "trust_env": false,
+      "error_type": "ConnectError",
+      "error": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1028)"
+    }
+  ],
+  "proxy_variables_present": {
+    "HTTP_PROXY": false,
+    "HTTPS_PROXY": false,
+    "ALL_PROXY": false
+  },
+  "qa_final": {
+    "passed": 687,
+    "skipped": 1,
+    "warnings": 2,
+    "seconds": 102.75,
+    "exit_code": 0,
+    "coverage_gate": 80,
+    "coverage_scope": [
+      "src",
+      "apps"
+    ],
+    "branch_coverage": false,
+    "new_exclusions": false,
+    "totals": {
+      "covered_lines": 11984,
+      "num_statements": 14917,
+      "percent_covered": 80.33786954481464,
+      "percent_covered_display": "80",
+      "missing_lines": 2933,
+      "excluded_lines": 11,
+      "percent_statements_covered": 80.33786954481464,
+      "percent_statements_covered_display": "80"
+    },
+    "full_coverage_json": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-autonomous-verified-coverage.json",
+    "full_coverage_sha256": "113bb2e04e1ee3c628ccebb2a6b80095a1d69434d1ad4ec5773f9cf47bc6075a",
+    "command": "python -B -m pytest -q -p no:cacheprovider --cov=src --cov=apps --cov-report=json:<TEMP>/datax-autonomous-verified-coverage.json --cov-fail-under=80 --basetemp <TEMP>/datax-autonomous-verified-tests",
+    "pip_check": "No broken requirements found.",
+    "top_remaining_files": [
+      {
+        "path": "apps\\custom_policy_probe\\main.py",
+        "missing_lines": 160,
+        "coverage": 19.19191919191919
+      },
+      {
+        "path": "apps\\final_source_audit\\main.py",
+        "missing_lines": 137,
+        "coverage": 42.436974789915965
+      },
+      {
+        "path": "src\\prospector_externo\\infrastructure\\http_client.py",
+        "missing_lines": 127,
+        "coverage": 0.0
+      },
+      {
+        "path": "apps\\b13_pipeline\\main.py",
+        "missing_lines": 122,
+        "coverage": 78.3303730017762
+      },
+      {
+        "path": "apps\\source_reconciliation\\main.py",
+        "missing_lines": 106,
+        "coverage": 21.48148148148148
+      },
+      {
+        "path": "apps\\browser_evidence_audit\\main.py",
+        "missing_lines": 100,
+        "coverage": 44.44444444444444
+      },
+      {
+        "path": "apps\\b10_semantic_audit\\main.py",
+        "missing_lines": 97,
+        "coverage": 61.6600790513834
+      },
+      {
+        "path": "src\\site_validation\\specialized.py",
+        "missing_lines": 93,
+        "coverage": 15.454545454545455
+      },
+      {
+        "path": "src\\prospector_externo\\domain\\api_discovery.py",
+        "missing_lines": 92,
+        "coverage": 83.88791593695271
+      },
+      {
+        "path": "src\\site_validation\\a9.py",
+        "missing_lines": 88,
+        "coverage": 25.423728813559322
+      },
+      {
+        "path": "src\\site_validation\\status_only.py",
+        "missing_lines": 72,
+        "coverage": 29.41176470588235
+      },
+      {
+        "path": "apps\\transtats_form_resource_probe\\main.py",
+        "missing_lines": 71,
+        "coverage": 31.73076923076923
+      },
+      {
+        "path": "src\\site_validation\\origin_recheck.py",
+        "missing_lines": 69,
+        "coverage": 55.1948051948052
+      },
+      {
+        "path": "apps\\source_recovery\\main.py",
+        "missing_lines": 66,
+        "coverage": 72.26890756302521
+      },
+      {
+        "path": "apps\\source_characterization\\main.py",
+        "missing_lines": 63,
+        "coverage": 83.88746803069054
+      }
+    ]
+  },
+  "browser_real_final": {
+    "browser_launches": 2,
+    "max_contexts": 1,
+    "active_contexts": 0,
+    "peak_sampled_rss_bytes": 366747648,
+    "blocked_request_types": {
+      "stylesheet": 30,
+      "image": 30,
+      "media": 30,
+      "font": 30
+    },
+    "blocked_scope": 30,
+    "wall_seconds": 56.717,
+    "resources": 30,
+    "pages": 30,
+    "failure_code": null,
+    "server_calls": {
+      "/robots.txt": 1,
+      "/page/0": 2,
+      "/page/1": 2,
+      "/page/2": 2,
+      "/page/3": 2,
+      "/page/4": 2,
+      "/page/5": 2,
+      "/page/6": 2,
+      "/page/7": 2,
+      "/page/8": 2,
+      "/page/9": 2,
+      "/page/10": 2,
+      "/page/11": 2,
+      "/page/12": 2,
+      "/page/13": 2,
+      "/page/14": 2,
+      "/page/15": 2,
+      "/page/16": 2,
+      "/page/17": 2,
+      "/page/18": 2,
+      "/page/19": 2,
+      "/page/20": 2,
+      "/page/21": 2,
+      "/page/22": 2,
+      "/page/23": 2,
+      "/page/24": 2,
+      "/page/25": 2,
+      "/page/26": 2,
+      "/page/27": 2,
+      "/page/28": 2,
+      "/page/29": 2
+    },
+    "test_seconds": 57.67,
+    "passed": 1,
+    "rss_interpretation": "maximum sampled browser tree RSS, not an absolute production OOM guarantee"
+  },
+  "global_validation": {
+    "executed": false,
+    "authorization_used": false,
+    "isolated_json_command_validated": true,
+    "missing_prerequisites": [
+      "Per-source process-tree RSS/CPU telemetry in operational B13 executor",
+      "Verified execution window and sustained capacity for up to 39 physical acquisitions at 900 seconds each"
+    ],
+    "docker_absence_is_not_sole_reason": true,
+    "actual_global_wall_seconds": null,
+    "actual_global_results": null
+  },
+  "git_final": {
+    "branch": "fix/prospector-cierre",
+    "head": "7a7caead651529297737db941d84511b0f6533bf",
+    "tracked_modified": 70,
+    "untracked": 1115,
+    "index_empty": true,
+    "untracked_by_root": {
+      ".dockerignore": 1,
+      ".patch12e": 11,
+      ".patch12f": 4,
+      ".patch12g": 8,
+      ".patch12h": 5,
+      ".patch12i": 3,
+      ".runtime": 141,
+      "BACKLOG_USER_STORIES.md": 1,
+      "CODEX_CONTINUACION_CIERRE_PROSPECTOR_EXTERNO_DATAX.md": 1,
+      "CODEX_DATAX_MASTER_PROMPT_EN.md": 1,
+      "CODEX_EJECUCION_AUTONOMA_HASTA_CIERRE_DATAX.md": 1,
+      "DATAX_AUDITORIA_Y_PLAN_CIERRE_52_20261015.md": 1,
+      "Dockerfile.api": 1,
+      "Dockerfile.batch": 1,
+      "INSTRUCCIONES_12D.txt": 1,
+      "INSTRUCCIONES_12E.txt": 1,
+      "INSTRUCCIONES_12F.txt": 1,
+      "INSTRUCCIONES_12G.txt": 1,
+      "INSTRUCCIONES_12H.txt": 1,
+      "INSTRUCCIONES_12I.txt": 1,
+      "INSTRUCCIONES_DATAX_12B.txt": 1,
+      "INSTRUCCIONES_DATAX_12C.txt": 1,
+      "apply_batch_12D_urls_exportacion.py": 1,
+      "apply_batch_12E_fuentes.py": 1,
+      "apply_batch_12F_navegacion.py": 1,
+      "apply_batch_12G_sincronizacion.py": 1,
+      "apply_batch_12H_checkpoint_parcial.py": 1,
+      "apply_batch_12I_mapping_inspect.py": 1,
+      "apps": 2,
+      "docker-compose.yml": 1,
+      "docs": 4,
+      "documento-arquitectura-prospector-externo.md": 1,
+      "ops": 2,
+      "output": 881,
+      "src": 1,
+      "tests": 27,
+      "validar_exportacion_fuentes_12C.py": 1,
+      "validar_rescate_fuentes_12B.py": 1
+    },
+    "commits_created": 0,
+    "pushes": 0,
+    "historic_deletions": 0
+  },
+  "baseline_comparison": {
+    "copied_files": 332,
+    "changes": [
+      {
+        "path": "README.md",
+        "baseline_sha256": "df0b48f578065ba79c97177fd822bbdb1a79b8b1b2b6e7391eea31fb2758def5",
+        "current_sha256": "1f6991b30e633094af349278174a0c11e177baac92dfc72ffe40634041ec8f15",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/b10_targeted_remediation/main.py",
+        "baseline_sha256": "36530c8188b4d7d414a4391e2eff2c672e08f6386655c8178e43e4460d372a6b",
+        "current_sha256": "3cdd1bf7cb0287efc591ca5ee7cf2f98320cc2228b1732cd8cb3b7a709f3e059",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/b12_datax_package/main.py",
+        "baseline_sha256": "0fa604b14a5a167c04fbfccbe4a1259d52cbe8a9adb59900efb5ca48995f175d",
+        "current_sha256": "9080302179d47f420ffeedae44a86ee700dce8e32225725e0b532f3a815f545b",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/b13_pipeline/main.py",
+        "baseline_sha256": "887c083fc018a8da7f5b9947299eafd7e7634f64244f4a04708d6ac57e8c72ff",
+        "current_sha256": "b551fb10a81e281ef59062065b4c799b398e0b52756944f42281db266f7ad67f",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/operational_config_promotion/main.py",
+        "baseline_sha256": "94775fa5b26f488226c4e2eb2e5daf88ae04b910299a9f731b424ea4022688f2",
+        "current_sha256": "7d7363357cbc291cb21c265e8b573856e9a7a53192200b7d22965bc089204978",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/persistence_closure/main.py",
+        "baseline_sha256": "b3c5b6db2e610b4fe1a7ab652c94ccef82c8c3c050f2d8041b8b92b04d456b91",
+        "current_sha256": "451d03cd4843fc227af3e2a05a5c69b6fc46d5d53de978f2824132fc0840a0c0",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/source_evidence_audit/main.py",
+        "baseline_sha256": "115c35ab2c2a00794bfdbaa67396fc6f6383a27b649955c51ab4ca40134ff12a",
+        "current_sha256": "1fc6a52e04ebd81b80a5617e69d3610cffd0f719c3dd66e9dd3811c6cb8c2814",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "apps/source_mapping/main.py",
+        "baseline_sha256": "d74c5f430e1a685ba4359233556932a4367e2962a9d339f5b4a2138c2e59e669",
+        "current_sha256": "8e1e900aaa5cdb9fc6d3b4f61e026cf344bc876f36835dad78fd0bc37770f3a4",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "config/source_execution_map.yaml",
+        "baseline_sha256": "c1d13afb74889288db3b5e3a95d48514181e45263009d4e1b1aabe5da687bb5f",
+        "current_sha256": "4b37b2cf774f73806ef122c1146809c4838a9f1717200a3bf847aaed1a909bde",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "docs/final_delivery_summary.md",
+        "baseline_sha256": "9ac8f575e8a997decb11daadd58793410e96241727473d971cdb60a5b9dc71fd",
+        "current_sha256": "cedbde6486040706f2ef7835431a08ffde12ee626e9f5fe34df324af6af2cc96",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/execution/checkpointed_batch.py",
+        "baseline_sha256": "6328afe006e9925fc4e4ad5be50a552e75e70e7ff6987f52dd29c5fd8871a190",
+        "current_sha256": "0699111a02d3052bfbc6fbaca80a11d3a4b78d30310659594b122fffcb466ce5",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/prospector_externo/adapters/api/routes.py",
+        "baseline_sha256": "722e6dba3f138d6582470517fcc54b53681c0b448c606f6885da460a87e1bbf3",
+        "current_sha256": "5f4d08b34e6ec985c88283246fb7be121bf501f4267e7cfcfe5c714331e89dca",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/prospector_externo/adapters/persistence/mongo_adapter.py",
+        "baseline_sha256": "35664edddf6036ce2a7a5d4065bc53bd3322712a20790590a96d3464d42f5846",
+        "current_sha256": "42aa77f609ae43741587a668ffba12691d2e66d5d73986d7a05c4e4adaf67d62",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/prospector_externo/domain/models.py",
+        "baseline_sha256": "bf444546d334582b6640d90a0f1a9957623813b5bd221953f8dc907e678ce273",
+        "current_sha256": "5e1743f17aa69cf1add8879d005f8fcd77d6ba6e6089f97fe6634a0aedb67c0a",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/prospector_externo/ports/catalog_repository.py",
+        "baseline_sha256": "6c0e82290e6b09be3ca943431bac824f87d6b16ea443e46d65c9587d954be1b6",
+        "current_sha256": "23a0f6215f4753c2a1d023aebcbd14729b35855eb8e7b4a46e6ab338da78506e",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/prospector_externo/workflows/javascript_workflow.py",
+        "baseline_sha256": "4ac2059f61b22acb05879d6d44850e25f56eec2c0eedc6c9cc5fe133249aebf7",
+        "current_sha256": "c27ad4ce8fd94e7a536abf9440333914d9fa9421f4cd0007a0df15cad153ea38",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "src/site_validation/core.py",
+        "baseline_sha256": "82af17706af0dfd0b08e57286d09ccc5491f4f5b3a11900e19609d6c05f19f25",
+        "current_sha256": "1b7b0e7f36d4242b31ce3e26d16cd204618fd204c8865926e2fe25824455f2c7",
+        "classification": "modified_since_baseline"
+      },
+      {
+        "path": "tests/test_b13_local_process_e2e.py",
+        "baseline_sha256": null,
+        "current_sha256": "c54d59a39a2f119a72652c1f199aba244965959de21b54b96f166784df9336cf",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_b13_preserved_packages_and_identity.py",
+        "baseline_sha256": null,
+        "current_sha256": "2a3966192c1292983b558f42cc64002131cc36bb405a2d62081dbaade8fd62de",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_javascript_discovery_resume.py",
+        "baseline_sha256": null,
+        "current_sha256": "5b0dbd95feac0bf557c07c9b2961b202d2cc569f970b83b42e7cb051bdada6a2",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_mongo_query_and_replay_contract.py",
+        "baseline_sha256": null,
+        "current_sha256": "63375f2219b1d0b33d75ce9d3a87ddb00849979f56615dfa4255f9245ed869ca",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_offline_browser_audit_resolution_cli.py",
+        "baseline_sha256": null,
+        "current_sha256": "cc7e984fe666161b4b84a10113624dda1a56e44459152c65eab255ac60e91467",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_offline_configuration_cli_flows.py",
+        "baseline_sha256": null,
+        "current_sha256": "680d752c8705e3d1e17bac3921da03f088e44530dad97c080058857688227076",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_offline_delivery_tools_e2e.py",
+        "baseline_sha256": null,
+        "current_sha256": "87c204b0ef5d507f5cbded77e05923dddbee7fa2acbf2d0cd6d70084e06b87cf",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_operational_promotion_and_admin.py",
+        "baseline_sha256": null,
+        "current_sha256": "fd3ed95d0aab11d21dd78eb8637a5dc10421ca641dda2ddeb19278314e50358f",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_probe_browser_contracts.py",
+        "baseline_sha256": null,
+        "current_sha256": "c0739d64c61bca1aec91ca222cd90e02cb49dca2de24c61f71c95fe6daa2979c",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_remediation_and_bulk_projection_cli.py",
+        "baseline_sha256": null,
+        "current_sha256": "d70bd03f4e397b1504ca5708c845d8d878c84a3c494893719f495dd133dbd2cf",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_site_validation_offline_cli.py",
+        "baseline_sha256": null,
+        "current_sha256": "41506bf0e13ce359d0e92a28242035d6e2b144e0f262e09306129d332c8c145f",
+        "classification": "not_in_baseline_snapshot"
+      },
+      {
+        "path": "tests/test_source_probe_cli_contracts.py",
+        "baseline_sha256": null,
+        "current_sha256": "be9c1886fd4e877ea325394139eab635890a071fef14a5dc38eb3345331eb28a",
+        "classification": "not_in_baseline_snapshot"
+      }
+    ],
+    "note": "Comparison to captured code/config/docs baseline, not attribution of entire diff against HEAD; runtime/output not part of this source snapshot"
+  },
+  "retirement_verification": {
+    "verified": 48,
+    "all_sha256_match": true,
+    "bytes": 383027,
+    "removed": 0,
+    "moved": 0
+  },
+  "historical_annex_sha256": "39febaf92ff56e21b5b4b901722ec215d551071859f0cadd295e0df13a86dcfa",
+  "hu_functional_counts": {
+    "PASS": 12,
+    "PARTIAL": 7,
+    "EXTERNAL_BLOCKER": 2,
+    "FAIL": 1
+  },
+  "documented_integration_verification": {
+    "fixture_state": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-aceptacion-20261022-223044\\M19\\test_local_b13_subprocess_resu0\\.runtime\\b13_pipeline\\local_e2e\\state.json",
+    "reports": 3,
+    "resources": 2,
+    "source": "alpha",
+    "public_network": false,
+    "fixture_catalog": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-aceptacion-20261022-223044\\M19\\test_local_b13_subprocess_resu0\\isolated-catalog",
+    "health": "UP",
+    "note": "Documented path extraction, offline sync check, hidden API subprocess and REST blocks verified on real HTTP; corrected Windows PowerShell array nesting",
+    "docs": 200,
+    "source_status": "ACTIVE",
+    "manual_root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-integration-verified-20261022-223230",
+    "api_process_closed": true
+  },
+  "document_validation": {
+    "powershell_blocks": 12,
+    "powershell_parse_errors": 0,
+    "hu_rows": 22,
+    "manual_rows": 26,
+    "test_references": 26,
+    "all_test_references_exist": true,
+    "all_audit_links_exist": true,
+    "python_src_apps_tests_ast_valid": true,
+    "diff_check_exit_code": 0,
+    "read_back_complete": true
+  },
+  "historic_zip_verification": {
+    "path": "output/b13-pipeline/b13-e2e/datax-package/datax_package.zip",
+    "sha256": "f52bf8d1f62d887420517f3d60dd8911f9d3ca5ebf258d5cf58f8369f7326e70",
+    "matches_recorded_historical": true
+  },
+  "finalized_at_utc": "2026-10-23T02:34:17.498681+00:00",
+  "final_handoff": {
+    "path": "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\docs\\final_delivery_summary.md",
+    "sha256": "cedbde6486040706f2ef7835431a08ffde12ee626e9f5fe34df324af6af2cc96",
+    "historical_annex_unchanged": true
+  }
+}

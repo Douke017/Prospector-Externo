@@ -37,6 +37,17 @@ def test_frontier_enforces_max_urls():
     assert frontier.stop_reason == StopReason.MAX_URLS
 
 
+def test_images_do_not_consume_navigation_budget():
+    frontier = DiscoveryFrontier(config(max_urls=1))
+    assert not frontier.enqueue("/uploads/foto.JPEG?size=large", base_url="https://example.test")
+    assert not frontier.enqueue("/uploads/icono.svg", base_url="https://example.test")
+    assert frontier.rejection_count("NON_NAVIGABLE_IMAGE") == 2
+    assert frontier.enqueue("/documentos", base_url="https://example.test")
+    assert frontier.discovered_count == 1
+    assert not frontier.enqueue("/otra-pagina", base_url="https://example.test")
+    assert frontier.stop_reason == StopReason.MAX_URLS
+
+
 def test_resource_key_is_scoped_by_source_and_ref_is_preserved():
     url = UrlNormalizer.normalize("https://example.test/data?ref=series-a&utm_source=x")
     assert url == "https://example.test/data?ref=series-a"

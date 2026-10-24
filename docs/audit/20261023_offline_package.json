@@ -1,0 +1,99 @@
+{
+  "pipeline_run_id": "carga-20261023-171007",
+  "revision": "20261023T221057_2179de3cbbaa",
+  "mode": "offline_existing_projection",
+  "command": ".\\.venv\\Scripts\\python.exe -B -m apps.b13_pipeline.main package-offline --run-id carga-20261023-171007 --projection-dir output/resource-quality/carga-20261023-171007/reprojection-verified --catalog-dir output/catalog",
+  "manifest_path": "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/manifest.json",
+  "zip_path": "output/b13-pipeline/carga-20261023-171007/datax-package/datax_package_20261023T221057_2179de3cbbaa.zip",
+  "zip_sha256": "e836c1c1fe2550a12ec67d52704e0923336d14d9d4c4e196cbd747aacf65d995",
+  "manifest_sha256": "4c7556ce7e727b476596142c3bfc57364f53ead0da02c60b67db571d19d9a88a",
+  "legacy_records": 1066,
+  "sources": {
+    "bbv": {
+      "raw": 1000,
+      "selected": 931,
+      "legacy_records": 931,
+      "api_projection_exact_match": true,
+      "selected_oembed": 0,
+      "pdf_with_encoded_spaces": 423,
+      "snapshot_run_id": "run_20261023_211309_f27290",
+      "resources_hash": "174ae3568b91f9100526af698f644f90a6c99fd36aa5260767ed97fc43e84079"
+    },
+    "finrural": {
+      "raw": 203,
+      "selected": 135,
+      "legacy_records": 135,
+      "api_projection_exact_match": true,
+      "selected_oembed": 0,
+      "pdf_with_encoded_spaces": 0,
+      "snapshot_run_id": "run_20261023_211011_2f85bf",
+      "resources_hash": "64b609f331ff512fd203b36155aba0796a3c6b035ec39a9bec8d8260c225cf15"
+    }
+  },
+  "checksums_verified": 11,
+  "package_files": 12,
+  "zip_crc_and_exact_contents": "PASS",
+  "protected_existing_files_unchanged": 72,
+  "original_zip_sha256": "8ff69dacabcce41c8f24381aa95617d12ff9acddc546e383d2578f0e32fad8af",
+  "origin_manifest_copied_unchanged": true,
+  "http_acquisitions": 0,
+  "remote_links_downloaded": false,
+  "api_validation": "FastAPI TestClient / ASGI, exact full projection against existing JSON catalog",
+  "source_modifications": [
+    "apps/b13_pipeline/main.py",
+    "tests/test_b13_preserved_packages_and_identity.py"
+  ],
+  "specific_tests": {
+    "passed": 41,
+    "warnings": 2
+  },
+  "global_tests": {
+    "passed": 752,
+    "skipped": 1,
+    "warnings": 2,
+    "duration_seconds": 192.16,
+    "coverage_percent": 80.5604431410883,
+    "covered_lines": 12362,
+    "total_statements": 15345,
+    "coverage_scope": [
+      "src",
+      "apps"
+    ],
+    "coverage_threshold_percent": 80,
+    "skip_reason": "Real Chromium opt-in; browser components unchanged",
+    "log": "output/resource-quality/carga-20261023-171007/offline-package-evidence/tests-global.log",
+    "coverage": "output/resource-quality/carga-20261023-171007/offline-package-evidence/coverage.json"
+  },
+  "protected_baseline": "output/resource-quality/carga-20261023-171007/offline-package-evidence/historical_hashes_before.json",
+  "protected_after": "output/resource-quality/carga-20261023-171007/offline-package-evidence/historical_hashes_after.json",
+  "only_new_protected_tree_files": [
+    "output/b13-pipeline/carga-20261023-171007/datax-package/datax_package_20261023T221057_2179de3cbbaa.zip",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/README.md",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/checksums.sha256",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/external_blockers.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/manifest.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/projections/bbv.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/projections/finrural.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/provenance/bbv/export_manifest.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/provenance/finrural/export_manifest.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/provenance/origin_manifest.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/sources.csv",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/sources/bbv.json",
+    "output/b13-pipeline/carga-20261023-171007/datax-package/revisions/20261023T221057_2179de3cbbaa/sources/finrural.json"
+  ],
+  "implementation_sha256": {
+    "apps/b13_pipeline/main.py": "77688b79c84e0e0b073e0fe69a95d2747075ab159c2b63daab2705871f549e7a",
+    "tests/test_b13_preserved_packages_and_identity.py": "1bd7d06f2747582f2f289523820a0d0992cecb5011bec1b49865d05ae58c03b9"
+  },
+  "documentation": [
+    "README.md",
+    "docs/final_delivery_summary.md"
+  ],
+  "constraints": {
+    "crawling": false,
+    "historical_overwrites": false,
+    "file_deletion_commands": false,
+    "frontend_bridge_internal_modified": false,
+    "commit_push": false
+  }
+}

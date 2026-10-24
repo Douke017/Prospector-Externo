@@ -1,0 +1,66 @@
+# HU-15: batch bajo demanda, API persistente y MongoDB con datos persistidos.
+# Solo para validación/despliegue local: MongoDB sin credenciales de producción.
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - prospector_mongo_data:/data/db
+    # Acceso local del pipeline B13 Windows para importar sus JSON sin segundo crawleo.
+    # No se expone a la red externa y no cambia el enlace interno mongo:27017.
+    ports:
+      - "127.0.0.1:${PROSPECTOR_MONGO_HOST_PORT:-27018}:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1}).ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    environment:
+      PROSPECTOR_BACKEND: mongo
+      PROSPECTOR_MONGO_URI: mongodb://mongo:27017
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+      start_period: 10s
+
+  batch:
+    profiles: ["batch"]
+    build:
+      context: .
+      dockerfile: Dockerfile.batch
+    environment:
+      PYTHONUNBUFFERED: "1"
+    entrypoint:
+      - python
+      - -m
+      - apps.crawler_batch.main
+      - --backend
+      - mongo
+      - --mongo-uri
+      - mongodb://mongo:27017
+      - --config
+      - /app/config/sources.yaml
+    # Nunca lanzar por defecto: requiere un --source concreto y autorización.
+    command: ["--help"]
+    shm_size: "1gb"
+    mem_limit: 3g
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  prospector_mongo_data:

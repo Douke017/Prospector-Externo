@@ -115,10 +115,10 @@ def test_periodic_statistical_pdf_is_conditionally_selected():
     selected, priority, reasons = ResourceProjectionPolicy.classify(resource)
     assert selected is True
     assert priority == ProjectionPriority.MEDIUM
-    assert "periodic_statistical_document" in reasons
+    assert reasons == ("public_document_reference",)
 
 
-def test_administrative_pdf_stays_out_of_projection_even_with_year():
+def test_administrative_pdf_is_preserved_without_business_relevance_filter():
     resource = _file(
         "k",
         "https://example.test/convocatoria_2026.pdf",
@@ -127,17 +127,17 @@ def test_administrative_pdf_stays_out_of_projection_even_with_year():
         period="2026",
     )
     selected, priority, reasons = ResourceProjectionPolicy.classify(resource)
-    assert selected is False
-    assert priority == ProjectionPriority.LOW
-    assert reasons == ("administrative_document",)
+    assert selected is True
+    assert priority == ProjectionPriority.MEDIUM
+    assert reasons == ("public_document_reference",)
 
 
-def test_unknown_archive_without_data_evidence_is_not_assumed_to_contain_data():
+def test_archive_reference_is_preserved_without_claiming_known_contents():
     resource = _file("k", "https://example.test/adjuntos.zip", title="Adjuntos", ext=".zip")
     selected, priority, reasons = ResourceProjectionPolicy.classify(resource)
-    assert selected is False
-    assert priority == ProjectionPriority.LOW
-    assert reasons == ("archive_contents_unknown",)
+    assert selected is True
+    assert priority == ProjectionPriority.MEDIUM
+    assert reasons == ("public_archive_reference",)
 
 
 def test_family_key_groups_same_series_across_periods_and_formats():
@@ -249,7 +249,7 @@ def test_projection_does_not_mutate_raw_resource_candidates():
     assert resource.model_dump(mode="json") == before
 
 
-def test_low_priority_decision_is_auditable_but_not_in_families():
+def test_generic_manual_is_preserved_in_projection_and_auditable():
     resource = _file(
         "admin",
         "https://e.test/manual.pdf",
@@ -265,10 +265,18 @@ def test_low_priority_decision_is_auditable_but_not_in_families():
         resources=[resource],
     )
     assert projection.total_raw_resources == 1
-    assert projection.total_selected_resources == 0
-    assert projection.total_families == 0
+    assert projection.total_selected_resources == 1
+    assert projection.total_families == 1
     assert projection.decisions[0].resource_key == "admin"
-    assert projection.decisions[0].selected is False
+    assert projection.decisions[0].selected is True
+
+
+@pytest.mark.parametrize("title", ["Manual", "Convocatoria", "Documento", "Sin periodo", "Indicadores"])
+def test_document_selection_does_not_depend_on_title_or_period(title):
+    resource = _file("doc", "https://example.test/attachment.pdf", title=title, ext=".pdf")
+    selected, _, reasons = ResourceProjectionPolicy.classify(resource)
+    assert selected is True
+    assert reasons == ("public_document_reference",)
 
 
 def test_application_service_preserves_source_and_snapshot_traceability():

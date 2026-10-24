@@ -1,0 +1,213 @@
+{
+  "date": "2026-10-23",
+  "timezone": "America/La_Paz",
+  "scope": "FOCUSED_PHASE_1_REPAIR_NOT_FINAL_CLOSURE",
+  "pipeline_run_id": "validacion-fuentes-01-20261023-181728",
+  "diagnosis": {
+    "asfi_valores": {
+      "operation": "save_discovery_checkpoint -> _atomic_write_text -> NamedTemporaryFile",
+      "failure_before_requests": true,
+      "temporary_path_length": 260
+    },
+    "statistics_denmark": {
+      "operation": "save_snapshot -> _mirror_evidence -> NamedTemporaryFile",
+      "http_status_before_failure": 200,
+      "temporary_path_length": 263
+    },
+    "offline_reproduction_tracebacks": ".runtime\\fase1_repair\\file_failure_reproduction.json",
+    "root_cause": "Temporary names duplicated the destination basename, exceeding Windows MAX_PATH despite valid final destination paths. Both operations reproduced independently without HTTP.",
+    "not_due": "Cadence schedules 4h after failure. Explicit same-pipeline resume reapplied that cadence and made FAILED terminal SKIPPED_STATUS; the child also reapplied cadence."
+  },
+  "corrections": [
+    "Short random temp basenames in the same target directory, preserving atomic replace and existing layout",
+    "Same-pipeline unfinished recovery bypasses due date only, never suspension; new periodic rounds retain cadence",
+    "Narrow legacy NOT_DUE-after-failure repair requires failed exit, prior attempt, same config fingerprint, selection and no hold; original skip observation is preserved",
+    "Persistence errors after HTTP materialize FAILED observation/report and remain retryable",
+    "B13 uses stored FAILED checkpoint evidence when no final report exists; no synthetic success",
+    "Full exception traceback in dispatcher logs"
+  ],
+  "validation": {
+    "focused_tests": {
+      "passed": 86,
+      "warnings": 2,
+      "log": ".runtime\\fase1_repair\\tests-focused-3.log"
+    },
+    "repair_tests_final": {
+      "passed": 11,
+      "log": ".runtime\\fase1_repair\\tests-repair-final.log"
+    },
+    "real_resume_command": ".\\.venv\\Scripts\\python.exe -B -m apps.b13_pipeline.main run --run-id validacion-fuentes-01-20261023-181728 --resume",
+    "network": "Sandbox WinError10013 blocked read-only robots preflight; resume ran with approved network access, TLS/robots unchanged",
+    "attempt_id": "20261023T223435_42d2f274bb20",
+    "acquisitions": 2,
+    "executed_source_ids": [
+      "asfi_valores",
+      "statistics_denmark"
+    ],
+    "recovered_eligibility_skips": [
+      "asfi_valores"
+    ],
+    "sources": [
+      {
+        "logical_source_id": "bcb",
+        "physical_source_id": "bcb",
+        "execution_status": "SUCCESS",
+        "raw_resource_count": 585,
+        "legacy_records": 537,
+        "selection_status": "ALREADY_COMPLETED",
+        "requests_this_attempt": 0,
+        "urls_pending": 0,
+        "urls_failed": 0,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "coverage_complete": true,
+        "crawl_run_id": "run_20261023_221733_4fbdab",
+        "checkpoint_state": "SUCCEEDED",
+        "attempts": 1
+      },
+      {
+        "logical_source_id": "asfi_valores",
+        "physical_source_id": "asfi_valores",
+        "execution_status": "PARTIAL_SUCCESS",
+        "raw_resource_count": 1000,
+        "legacy_records": 1000,
+        "selection_status": "SELECTED",
+        "requests_this_attempt": 250,
+        "urls_pending": 25,
+        "urls_failed": 3,
+        "stop_reason": "REQUEST_BUDGET_REACHED",
+        "coverage_complete": false,
+        "crawl_run_id": "run_20261023_223437_e635aa",
+        "checkpoint_state": "PARTIAL",
+        "attempts": 2
+      },
+      {
+        "logical_source_id": "statistics_denmark",
+        "physical_source_id": "statistics_denmark",
+        "execution_status": "SUCCESS",
+        "raw_resource_count": 1,
+        "legacy_records": 1,
+        "selection_status": "SELECTED",
+        "requests_this_attempt": 2,
+        "urls_pending": 0,
+        "urls_failed": 0,
+        "stop_reason": "API_SEEDS_EXHAUSTED",
+        "coverage_complete": true,
+        "crawl_run_id": "run_20261023_223851_549dcb",
+        "checkpoint_state": "SUCCEEDED",
+        "attempts": 3
+      },
+      {
+        "logical_source_id": "vipfe",
+        "physical_source_id": "vipfe",
+        "execution_status": "SUCCESS",
+        "raw_resource_count": 3,
+        "legacy_records": 3,
+        "selection_status": "ALREADY_COMPLETED",
+        "requests_this_attempt": 0,
+        "urls_pending": 0,
+        "urls_failed": 0,
+        "stop_reason": "QUEUE_EXHAUSTED",
+        "coverage_complete": true,
+        "crawl_run_id": "run_20261023_221836_5c55af",
+        "checkpoint_state": "SUCCEEDED",
+        "attempts": 1
+      }
+    ],
+    "new_log_has_file_not_found": false,
+    "global_suite_runs": 1,
+    "global_tests": {
+      "passed": 763,
+      "skipped": 1,
+      "warnings": 2,
+      "duration_seconds": 129.48,
+      "coverage_scope": [
+        "src",
+        "apps"
+      ],
+      "covered_lines": 12423,
+      "total_statements": 15377,
+      "coverage_percent": 80.78949079794498,
+      "threshold_percent": 80,
+      "log": ".runtime/fase1_repair/tests-global.log",
+      "coverage": ".runtime/fase1_repair/coverage.json",
+      "skip_reason": "Opt-in real Chromium; not activated for this task"
+    }
+  },
+  "state": {
+    "status": "READY",
+    "pending": [],
+    "unresolved": [],
+    "coverage_partial_sources": [
+      "asfi_valores"
+    ],
+    "remaining_resume_candidates": [
+      "asfi_valores"
+    ],
+    "timings": {
+      "crawl_seconds": 259.45090549999986,
+      "mongo_sync_seconds": null,
+      "package_seconds": 0.19401290000041627,
+      "projection_seconds": 2.916977300000326,
+      "total_seconds": 262.80876780000017
+    }
+  },
+  "package": {
+    "cross_physical_duplicate_groups": 0,
+    "duplicate_groups": 0,
+    "legacy_records": 1541,
+    "package_dir": "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\output\\b13-pipeline\\validacion-fuentes-01-20261023-181728\\datax-package\\latest",
+    "package_ready": true,
+    "zip_path": "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\output\\b13-pipeline\\validacion-fuentes-01-20261023-181728\\datax-package\\datax_package.zip",
+    "zip_sha256": "f1bdea2f1397e4dc97f376d2c0534c2732c23dca8906e677f27d5fcd2c8f41dc",
+    "manifest_path": "C:\\Ultimo Semestre 7\\trabajo\\DATAX\\crawler prospector externo\\crawler_finrural-main\\crawler_finrural-main\\output\\b13-pipeline\\validacion-fuentes-01-20261023-181728\\datax-package\\latest\\manifest.json",
+    "checksum_validation": "PASS_8_FILES",
+    "zip_crc_and_contents": "PASS",
+    "links_downloaded_as_documents": false
+  },
+  "integrity": {
+    "baseline_files": 135,
+    "unchanged_existing_files": 126,
+    "authorized_mutable_paths": [
+      "output/catalog/state/deliveries.json",
+      "output/catalog/state/sources.json",
+      "output/checkpointed/validacion-fuentes-01-20261023-181728/statistics_denmark/state/sources.json",
+      "output/checkpointed/validacion-fuentes-01-20261023-181728/asfi_valores/state/sources.json",
+      ".runtime/b13_pipeline/validacion-fuentes-01-20261023-181728/checkpoint.json",
+      ".runtime/b13_pipeline/validacion-fuentes-01-20261023-181728/checkpointed_batch.log",
+      ".runtime/b13_pipeline/validacion-fuentes-01-20261023-181728/state.json",
+      ".runtime/b13_pipeline/validacion-fuentes-01-20261023-181728/logs/bcb_projection.log",
+      ".runtime/b13_pipeline/validacion-fuentes-01-20261023-181728/logs/vipfe_projection.log"
+    ],
+    "removed_existing_files": [],
+    "runtime_originals": ".runtime\\fase1_repair\\original",
+    "original_log_is_prefix": true,
+    "old_attempts_snapshots_observations_resources_packages_unchanged": true,
+    "bcb_vipfe_catalog_entities_match_preserved_source_mirrors": true,
+    "package_780_sha256": "8ff69dacabcce41c8f24381aa95617d12ff9acddc546e383d2578f0e32fad8af",
+    "package_1066_sha256": "e836c1c1fe2550a12ec67d52704e0923336d14d9d4c4e196cbd747aacf65d995",
+    "baseline_path": ".runtime\\fase1_repair\\baseline_sha256.json",
+    "verified_after_global_tests": true
+  },
+  "implementation_sha256": {
+    "src/prospector_externo/adapters/persistence/local_json_adapter.py": "54431dd29efec452ae03c2cf57f638901f6ee4ab0ca2b49ab054e8f51e36cf35",
+    "src/prospector_externo/application/dispatcher.py": "29517e56e3b2b6e430be3a682836cb05a1c736b38a5d64486cfbd2668af6491d",
+    "src/prospector_externo/application/orchestrator.py": "dbfce1bac6c1819662a9b85e4a9162c873edc4254ee6ce35cf8d965bc2342a06",
+    "src/prospector_externo/application/status_gate.py": "71e1b1c8fe6a8bd522f94387ab2c1378cc4908403589614031bbcbf38e5c0aa0",
+    "src/execution/checkpointed_batch.py": "77930bc2e61aac6d2191fd9e37d2121db14c0e9c2ab9dd99280403f13b8db772",
+    "apps/checkpointed_batch/main.py": "fc71742ead2a38fe6189226d658ca20ec02d78929ce6af77ffda0a9188bbbf62",
+    "apps/b13_pipeline/main.py": "8011f5762fefd5be4ff9df79dfae074ddff13f6c917adee36dffc6cda52b0d9f",
+    "tests/test_execution_resume_repair.py": "80ab595b6bb5d3d08c6dad9bfba0f3225a55fd084932a0808f3dfb9ac4bd2446"
+  },
+  "constraints": {
+    "force_used": false,
+    "config_security_limits_health_changed_for_convenience": false,
+    "other_origins_crawled": false,
+    "bcb_vipfe_recrawled": false,
+    "browsers_launched_for_real_resume": false,
+    "scheduler_enabled": false,
+    "internal_bridge_frontend_changed": false,
+    "commit_push": false,
+    "final_closure_declared": false
+  },
+  "implementation_sha256_verified_after_global_tests": true
+}

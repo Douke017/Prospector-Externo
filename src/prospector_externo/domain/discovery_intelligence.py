@@ -125,6 +125,28 @@ class PaginationYieldPolicy:
     def families_stopped(self) -> int:
         return sum(1 for state in self._states.values() if state.stopped)
 
+    def dump_state(self) -> dict:
+        return {key: {"pages_visited": state.pages_visited,
+                      "new_resources": state.new_resources,
+                      "consecutive_empty": state.consecutive_empty,
+                      "recent_yield": list(state.recent_yield), "stopped": state.stopped}
+                for key, state in self._states.items()}
+
+    def restore_state(self, states: dict) -> None:
+        if not isinstance(states, dict):
+            raise ValueError("DISCOVERY_PAGINATION_INVALID")
+        restored = {}
+        for key, row in states.items():
+            values = [row.get(name) for name in ("pages_visited", "new_resources", "consecutive_empty")]
+            recent = row.get("recent_yield")
+            if (not isinstance(key, str) or not isinstance(recent, list)
+                    or len(recent) > self.recent_window
+                    or any(type(v) is not int or v < 0 for v in [*values, *recent])
+                    or type(row.get("stopped")) is not bool):
+                raise ValueError("DISCOVERY_PAGINATION_INVALID")
+            restored[key] = PaginationFamilyState(*values, recent_yield=deque(recent), stopped=row["stopped"])
+        self._states = restored
+
 
 class SpiderTrapDetector:
     """Detecta firmas acotadas de URLs claramente explosivas.

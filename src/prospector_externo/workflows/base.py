@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import os
 import re
+import uuid
+from datetime import datetime, timezone
 from typing import List, Optional, Set, Tuple
 from urllib.parse import unquote, urlparse
 
@@ -16,6 +18,7 @@ from prospector_externo.domain.models import (
     ApiMetadata,
     ChangeStatus,
     DiscoveryType,
+    DiscoveredUrl,
     ResourceCandidate,
     ResourceType,
     SourceConfig,
@@ -23,8 +26,10 @@ from prospector_externo.domain.models import (
 from prospector_externo.domain.normalizer import UrlNormalizer
 from prospector_externo.domain.observations import CoverageStats
 from prospector_externo.infrastructure.http_runtime import SourceHttpSession
+from prospector_externo.infrastructure.archive_extractor import ArchiveExtractor
 from prospector_externo.infrastructure.sitemap_discovery import SitemapDiscovery
 from prospector_externo.kernel.workflow_port import SourceWorkflow
+from prospector_externo.kernel.contracts import ExtractionResult
 
 
 class ResourceDetector:
@@ -72,6 +77,130 @@ class BaseWorkflow(SourceWorkflow):
         if self.http_session is None:
             raise RuntimeError("Workflow sin SourceHttpSession; debe ejecutarse mediante SourceDispatcher")
         return self.http_session
+
+    def _capture_partial(self, resources, discovered, coverage, *, frontier=None, pagination=None):
+        self._partial_state = (resources, discovered, coverage, frontier, pagination)
+        self._partial_baseline_counts = (len(resources), len(discovered))
+
+    def on_timeout(self, config: SourceConfig) -> ExtractionResult:
+        """El deadline cancela I/O; devuelve lo ya observado sin inventar éxito vacío."""
+        child = getattr(self, "_active_subworkflow", None)
+        if child is not None:
+            return child.on_timeout(config)
+        resources, discovered, coverage, frontier, pagination = getattr(
+            self, "_partial_state", ([], [], CoverageStats(), None, None),
+        )
+        coverage.stop_reason = "MAX_RUNTIME"
+        coverage.timeouts += 1
+        coverage.resources_found = len(resources)
+        coverage.requests_total = self._session().requests_used
+        if frontier is not None:
+            frontier.stop_reason = StopReason.MAX_RUNTIME
+            coverage.urls_pending = frontier.pending_count
+            coverage.urls_discovered = frontier.discovered_count
+            coverage.urls_rejected = frontier.rejected_count
+            if pagination is not None:
+                self._finish_coverage(coverage=coverage, frontier=frontier,
+                                      pagination=pagination, resources=resources, session=self._session())
+                self._checkpoint_discovery(config=config, frontier=frontier, pagination=pagination,
+                                           resources=resources, discovered_urls=discovered,
+                                           coverage=coverage, finished=True)
+        initial_resources, initial_discovered = getattr(self, "_partial_baseline_counts", (0, 0))
+        made_progress = len(resources) > initial_resources or len(discovered) > initial_discovered
+        return ExtractionResult(source_id=config.source_id, success=made_progress,
+                                resources=resources, discovered_urls=discovered, coverage=coverage,
+                                failure_code="MAX_RUNTIME", metadata=getattr(self, "_discovery_metadata", {}))
+
+    def _open_discovery(self, config: SourceConfig):
+        """Restaura una adquisición técnica; la persistencia se inyecta por callback."""
+        fingerprint = DiscoveryFrontier.profile_fingerprint(config)
+        frontier, pagination = DiscoveryFrontier(config), self._pagination_policy(config)
+        resources, discovered = [], []
+        state = getattr(self, "_discovery_checkpoint", None)
+        self._sitemaps_seeded = False
+        self._inspected_archives = set()
+        self._discovery_cycle_id = uuid.uuid4().hex
+        self._resume_status = "NO_CHECKPOINT_RESTART" if state is None else "FRESH_CYCLE"
+        coverage = CoverageStats()
+        if state is not None:
+            if not isinstance(state, dict) or state.get("source_id") != config.source_id:
+                raise ValueError("DISCOVERY_CHECKPOINT_INVALID_SOURCE")
+            if state.get("schema_version") != "discovery-progress-1.0":
+                self._resume_status = "LEGACY_CHECKPOINT_RESTART"
+            elif state.get("pipeline_run_id") != getattr(self, "_pipeline_run_id", None):
+                self._resume_status = "PIPELINE_CHANGED_RESTART"
+            elif state.get("profile_fingerprint") != fingerprint:
+                self._resume_status = "PROFILE_CHANGED_RESTART"
+            else:
+                if (not {"frontier", "pagination", "resources", "discovered_urls", "sitemaps_seeded"}.issubset(state)
+                        or type(state.get("traversal_complete")) is not bool
+                        or not isinstance(state.get("cycle_id"), str) or not state["cycle_id"]
+                        or not isinstance(state.get("last_run_id"), str)
+                        or not isinstance(state["resources"], list)
+                        or not isinstance(state["discovered_urls"], list)
+                        or not isinstance(state["pagination"], dict)
+                        or len(state["resources"]) > config.max_resources
+                        or type(state.get("robots_disallowed", 0)) is not int
+                        or state.get("robots_disallowed", 0) < 0):
+                    raise ValueError("DISCOVERY_CHECKPOINT_INVALID_ENVELOPE")
+            if (self._resume_status == "FRESH_CYCLE" and not (
+                    state.get("traversal_complete") and
+                    state.get("materialized_run_id") == state.get("last_run_id"))):
+                frontier = DiscoveryFrontier.restore(config, state["frontier"])
+                resources = [ResourceCandidate.model_validate(row) for row in state["resources"]]
+                discovered = [DiscoveredUrl.model_validate(row) for row in state["discovered_urls"]]
+                if (any(row.source_id != config.source_id for row in [*resources, *discovered])
+                        or len({row.resource_key for row in resources}) != len(resources)):
+                    raise ValueError("DISCOVERY_CHECKPOINT_INVALID_INVENTORY")
+                pagination.restore_state(state["pagination"])
+                self._sitemaps_seeded = state["sitemaps_seeded"]
+                if type(self._sitemaps_seeded) is not bool:
+                    raise ValueError("DISCOVERY_CHECKPOINT_INVALID_SITEMAPS")
+                archives = state.get("inspected_archives", [])
+                if not isinstance(archives, list) or any(not isinstance(url, str) for url in archives):
+                    raise ValueError("DISCOVERY_CHECKPOINT_INVALID_ARCHIVES")
+                self._inspected_archives = set(archives)
+                self._discovery_cycle_id = state["cycle_id"]
+                self._resume_status = "RESTORED"
+                coverage.resumed_from_checkpoint = True
+                coverage.urls_visited_before_resume = frontier.visited_count
+                # Una exclusión legal previa no desaparece por reiniciar el proceso.
+                coverage.robots_disallowed = state.get("robots_disallowed", 0)
+        if self._resume_status != "RESTORED":
+            frontier.seed(config.seeds or [config.entrypoint])
+        self._discovery_metadata = {
+            "discovery_profile_fingerprint": fingerprint,
+            "discovery_cycle_id": self._discovery_cycle_id,
+            "resume_status": self._resume_status,
+            "resumed_from_run_id": state.get("last_run_id") if state and self._resume_status == "RESTORED" else None,
+        }
+        return frontier, pagination, resources, discovered, coverage
+
+    def _checkpoint_discovery(self, *, config, frontier, pagination, resources,
+                              discovered_urls, coverage, finished=False):
+        callback = getattr(self, "_save_discovery_callback", None)
+        if callback is None:
+            return
+        callback({
+            "schema_version": "discovery-progress-1.0", "source_id": config.source_id,
+            "source_name": config.name or config.source_id, "entrypoint": config.entrypoint,
+            "workflow": config.workflow,
+            "profile_fingerprint": self._discovery_metadata["discovery_profile_fingerprint"],
+            "cycle_id": self._discovery_cycle_id,
+            "resume_status": self._resume_status,
+            "last_run_id": self._discovery_run_id,
+            "pipeline_run_id": getattr(self, "_pipeline_run_id", None),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "frontier": frontier.dump_state(), "pagination": pagination.dump_state(),
+            "resources": [row.model_dump(mode="json") for row in resources],
+            "discovered_urls": [row.model_dump(mode="json") for row in discovered_urls],
+            "sitemaps_seeded": self._sitemaps_seeded,
+            "inspected_archives": sorted(self._inspected_archives),
+            "robots_disallowed": coverage.robots_disallowed,
+            "attempt_finished": finished,
+            "traversal_complete": finished and not coverage.is_partial_discovery(),
+            "materialized_run_id": None,
+        })
 
     def _extract_period_from_text(self, text: str) -> Optional[str]:
         low = text.lower()
@@ -136,6 +265,8 @@ class BaseWorkflow(SourceWorkflow):
 
     @staticmethod
     def _discovery_method(discovery_type: DiscoveryType) -> str:
+        if discovery_type == DiscoveryType.JAVASCRIPT:
+            return "javascript"
         if discovery_type == DiscoveryType.COMMENTED_HTML:
             return "commented_html_link"
         if discovery_type == DiscoveryType.SITEMAP:
@@ -371,6 +502,76 @@ class BaseWorkflow(SourceWorkflow):
             recent_window=config.pagination_window,
         )
 
+    async def _inspect_archive_candidates(
+        self, *, config: SourceConfig, resources: List[ResourceCandidate],
+        coverage: CoverageStats,
+    ) -> None:
+        """Enriquecer el RAW con miembros de contenedores acotados y sin URL inventada.
+
+        El campo `url` apunta al contenedor original y `extracted_from_archive`
+        identifica la relación. Son miembros de catálogo, NO descargas directas.
+        Solo se inspeccionan archivos ya encontrados en la exploración.
+        """
+        if not config.inspect_archives:
+            return
+        inspected = getattr(self, "_inspected_archives", set())
+        archives = [r for r in resources if not r.extracted_from_archive
+                    and r.url not in inspected and ArchiveExtractor.can_inspect(r.url)]
+        if not archives:
+            return
+        session = self._session()
+        selected = archives[:config.max_archive_inspections]
+        coverage.archive_inspection_deferred += len(archives) - len(selected)
+        for i, archive in enumerate(selected):
+            if session.budget.remaining <= 0 or len(resources) >= config.max_resources:
+                coverage.archive_inspection_deferred += len(selected) - i
+                break
+            data, _status, error, _headers = await session.fetch_bytes_limited(
+                archive.url,
+                max_bytes=config.max_archive_bytes,
+                accept="application/zip,application/x-tar,application/gzip,*/*;q=0.1",
+            )
+            if error or data is None:
+                coverage.archive_inspection_errors += 1
+                continue
+            try:
+                members = ArchiveExtractor.inspect_archive_bytes(
+                    data, filename_hint=archive.url,
+                    max_entries=config.max_archive_entries,
+                    max_uncompressed_bytes=config.max_archive_uncompressed_bytes,
+                )
+            except ValueError:
+                coverage.archive_inspection_errors += 1
+                continue
+            coverage.archive_inspected += 1
+            inspected.add(archive.url)
+            from_archive = archive.url
+            for member in members:
+                if not member.extension or member.extension not in ResourceDetector.RESOURCE_EXTENSIONS:
+                    continue
+                if len(resources) >= config.max_resources:
+                    coverage.resources_limit_reached += 1
+                    continue
+                # La identidad incluye contenedor y ruta interna. Jamás construir
+                # una URL HTTP supuesta a partir del nombre dentro del paquete.
+                identity = f"archive-member|{archive.url}|{member.filename}"
+                resources.append(ResourceCandidate(
+                    resource_key=UrlNormalizer.compute_resource_key(config.source_id, identity),
+                    url=from_archive,
+                    source_id=config.source_id,
+                    title=member.filename,
+                    file_extension=member.extension,
+                    content_length_bytes=member.size_bytes,
+                    discovered_from_url=archive.discovered_from_url,
+                    extracted_from_archive=from_archive,
+                    change_status=ChangeStatus.NEW,
+                    discovery_method="archive_internal",
+                    context_text=f"Miembro del archivo: {member.filename}",
+                ))
+                coverage.archive_members_found += 1
+        coverage.resources_found = len(resources)
+        coverage.requests_total = session.requests_used
+
     async def _seed_from_sitemaps(
         self,
         *,
@@ -446,6 +647,7 @@ class BaseWorkflow(SourceWorkflow):
         coverage.resources_found = len(resources)
         coverage.urls_discovered = frontier.discovered_count
         coverage.urls_rejected = frontier.rejected_count
+        coverage.resources_limit_reached = frontier.rejection_count("MAX_RESOURCES")
         coverage.urls_pending = frontier.pending_count
         coverage.requests_total = session.requests_used
         coverage.spider_traps_blocked = frontier.spider_traps_blocked

@@ -3,6 +3,8 @@ Pool de ejecución con Bulkhead para aislar tareas livianas HTTP de tareas de na
 Permite concurrencia controlada para fuentes completas y subtareas (como obtención de cabeceras).
 """
 
+import asyncio
+from contextlib import asynccontextmanager
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed, Future
 from typing import Callable, List, Any, TypeVar, Optional
@@ -22,8 +24,14 @@ class AsyncWorkerPool:
     """
 
     def __init__(self, max_http_workers: int = 6, max_browser_workers: int = 2):
+        if max_http_workers < 1 or max_browser_workers < 1:
+            raise ValueError("Los límites de workers deben ser positivos")
         self.max_http_workers = max_http_workers
         self.max_browser_workers = max_browser_workers
+        # El batch moderno es async: los ThreadPoolExecutor de compatibilidad
+        # no regulan por sí solos las corutinas de los workflows.
+        self._http_async_slots = asyncio.Semaphore(max_http_workers)
+        self._browser_async_slots = asyncio.Semaphore(max_browser_workers)
         self._http_executor = ThreadPoolExecutor(
             max_workers=self.max_http_workers,
             thread_name_prefix="http-worker"
@@ -32,6 +40,19 @@ class AsyncWorkerPool:
             max_workers=self.max_browser_workers,
             thread_name_prefix="browser-worker"
         )
+
+    @asynccontextmanager
+    async def async_source_slot(self, config: SourceConfig):
+        """Bulkhead efectivo de workflows async, sin enviar corutinas a threads.
+
+        Un workflow JS ocupa una plaza de navegador durante TODO su recorrido;
+        los workflows HTTP/API emplean plazas independientes. La liberación
+        automática también cubre fallos y cancelación del batch.
+        """
+        slots = (self._browser_async_slots if config.workflow.lower() == "javascript"
+                 else self._http_async_slots)
+        async with slots:
+            yield
 
     def submit_workflow(self, task_func: Callable[[SourceConfig], R], config: SourceConfig) -> Future:
         """

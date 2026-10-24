@@ -160,8 +160,8 @@ def test_a6_operational_batch_uses_physical_groups_and_reserves_special_sources(
     ordinary = build_physical_targets(roster, include_special=False)
     all_targets = build_physical_targets(roster, include_special=True)
 
-    assert len(ordinary) == 32
-    assert len(all_targets) == 35
+    assert len(ordinary) == 36
+    assert len(all_targets) == 39
     assert {target.physical_source_id for target in all_targets} - {
         target.physical_source_id for target in ordinary
     } == {"mhe", "sigma", "transtats"}

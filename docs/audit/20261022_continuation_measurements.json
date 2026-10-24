@@ -1,0 +1,379 @@
+{
+  "public_finrural": {
+    "root": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-finrural-public-20261022-6blibllx",
+    "config": {
+      "source_id": "finrural",
+      "name": "FINRURAL — Asociación de Instituciones Financieras de Desarrollo",
+      "entrypoint": "https://www.finrural.org.bo",
+      "workflow": "html",
+      "seeds": [
+        "https://www.finrural.org.bo/reporte-financiero-mensual-instituciones-financieras-de-desarrollo/",
+        "https://www.finrural.org.bo/archivo-historico/"
+      ],
+      "update_category": "MONTHLY",
+      "allowed_extensions": [
+        ".pdf",
+        ".xlsx",
+        ".xls",
+        ".csv",
+        ".zip"
+      ],
+      "excluded_path_keywords": [
+        "/historia/",
+        "/mision-y-vision/",
+        "/estructura-organizacional/",
+        "/glosario-de-microfinanzas/",
+        "/manifiesto-de-las-microfinanzas/",
+        "/que-son-las-ifd/",
+        "/enlaces-de-interes/",
+        "/impro-ifd/"
+      ],
+      "rate_limit_seconds": 1.0,
+      "max_requests": 4,
+      "max_runtime_seconds": 25,
+      "max_urls": 600,
+      "max_depth": 1,
+      "max_resources": 1000,
+      "discover_sitemaps": false,
+      "discover_apis": false,
+      "inspect_archives": false
+    },
+    "measurements": [
+      {
+        "mode": "fresh",
+        "attempt": 1,
+        "wall_seconds": 5.218,
+        "cpu_seconds": 1.406,
+        "rss_after_bytes": 62636032,
+        "run_id": "run_20261023_001704_6036dd",
+        "status": "PARTIAL_SUCCESS",
+        "resume_status": "NO_CHECKPOINT_RESTART",
+        "coverage": {
+          "pages_visited": 3,
+          "resumed_from_checkpoint": false,
+          "urls_visited_before_resume": 0,
+          "urls_discovered": 277,
+          "resources_found": 129,
+          "urls_rejected": 48,
+          "urls_failed": 0,
+          "urls_pending": 145,
+          "resources_limit_reached": 0,
+          "requests_total": 4,
+          "http_403": 0,
+          "http_429": 0,
+          "timeouts": 0,
+          "robots_disallowed": 0,
+          "sitemap_documents": 0,
+          "sitemap_urls": 0,
+          "sitemap_errors": 0,
+          "spider_traps_blocked": 0,
+          "query_variants_blocked": 0,
+          "pagination_pages": 0,
+          "pagination_families_stopped": 0,
+          "api_endpoints": 0,
+          "api_documentation_found": 0,
+          "openapi_documents": 0,
+          "api_non_get_operations_skipped": 0,
+          "api_auth_required": 0,
+          "api_unresolved_operations": 0,
+          "api_pages_visited": 0,
+          "api_records_sampled": 0,
+          "api_pagination_stopped": 0,
+          "api_documents_probed": 0,
+          "api_document_errors": 0,
+          "archive_inspected": 0,
+          "archive_members_found": 0,
+          "archive_inspection_errors": 0,
+          "archive_inspection_deferred": 0,
+          "stop_reason": "REQUEST_BUDGET_REACHED"
+        },
+        "raw": 129,
+        "catalog": 129,
+        "requests": [
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/robots.txt",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/reporte-financiero-mensual-instituciones-financieras-de-desarrollo/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/archivo-historico/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/",
+            "status": 200
+          }
+        ],
+        "projection_selected": 129
+      },
+      {
+        "mode": "fresh",
+        "attempt": 2,
+        "wall_seconds": 4.093,
+        "cpu_seconds": 1.297,
+        "rss_after_bytes": 67813376,
+        "run_id": "run_20261023_001709_b87c75",
+        "status": "PARTIAL_SUCCESS",
+        "resume_status": "NO_CHECKPOINT_RESTART",
+        "coverage": {
+          "pages_visited": 3,
+          "resumed_from_checkpoint": false,
+          "urls_visited_before_resume": 0,
+          "urls_discovered": 277,
+          "resources_found": 129,
+          "urls_rejected": 48,
+          "urls_failed": 0,
+          "urls_pending": 145,
+          "resources_limit_reached": 0,
+          "requests_total": 4,
+          "http_403": 0,
+          "http_429": 0,
+          "timeouts": 0,
+          "robots_disallowed": 0,
+          "sitemap_documents": 0,
+          "sitemap_urls": 0,
+          "sitemap_errors": 0,
+          "spider_traps_blocked": 0,
+          "query_variants_blocked": 0,
+          "pagination_pages": 0,
+          "pagination_families_stopped": 0,
+          "api_endpoints": 0,
+          "api_documentation_found": 0,
+          "openapi_documents": 0,
+          "api_non_get_operations_skipped": 0,
+          "api_auth_required": 0,
+          "api_unresolved_operations": 0,
+          "api_pages_visited": 0,
+          "api_records_sampled": 0,
+          "api_pagination_stopped": 0,
+          "api_documents_probed": 0,
+          "api_document_errors": 0,
+          "archive_inspected": 0,
+          "archive_members_found": 0,
+          "archive_inspection_errors": 0,
+          "archive_inspection_deferred": 0,
+          "stop_reason": "REQUEST_BUDGET_REACHED"
+        },
+        "raw": 129,
+        "catalog": 129,
+        "requests": [
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/robots.txt",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/reporte-financiero-mensual-instituciones-financieras-de-desarrollo/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/archivo-historico/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/",
+            "status": 200
+          }
+        ],
+        "projection_selected": 129
+      },
+      {
+        "mode": "resume",
+        "attempt": 1,
+        "wall_seconds": 4.034,
+        "cpu_seconds": 1.172,
+        "rss_after_bytes": 71815168,
+        "run_id": "run_20261023_001713_4155e2",
+        "status": "PARTIAL_SUCCESS",
+        "resume_status": "NO_CHECKPOINT_RESTART",
+        "coverage": {
+          "pages_visited": 3,
+          "resumed_from_checkpoint": false,
+          "urls_visited_before_resume": 0,
+          "urls_discovered": 277,
+          "resources_found": 129,
+          "urls_rejected": 48,
+          "urls_failed": 0,
+          "urls_pending": 145,
+          "resources_limit_reached": 0,
+          "requests_total": 4,
+          "http_403": 0,
+          "http_429": 0,
+          "timeouts": 0,
+          "robots_disallowed": 0,
+          "sitemap_documents": 0,
+          "sitemap_urls": 0,
+          "sitemap_errors": 0,
+          "spider_traps_blocked": 0,
+          "query_variants_blocked": 0,
+          "pagination_pages": 0,
+          "pagination_families_stopped": 0,
+          "api_endpoints": 0,
+          "api_documentation_found": 0,
+          "openapi_documents": 0,
+          "api_non_get_operations_skipped": 0,
+          "api_auth_required": 0,
+          "api_unresolved_operations": 0,
+          "api_pages_visited": 0,
+          "api_records_sampled": 0,
+          "api_pagination_stopped": 0,
+          "api_documents_probed": 0,
+          "api_document_errors": 0,
+          "archive_inspected": 0,
+          "archive_members_found": 0,
+          "archive_inspection_errors": 0,
+          "archive_inspection_deferred": 0,
+          "stop_reason": "REQUEST_BUDGET_REACHED"
+        },
+        "raw": 129,
+        "catalog": 129,
+        "requests": [
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/robots.txt",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/reporte-financiero-mensual-instituciones-financieras-de-desarrollo/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/archivo-historico/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/",
+            "status": 200
+          }
+        ],
+        "projection_selected": 129
+      },
+      {
+        "mode": "resume",
+        "attempt": 2,
+        "wall_seconds": 9.062,
+        "cpu_seconds": 0.922,
+        "rss_after_bytes": 74764288,
+        "run_id": "run_20261023_001717_a85b71",
+        "status": "PARTIAL_SUCCESS",
+        "resume_status": "RESTORED",
+        "coverage": {
+          "pages_visited": 3,
+          "resumed_from_checkpoint": true,
+          "urls_visited_before_resume": 3,
+          "urls_discovered": 280,
+          "resources_found": 132,
+          "urls_rejected": 48,
+          "urls_failed": 0,
+          "urls_pending": 142,
+          "resources_limit_reached": 0,
+          "requests_total": 4,
+          "http_403": 0,
+          "http_429": 0,
+          "timeouts": 0,
+          "robots_disallowed": 0,
+          "sitemap_documents": 0,
+          "sitemap_urls": 0,
+          "sitemap_errors": 0,
+          "spider_traps_blocked": 0,
+          "query_variants_blocked": 0,
+          "pagination_pages": 0,
+          "pagination_families_stopped": 0,
+          "api_endpoints": 0,
+          "api_documentation_found": 0,
+          "openapi_documents": 0,
+          "api_non_get_operations_skipped": 0,
+          "api_auth_required": 0,
+          "api_unresolved_operations": 0,
+          "api_pages_visited": 0,
+          "api_records_sampled": 0,
+          "api_pagination_stopped": 0,
+          "api_documents_probed": 0,
+          "api_document_errors": 0,
+          "archive_inspected": 0,
+          "archive_members_found": 0,
+          "archive_inspection_errors": 0,
+          "archive_inspection_deferred": 0,
+          "stop_reason": "REQUEST_BUDGET_REACHED"
+        },
+        "raw": 132,
+        "catalog": 132,
+        "requests": [
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/robots.txt",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/sostenibilidad/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/cidre-ifd/",
+            "status": 200
+          },
+          {
+            "method": "GET",
+            "url": "https://www.finrural.org.bo/crecer-ifd/",
+            "status": 200
+          }
+        ],
+        "projection_selected": 132
+      }
+    ]
+  },
+  "browser_30_pages": {
+    "fixture": "30 local JS pages; DATAX_BROWSER_INTEGRATION=1",
+    "wall_seconds": 60.079,
+    "browser_launches": 2,
+    "max_contexts": 1,
+    "active_contexts_after": 0,
+    "peak_sampled_rss_bytes": 360370176,
+    "blocked_assets": {
+      "image": 30,
+      "stylesheet": 30,
+      "font": 30,
+      "media": 30
+    },
+    "blocked_scope": 30,
+    "resources": 30,
+    "http_preflight_requests": 31,
+    "actual_server_requests": 61,
+    "passed": 1,
+    "pytest_seconds": 61.45,
+    "limits": "RSS sampled; no production OOM certification; browser navigation not included in HTTP request counter"
+  },
+  "native_api": {
+    "deployment": "native uvicorn subprocess; isolated empty JSON catalog; no Docker",
+    "startup_to_health_seconds": 2.403,
+    "checks": {
+      "GET /health": 200,
+      "GET /docs": 200,
+      "GET /openapi.json": 200,
+      "GET /catalog/sources": 200,
+      "GET /catalog/sources/absent": 404,
+      "POST /catalog/sources": 405,
+      "GET /catalog/resources?limit=0": 422,
+      "GET /search/export-index": 404,
+      "POST /mapping/inspect invalid": 422,
+      "POST /mapping/inspect valid": 200
+    },
+    "port": 57459,
+    "catalog": "C:\\Users\\VALDIVIA\\AppData\\Local\\Temp\\datax-api-native-20261022-cf0ro871\\catalog"
+  }
+}

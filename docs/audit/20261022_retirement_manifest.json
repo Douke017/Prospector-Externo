@@ -1,0 +1,646 @@
+{
+  "schema_version": "datax-retirement-review-1.0",
+  "date": "2026-10-22",
+  "files": [
+    {
+      "path": ".patch12e/config/final_source_matrix.yaml",
+      "bytes": 27571,
+      "sha256": "f3bcfeca45c1d7e7d57832b174b21e71154ebad02db6bc53f05c725ea042c9cc",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "apps/b10_semantic_audit/main.py",
+        "apps/final_source_audit/main.py",
+        "tests/test_batch12e_fuentes_recuperadas.py",
+        "docs/b10_final_source_audit.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/config/source_execution_map.yaml",
+      "bytes": 8493,
+      "sha256": "6311630355ed35e472514dd4a9bae85008d2891ebafa44d519dd17d570a102d2",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/site_validation/core.py",
+        "apps/b10_targeted_remediation/main.py",
+        "apps/b13_pipeline/main.py",
+        "apps/checkpointed_batch/main.py",
+        "apps/final_source_audit/main.py",
+        "apps/persistence_closure/main.py",
+        "config/persistence_resolution.yaml",
+        "tests/test_batch12e_fuentes_recuperadas.py",
+        "tests/test_physical_acquisition_reuse.py",
+        "docs/b13_reproducible_pipeline.md",
+        "docs/b9_operational_config_promotion.md",
+        "docs/site_validation_audit_design.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/config/source_operational_plan.yaml",
+      "bytes": 45921,
+      "sha256": "147a9bfea87eb97b4d68a406b01bf8ed89e06ddc21fe939d46a5368702373a54",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/site_validation/core.py",
+        "apps/b13_pipeline/main.py",
+        "apps/checkpointed_batch/main.py",
+        "apps/checkpoint_admin/main.py",
+        "apps/custom_resolution/main.py",
+        "apps/final_source_audit/main.py",
+        "apps/operational_config_promotion/main.py",
+        "apps/sources_config_audit/main.py",
+        "apps/source_operational_plan/main.py",
+        "config/custom_candidates.yaml",
+        "tests/test_b13_pipeline.py",
+        "tests/test_batch12e_fuentes_recuperadas.py",
+        "docs/b13_reproducible_pipeline.md",
+        "docs/b7_browser_closure.md",
+        "docs/b8_custom_closure.md",
+        "docs/b9_checkpointed_batch.md",
+        "docs/b9_operational_config_promotion.md",
+        "docs/site_validation_audit_design.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/config/sources.yaml",
+      "bytes": 25246,
+      "sha256": "7848996c13d8ec6b46258560e49fed06883518382860ec59806ac77e466e339f",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/site_validation/specialized.py",
+        "src/prospector_externo/domain/models.py",
+        "apps/b10_targeted_remediation/main.py",
+        "apps/b13_pipeline/main.py",
+        "apps/checkpointed_batch/main.py",
+        "apps/crawler_batch/main.py",
+        "apps/final_source_audit/main.py",
+        "apps/operational_config_promotion/main.py",
+        "apps/persistence_closure/main.py",
+        "apps/sources_config_audit/main.py",
+        "apps/source_characterization/main.py",
+        "config/b10_final_audit_resolution.yaml",
+        "config/source_capabilities.yaml",
+        "config/source_inventory.yaml",
+        "config/workflow_compatibility.yaml",
+        "tests/test_api_workflow_batch3b.py",
+        "tests/test_async_discovery_integration.py",
+        "tests/test_async_discovery_integration_2b.py",
+        "tests/test_b10_canonical_hosts_batch10c4.py",
+        "tests/test_b10_core_runtime_batch10c.py",
+        "tests/test_b10_smoke_followup_batch10c11.py",
+        "tests/test_batch12e_fuentes_recuperadas.py",
+        "tests/test_batch12f_navigation_policy.py",
+        "tests/test_bcb_grouping_batch5a.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_data_gov_public_catalog_batch10c5.py",
+        "tests/test_discovery_checkpoint_resume.py",
+        "tests/test_orchestrator_hexagonal.py",
+        "tests/test_real_smoke_hardening.py",
+        "tests/test_resilience_interruption.py",
+        "tests/test_sources_config.py",
+        "tests/test_statistics_denmark_statbank_api_batch10c33.py",
+        "docs/b10_core_runtime_remediation.md",
+        "docs/b10_final_source_audit.md",
+        "docs/b13_reproducible_pipeline.md",
+        "docs/b6_http_api_closure.md",
+        "docs/b7_browser_closure.md",
+        "docs/b9_checkpointed_batch.md",
+        "docs/b9_operational_config_promotion.md",
+        "docs/b9_sources_config_audit.md",
+        "docs/final_delivery_summary.md",
+        "docs/site_validation_audit_design.md",
+        "docs/source_capabilities.md",
+        "docs/source_characterization.md",
+        "docs/source_mapping.md",
+        "README.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/manifest.json",
+      "bytes": 2051,
+      "sha256": "bd62c30d596d985399161d7f76e7cc6cb61131175f6fb1030dfe9e4851ab02c4",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/prospector_externo/application/projection_export_pipeline.py",
+        "apps/b12_closure_audit/main.py",
+        "apps/b12_datax_package/main.py",
+        "apps/b12_enterprise_delivery/main.py",
+        "apps/b13_closure_audit/main.py",
+        "apps/b13_pipeline/main.py",
+        "tests/test_b12_closure_audit.py",
+        "tests/test_b12_enterprise_delivery.py",
+        "tests/test_b13_pipeline.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_projection_pipeline_batch4c.py",
+        "docs/b12_datax_delivery_package.md",
+        "docs/b12_enterprise_delivery.md",
+        "docs/b12_final_closure.md",
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/tests/test_b10_canonical_hosts_batch10c4.py",
+      "bytes": 2038,
+      "sha256": "b6d5e141f8bf3dc51ccda7328ab6850cb21548ecd35db6d3bce9e14bb7271662",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/tests/test_b13_pipeline.py",
+      "bytes": 7435,
+      "sha256": "d5d9add32c6205c6627192d1163805f2b801a2dfdbe32fd86091b6e76b347472",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/tests/test_batch12e_fuentes_recuperadas.py",
+      "bytes": 3325,
+      "sha256": "dbbaae86945b3dfc83b6bb02efb5bc0062d99c8d6c9624b5ea63398b1c6aed42",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/tests/test_data_gov_public_catalog_batch10c5.py",
+      "bytes": 1071,
+      "sha256": "56e8cf4ab274e40871d90b3d2f118b4c8f116c91a22ed008d3d90b9433c286a4",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/tests/test_site_validation.py",
+      "bytes": 10354,
+      "sha256": "3b2fea3ce5d3e91f0e27b1e4cdacd13215d708d7c97493d97bb94e27dac6dbea",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12e/tests/test_statistics_denmark_statbank_api_batch10c33.py",
+      "bytes": 1039,
+      "sha256": "c8297d66bb72f8a513c5eed7d33cf0a40ef8d810b93f72b6cc53a6a42bb932b9",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12f/config/sources.yaml",
+      "bytes": 25405,
+      "sha256": "53901d38b3294fbe0b162801e298c2a6beee58d7788db0a1a7dd2d2d481ee376",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/site_validation/specialized.py",
+        "src/prospector_externo/domain/models.py",
+        "apps/b10_targeted_remediation/main.py",
+        "apps/b13_pipeline/main.py",
+        "apps/checkpointed_batch/main.py",
+        "apps/crawler_batch/main.py",
+        "apps/final_source_audit/main.py",
+        "apps/operational_config_promotion/main.py",
+        "apps/persistence_closure/main.py",
+        "apps/sources_config_audit/main.py",
+        "apps/source_characterization/main.py",
+        "config/b10_final_audit_resolution.yaml",
+        "config/source_capabilities.yaml",
+        "config/source_inventory.yaml",
+        "config/workflow_compatibility.yaml",
+        "tests/test_api_workflow_batch3b.py",
+        "tests/test_async_discovery_integration.py",
+        "tests/test_async_discovery_integration_2b.py",
+        "tests/test_b10_canonical_hosts_batch10c4.py",
+        "tests/test_b10_core_runtime_batch10c.py",
+        "tests/test_b10_smoke_followup_batch10c11.py",
+        "tests/test_batch12e_fuentes_recuperadas.py",
+        "tests/test_batch12f_navigation_policy.py",
+        "tests/test_bcb_grouping_batch5a.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_data_gov_public_catalog_batch10c5.py",
+        "tests/test_discovery_checkpoint_resume.py",
+        "tests/test_orchestrator_hexagonal.py",
+        "tests/test_real_smoke_hardening.py",
+        "tests/test_resilience_interruption.py",
+        "tests/test_sources_config.py",
+        "tests/test_statistics_denmark_statbank_api_batch10c33.py",
+        "docs/b10_core_runtime_remediation.md",
+        "docs/b10_final_source_audit.md",
+        "docs/b13_reproducible_pipeline.md",
+        "docs/b6_http_api_closure.md",
+        "docs/b7_browser_closure.md",
+        "docs/b9_checkpointed_batch.md",
+        "docs/b9_operational_config_promotion.md",
+        "docs/b9_sources_config_audit.md",
+        "docs/final_delivery_summary.md",
+        "docs/site_validation_audit_design.md",
+        "docs/source_capabilities.md",
+        "docs/source_characterization.md",
+        "docs/source_mapping.md",
+        "README.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12f/manifest.json",
+      "bytes": 566,
+      "sha256": "7b4e7b494b8710520622bba87fdd38a2b0fc7a9bc3c736c0878d2ae70da86de3",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/prospector_externo/application/projection_export_pipeline.py",
+        "apps/b12_closure_audit/main.py",
+        "apps/b12_datax_package/main.py",
+        "apps/b12_enterprise_delivery/main.py",
+        "apps/b13_closure_audit/main.py",
+        "apps/b13_pipeline/main.py",
+        "tests/test_b12_closure_audit.py",
+        "tests/test_b12_enterprise_delivery.py",
+        "tests/test_b13_pipeline.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_projection_pipeline_batch4c.py",
+        "docs/b12_datax_delivery_package.md",
+        "docs/b12_enterprise_delivery.md",
+        "docs/b12_final_closure.md",
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12f/src/prospector_externo/domain/discovery.py",
+      "bytes": 8598,
+      "sha256": "d379d3d2bc9741d043e2c45f47a3037e9e254e8c3acaa94d6e672aebb974a35b",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12f/tests/test_batch12f_navigation_policy.py",
+      "bytes": 3022,
+      "sha256": "bbb1dbe36650a4b53e538dd4967a96da178804a7fbbd6b2aa434c421caacf30c",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/apps/b13_pipeline/main.py",
+      "bytes": 39268,
+      "sha256": "24a01240384dc5d0a10174186a075ec3cf8140804d9e53653d63fc4605ccfd24",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md",
+        "docs/site_validation_audit_design.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/apps/catalog_sync/__init__.py",
+      "bytes": 67,
+      "sha256": "59a30f5fca6e736f83881aaa12c3d38718b90972d48b878a192840797386e58a",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/apps/catalog_sync/main.py",
+      "bytes": 2928,
+      "sha256": "1077b1f0513ade77528e52af4f50674341147b4bdcb39119a19b354a69c48377",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md",
+        "docs/site_validation_audit_design.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/docker-compose.yml",
+      "bytes": 1812,
+      "sha256": "9453933077a64cdca78483b1df103a4738dccde97d374a2a77103df64f1c1d50",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "tests/test_docker_deployment_hu15.py"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/manifest.json",
+      "bytes": 1227,
+      "sha256": "9ad789901b00fde16365fd0935c97f97af4ce2c47eea4bf0fb9dcde9c575a81e",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/prospector_externo/application/projection_export_pipeline.py",
+        "apps/b12_closure_audit/main.py",
+        "apps/b12_datax_package/main.py",
+        "apps/b12_enterprise_delivery/main.py",
+        "apps/b13_closure_audit/main.py",
+        "apps/b13_pipeline/main.py",
+        "tests/test_b12_closure_audit.py",
+        "tests/test_b12_enterprise_delivery.py",
+        "tests/test_b13_pipeline.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_projection_pipeline_batch4c.py",
+        "docs/b12_datax_delivery_package.md",
+        "docs/b12_enterprise_delivery.md",
+        "docs/b12_final_closure.md",
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/src/prospector_externo/adapters/persistence/local_json_adapter.py",
+      "bytes": 17937,
+      "sha256": "3d5d07bd2893957d19fff66f24c748e6573b879e5f5feb642eca4f932f836fc6",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/src/prospector_externo/application/catalog_sync.py",
+      "bytes": 8512,
+      "sha256": "c02005b0b5a9840cbea1e43af5760143a6be778b1287fd47aa8f5ef7e82c4e7c",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12g/tests/test_batch12g_catalog_sync.py",
+      "bytes": 7327,
+      "sha256": "dec16d85e13b123383634114cf983f7a6cb2319f33e76cc271e86617c72f931d",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12h/apps/checkpointed_batch/main.py",
+      "bytes": 5289,
+      "sha256": "b0d6ebc691ca45ea7885d2b7965a56edc410da87e88b6d4f4f2312fd50c0b3ae",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md",
+        "docs/site_validation_audit_design.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12h/manifest.json",
+      "bytes": 911,
+      "sha256": "23f0f9c5340c43de54160ca9fbaec5f324ac51638a6f28530276fa03a2f7cb5c",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/prospector_externo/application/projection_export_pipeline.py",
+        "apps/b12_closure_audit/main.py",
+        "apps/b12_datax_package/main.py",
+        "apps/b12_enterprise_delivery/main.py",
+        "apps/b13_closure_audit/main.py",
+        "apps/b13_pipeline/main.py",
+        "tests/test_b12_closure_audit.py",
+        "tests/test_b12_enterprise_delivery.py",
+        "tests/test_b13_pipeline.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_projection_pipeline_batch4c.py",
+        "docs/b12_datax_delivery_package.md",
+        "docs/b12_enterprise_delivery.md",
+        "docs/b12_final_closure.md",
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12h/src/execution/checkpointed_batch.py",
+      "bytes": 15911,
+      "sha256": "32b1bfae5dfaab3befb20a51f6d2b7df64be0da26e880ba133a860b4d3c335f7",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12h/src/persistence/model.py",
+      "bytes": 7977,
+      "sha256": "9e6f07b6dbca3998c622237ac0d29a35733e4a1187a21b5e729e8a002fb86d58",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12h/tests/test_batch12h_partial_checkpoint.py",
+      "bytes": 4398,
+      "sha256": "cc55b16ee5f7ad903e5b6ccbd18becbf57c1c29d00c51f7a1e05cafa090cf635",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12i/manifest.json",
+      "bytes": 510,
+      "sha256": "01780755a68bc3e50bdc7957caec3ec5f6c873343bd03961f6cec73baac99fc9",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "src/prospector_externo/application/projection_export_pipeline.py",
+        "apps/b12_closure_audit/main.py",
+        "apps/b12_datax_package/main.py",
+        "apps/b12_enterprise_delivery/main.py",
+        "apps/b13_closure_audit/main.py",
+        "apps/b13_pipeline/main.py",
+        "tests/test_b12_closure_audit.py",
+        "tests/test_b12_enterprise_delivery.py",
+        "tests/test_b13_pipeline.py",
+        "tests/test_continuation_cli_flows.py",
+        "tests/test_projection_pipeline_batch4c.py",
+        "docs/b12_datax_delivery_package.md",
+        "docs/b12_enterprise_delivery.md",
+        "docs/b12_final_closure.md",
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12i/src/prospector_externo/adapters/api/routes.py",
+      "bytes": 7870,
+      "sha256": "722e6dba3f138d6582470517fcc54b53681c0b448c606f6885da460a87e1bbf3",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": ".patch12i/tests/test_catalog_api.py",
+      "bytes": 16090,
+      "sha256": "9494b9671cd2d603f1731362b7bc5a4bc2d901366cf488c0ca84f0a46ef12176",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "apply_batch_12D_urls_exportacion.py",
+      "bytes": 3822,
+      "sha256": "d22ac751f683f66f7d36f3d55248c5e220fe88d20b2987f7781f26d410846ebb",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "apply_batch_12E_fuentes.py",
+      "bytes": 4879,
+      "sha256": "64438aeee91d180273313304ad68cdd0c005d9f305f1322b2db25afd60a22945",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "apply_batch_12F_navegacion.py",
+      "bytes": 4583,
+      "sha256": "a037dd1ae72523ff1c32b0e0b2107838694c5ee75a27f9fb89f52339880e9d0a",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "apply_batch_12G_sincronizacion.py",
+      "bytes": 4433,
+      "sha256": "37f70ce4e30b0db77c728ef59be82e3b40e21f294ec61fc2b8a0a86970825cbd",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "apply_batch_12H_checkpoint_parcial.py",
+      "bytes": 3033,
+      "sha256": "3167ad6fc5c2124e6396b104da74dc70c7f60cba84dc16b979c00549044b44b3",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "apply_batch_12I_mapping_inspect.py",
+      "bytes": 2758,
+      "sha256": "1024076f02a938e0d31c1238c29aab997d3b5e1dfc754fd8f58dd791df153d2d",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "benchmark_runner.py",
+      "bytes": 12178,
+      "sha256": "d8ae44ff183e666839a9e9d53ee988074abd38eda55ce1179619866ddcc3db21",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [
+        "docs/final_delivery_summary.md",
+        "docs/source_mapping.md"
+      ],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_12D.txt",
+      "bytes": 1742,
+      "sha256": "5e8510faef2eb294c7612e3d5e081abe04df0e8f8d7ad5c7fa6058cc87b0f64a",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_12E.txt",
+      "bytes": 1557,
+      "sha256": "9605aaea211f3fd3e2de9665ebbaba1e1938328eecbaa98538e787517f7493be",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_12F.txt",
+      "bytes": 1489,
+      "sha256": "8571f8cee78b7450f16ab6f7a05b46d27358a0e70cceabd608230ba10721e993",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_12G.txt",
+      "bytes": 3408,
+      "sha256": "adf80f72d53d2f19f6ae480b8540f0d9337a9f42a8a337781b5397289c6726ea",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_12H.txt",
+      "bytes": 1142,
+      "sha256": "db950d520a2e1af01155e62b3fa6e6a11c62b231ca2b6c17c050139b44e8b874",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_12I.txt",
+      "bytes": 1570,
+      "sha256": "e1d06413c437f27ff5e50c48bb414e1a07e3b78bb644690f9b6261199038fa38",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_DATAX_12B.txt",
+      "bytes": 957,
+      "sha256": "13ca9e86efe42cff4b67491ac89491fff82994c9be332e4c6a7628327fb17d8c",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "INSTRUCCIONES_DATAX_12C.txt",
+      "bytes": 1675,
+      "sha256": "327b2a5102829b28d90dda9919e7b7983f0d4b3dfaa17d7be2b3de1c26bd28dc",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "validar_exportacion_fuentes_12C.py",
+      "bytes": 13684,
+      "sha256": "5614e6c44264e63012e768c7139a65e9f41560afab20a35f2164f53d113d1c3c",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    },
+    {
+      "path": "validar_rescate_fuentes_12B.py",
+      "bytes": 9948,
+      "sha256": "57c2ba23bbe24bb1cb855c7c1a5dcb038093bc58388487927357b9f4bc2e4958",
+      "reason": "Copia historica/instalador/instruccion: candidato a revision; vigencia pendiente de confirmar",
+      "dependencies_or_references": [],
+      "decision": "PRESERVE; no ejecutado, borrado ni movido"
+    }
+  ],
+  "file_count": 48,
+  "total_bytes": 383027,
+  "proposal": {
+    "backup_destination": "Unidad externa elegida y aprobada por el propietario; conservar rutas relativas",
+    "steps": [
+      "Copiar lista aprobada a respaldo externo",
+      "Verificar cantidad, tamanos y SHA-256 contra este manifiesto",
+      "Revisar referencias y obtener autorizacion de retiro",
+      "Retirar unicamente despues de aprobacion explicita"
+    ],
+    "executed": false
+  },
+  "excluded_from_retirement": [
+    "output/",
+    ".runtime/",
+    "BACKLOG_USER_STORIES.md",
+    "documento-arquitectura-prospector-externo.md",
+    "docs/audit/",
+    "c?digo activo"
+  ],
+  "reference_matching": "Rutas literales o nombres de archivo; indicios para revision, sin prueba de dependencia activa"
+}

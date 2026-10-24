@@ -11,6 +11,12 @@ Policy:
 from __future__ import annotations
 
 import logging
+from urllib.parse import urlsplit
+
+try:
+    import psutil
+except ImportError:  # Dependencia opcional del extra [browser].
+    psutil = None
 from typing import Optional, Tuple
 
 logger = logging.getLogger("prospector.infrastructure.browser")
@@ -35,14 +41,22 @@ class PlaywrightDriver:
     """Bounded Playwright driver with a controlled system-Chrome fallback."""
 
     MAX_PAGES_BEFORE_RESTART = 15
+    MAX_BROWSER_RSS_BYTES = 1024 * 1024 * 1024
 
-    def __init__(self, headless: bool = True, timeout_ms: int = 25000):
+    def __init__(
+        self, headless: bool = True, timeout_ms: int = 25000,
+        max_browser_rss_bytes: int = MAX_BROWSER_RSS_BYTES,
+    ):
+        if max_browser_rss_bytes <= 0:
+            raise ValueError("max_browser_rss_bytes debe ser positivo")
         self.headless = headless
         self.timeout_ms = timeout_ms
         self._playwright: Optional[Playwright] = None
         self._browser: Optional[Browser] = None
         self._pages_navigated = 0
         self._browser_source: Optional[str] = None
+        self.max_browser_rss_bytes = max_browser_rss_bytes
+        self.allowed_hosts = None
 
     @property
     def browser_source(self) -> Optional[str]:
@@ -112,6 +126,59 @@ class PlaywrightDriver:
                     f"managed={managed_exc!s}; system_chrome={chrome_exc!s}"
                 ) from chrome_exc
 
+    def _browser_tree_rss_bytes(self) -> Optional[int]:
+        """Mide el RSS del driver Playwright y sus procesos descendientes.
+
+        Playwright Python no publica un PID de Chromium. La ruta al proceso
+        driver es interna y por eso se comprueba defensivamente. Si cambia la
+        API interna no se devuelve un consumo inventado.
+        """
+        if psutil is None or self._playwright is None:
+            return None
+        impl = getattr(self._playwright, "_impl_obj", None)
+        connection = getattr(impl, "_connection", None)
+        transport = getattr(connection, "_transport", None)
+        proc = getattr(transport, "_proc", None)
+        pid = getattr(proc, "pid", None)
+        if not pid:
+            return None
+        try:
+            root = psutil.Process(pid)
+            processes = [root, *root.children(recursive=True)]
+            total = 0
+            for child in processes:
+                try:
+                    total += child.memory_info().rss
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                    continue
+            return total
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            return None
+
+    def _recycle_on_memory_pressure(self) -> bool:
+        if self._browser is None:
+            return False
+        rss = self._browser_tree_rss_bytes()
+        if rss is None:
+            # Los fakes de pruebas no exponen PID. Un runtime Playwright real
+            # debe fallar explícitamente si no puede medir sus procesos.
+            impl = getattr(self._playwright, "_impl_obj", None)
+            if impl is not None:
+                self.close()
+                raise RuntimeError(
+                    "BROWSER_MEMORY_MONITOR_UNAVAILABLE: no se pudo medir "
+                    "el árbol de procesos de Chromium"
+                )
+            return False
+        if rss < self.max_browser_rss_bytes:
+            return False
+        logger.warning(
+            "Chromium/Playwright RSS %d bytes supera límite %d; reciclando.",
+            rss, self.max_browser_rss_bytes,
+        )
+        self.close()
+        return True
+
     def _ensure_browser(self) -> None:
         """Start or recycle the browser while preserving bounded memory use."""
         if not HAS_PLAYWRIGHT or sync_playwright is None:
@@ -119,6 +186,13 @@ class PlaywrightDriver:
                 "Playwright no está instalado en el entorno. "
                 "Instala el paquete Python antes de ejecutar workflows JavaScript."
             )
+        if psutil is None:
+            raise RuntimeError(
+                "BROWSER_MEMORY_MONITOR_UNAVAILABLE: instalar psutil con "
+                "python -m pip install '.[browser]'"
+            )
+        if self._browser is not None:
+            self._recycle_on_memory_pressure()
 
         if (
             self._browser is not None
@@ -150,6 +224,7 @@ class PlaywrightDriver:
 
         context: Optional[BrowserContext] = None
         page: Optional[Page] = None
+        attempted_navigation = False
 
         try:
             assert self._browser is not None
@@ -160,22 +235,23 @@ class PlaywrightDriver:
             )
             page = context.new_page()
             page.set_default_timeout(self.timeout_ms)
+            page.set_default_navigation_timeout(self.timeout_ms)
 
-            page.route(
-                "**/*",
-                lambda route, request: (
+            allowed_hosts = self.allowed_hosts or {urlsplit(url).hostname}
+            def route_request(route, request):
+                host = (urlsplit(getattr(request, "url", url)).hostname or "").lower().rstrip(".")
+                if (request.resource_type in {"image", "media", "font", "stylesheet"}
+                        or host not in allowed_hosts):
                     route.abort()
-                    if request.resource_type
-                    in {"image", "media", "font", "stylesheet"}
-                    else route.continue_()
-                ),
-            )
+                else:
+                    route.continue_()
+            page.route("**/*", route_request)
 
+            attempted_navigation = True
             page.goto(url, wait_until="domcontentloaded")
             page.wait_for_timeout(1500)
 
             content = page.content()
-            self._pages_navigated += 1
             return content, None
 
         except Exception as exc:
@@ -192,6 +268,13 @@ class PlaywrightDriver:
                     context.close()
                 except Exception:
                     pass
+
+            if attempted_navigation:
+                self._pages_navigated += 1
+            # Muestreo posterior tras liberar page/context; si el RSS creció,
+            # cerrar Chromium antes de la siguiente navegación.
+            if self._browser is not None:
+                self._recycle_on_memory_pressure()
 
     def close(self) -> None:
         """Close browser and Playwright runtime safely."""

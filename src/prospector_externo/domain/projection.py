@@ -23,6 +23,8 @@ from prospector_externo.domain.grouping import (
     GroupingUnmatchedPolicy,
 )
 from prospector_externo.domain.models import ApiMetadata, ResourceCandidate, ResourceType
+from prospector_externo.domain.normalizer import UrlNormalizer
+from prospector_externo.domain.api_discovery import ApiDetector
 
 
 class ProjectionPriority(str, Enum):
@@ -276,7 +278,10 @@ class ResourceFamilyKeyBuilder:
         if anchor and cls._ascii(anchor) not in cls.GENERIC_LINK_TEXT:
             values.append(anchor)
 
-        parsed = urlparse(resource.url)
+        try:
+            parsed = urlparse(resource.url)
+        except ValueError:
+            return values
         basename = os.path.basename(parsed.path.rstrip("/"))
         if basename:
             values.append(unquote(basename))
@@ -327,13 +332,16 @@ class ResourceFamilyKeyBuilder:
             return cleaned[0]
 
         # Last-resort key remains deterministic and source-local via family_id.
-        path = urlparse(resource.url).path.strip("/") or "resource"
+        try:
+            path = urlparse(resource.url).path.strip("/") or "resource"
+        except ValueError:
+            path = "resource"
         fallback = cls._clean(path) or "resource"
         return fallback
 
 
 class ResourceProjectionPolicy:
-    """Clasifica recursos para downstream sin borrar evidencia del catálogo bruto."""
+    """Selecciona referencias consumibles por criterios técnicos, sin filtro de negocio."""
 
     STRUCTURED_FORMATS = {
         "csv", "tsv", "xls", "xlsx", "ods", "json", "xml", "geojson", "ndjson",
@@ -341,18 +349,6 @@ class ResourceProjectionPolicy:
     }
     DOCUMENT_FORMATS = {"pdf", "doc", "docx"}
     ARCHIVE_FORMATS = {"zip", "tar", "gz", "tgz", "rar", "7z"}
-
-    POSITIVE_TERMS = (
-        "estadistic", "dataset", "datos", "serie", "indicador", "boletin estad",
-        "reporte financiero", "informe financiero", "balance", "cartera", "mensual",
-        "trimestral", "semestral", "anuario", "censo", "encuesta", "precios",
-        "produccion", "comercio", "empleo", "presupuesto", "exportacion",
-    )
-    ADMIN_TERMS = (
-        "convocatoria", "organigrama", "recursos humanos", "rrhh", "reglamento",
-        "normativa", "resolucion", "formulario", "manual", "contratacion",
-        "licitacion", "mision", "vision", "evento", "publicidad",
-    )
 
     @staticmethod
     def detect_format(resource: ResourceCandidate) -> str:
@@ -383,26 +379,25 @@ class ResourceProjectionPolicy:
         return "unknown"
 
     @classmethod
-    def _evidence_text(cls, resource: ResourceCandidate) -> str:
-        text = " ".join(
-            part for part in (
-                resource.title,
-                resource.anchor_text,
-                resource.context_text,
-                unquote(resource.url),
-            ) if part
-        )
-        return ResourceFamilyKeyBuilder._ascii(text)
-
-    @classmethod
     def classify(cls, resource: ResourceCandidate) -> Tuple[bool, ProjectionPriority, Tuple[str, ...]]:
+        # El miembro de un contenedor no tiene URL HTTP de descarga propia.
+        # Permanece en el inventario RAW, nunca se proyecta como CSV/PDF directo.
+        if resource.extracted_from_archive:
+            return False, ProjectionPriority.LOW, ("archive_member_metadata_only",)
+        # No seleccionar enlaces que DATAX no pueda consumir. Se conservan
+        # íntegros en RAW y se explica la exclusión en decisions.reason_codes.
+        # raw_url puede ser relativa: la validación corresponde a resource.url,
+        # que ya fue resuelta por discovery.
+        download_url = UrlNormalizer.encode_download_url(resource.url)
+        if download_url is None:
+            return False, ProjectionPriority.LOW, ("invalid_download_url",)
         fmt = cls.detect_format(resource)
-        text = cls._evidence_text(resource)
-        has_positive = any(term in text for term in cls.POSITIVE_TERMS)
-        has_admin = any(term in text for term in cls.ADMIN_TERMS)
-        period = ProjectionPeriodNormalizer.extract(resource)
+        path_reasons = ("download_path_encoded",) if download_url != resource.url else ()
 
         if resource.resource_type == ResourceType.API:
+            auxiliary = ApiDetector.auxiliary_reason(download_url)
+            if auxiliary:
+                return False, ProjectionPriority.LOW, (auxiliary,)
             api = resource.api
             if api is None:
                 return False, ProjectionPriority.LOW, ("api_without_metadata",)
@@ -414,26 +409,16 @@ class ResourceProjectionPolicy:
                 return False, ProjectionPriority.LOW, ("api_non_get",)
             if api.auth_required or not api.callable_by_policy:
                 return False, ProjectionPriority.LOW, ("api_not_publicly_callable",)
-            return True, ProjectionPriority.HIGH, ("public_get_api",)
+            return True, ProjectionPriority.HIGH, ("public_get_api",) + path_reasons
 
         if fmt in cls.STRUCTURED_FORMATS:
-            return True, ProjectionPriority.HIGH, ("structured_data_format",)
+            return True, ProjectionPriority.HIGH, ("structured_data_format",) + path_reasons
 
         if fmt in cls.ARCHIVE_FORMATS:
-            if has_positive or period:
-                return True, ProjectionPriority.MEDIUM, ("archive_with_statistical_evidence",)
-            return False, ProjectionPriority.LOW, ("archive_contents_unknown",)
+            return True, ProjectionPriority.MEDIUM, ("public_archive_reference",) + path_reasons
 
         if fmt in cls.DOCUMENT_FORMATS:
-            if has_admin and not has_positive:
-                return False, ProjectionPriority.LOW, ("administrative_document",)
-            if has_positive and period:
-                return True, ProjectionPriority.MEDIUM, ("periodic_statistical_document",)
-            if has_positive:
-                return True, ProjectionPriority.MEDIUM, ("statistical_document",)
-            if period:
-                return True, ProjectionPriority.MEDIUM, ("periodic_document",)
-            return False, ProjectionPriority.LOW, ("document_without_data_evidence",)
+            return True, ProjectionPriority.MEDIUM, ("public_document_reference",) + path_reasons
 
         return False, ProjectionPriority.LOW, ("unsupported_or_unknown_format",)
 
@@ -533,7 +518,7 @@ class ProjectionBuilder:
             resource_type=resource.resource_type,
             title=resource.title or description,
             description=description,
-            url=resource.url,
+            url=UrlNormalizer.encode_download_url(resource.url),
             raw_url=resource.raw_url,
             origin_url=resource.discovered_from_url,
             format=fmt,

@@ -33,6 +33,10 @@ sources:
   - https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera/
   - https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera-2024/
   - https://www.bbv.com.bo/hechos-relevantes-y-noticias/
+  # Las cinco paginas oficiales son semillas prioritarias. El sitemap de BBV
+  # puede saturar max_urls antes de recorrerlas (B13: MAX_URLS, 1 HTML).
+  # No se desactiva robots.txt ni se acorta el recorrido de enlaces HTML.
+  discover_sitemaps: false
   update_category: DAILY
   allowed_extensions:
   - .pdf
@@ -173,6 +177,11 @@ sources:
   entrypoint: https://www.asfi.gob.bo
   seeds:
   - https://www.asfi.gob.bo
+  # Páginas con rendimiento documental observado en B13; priorizarlas dentro
+  # del MISMO presupuesto HTTP (sin aumentar 250 requests/URLs ni 1000 recursos).
+  - https://www.asfi.gob.bo/pb/decretos-supremos-referidos-servicios-financieros
+  - https://www.asfi.gob.bo/pb/decretos
+  - https://www.asfi.gob.bo/auditorias?page=1
   workflow: html
 - update_category: MONTHLY
   allowed_extensions:
@@ -639,10 +648,21 @@ sources:
   source_id: undata
   name: United Nations Data
   entrypoint: https://data.un.org
+  workflow: api
+  # Dos indicadores curados, VERIFICADOS; no representan el catálogo UNData.
+  # Su agotamiento DEBE producir PARTIAL_SUCCESS y conservar el histórico.
+  api_seed_scope: curated
   seeds:
-  - https://data.un.org
-  workflow: javascript
+  - https://unsd-datacommons.gcp.un-icc.cloud/core/api/v2/observation?date=LATEST&variable.dcids=undata%2Funodc%2FVIC_HOM_RT&entity.dcids=country%2FZAF&select=date&select=value&select=variable&select=entity
+  - https://unsd-datacommons.gcp.un-icc.cloud/core/api/v2/observation?date=LATEST&variable.dcids=undata%2Fsdg%2FVC_DTH_TOTN&entity.dcids=country%2FSSD&select=date&select=value&select=variable&select=entity
+  allowed_hosts:
+  - unsd-datacommons.gcp.un-icc.cloud
   discover_apis: true
+  max_requests: 8
+  max_api_endpoints: 2
+  max_api_response_bytes: 131072
+  follow_api_pagination: false
+  probe_api_documentation: false
 - update_category: MONTHLY
   allowed_extensions:
   - .pdf
@@ -898,3 +918,136 @@ sources:
     - /DL_SelectFields.aspx
     evidence_seed_urls:
     - https://www.transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=&gnoyr_VQ=GED
+# Lote 12E: fuentes recuperadas tras evidencia 12B/12C; sin bypass robots/TLS.
+- source_id: ibch
+  name: Instituto Boliviano del Cemento y Hormigón
+  entrypoint: https://www.ibch.com/
+  workflow: html
+  seeds:
+  - https://www.ibch.com/pub/
+  - https://www.ibch.com/boletin/
+  - https://www.ibch.com/pavimentos/publicaciones/
+  update_category: MONTHLY
+  allowed_extensions:
+  - .pdf
+  - .xlsx
+  - .xls
+  - .csv
+  - .zip
+  allowed_hosts:
+  - www.ibch.com
+  - ibch.com
+  rate_limit_seconds: 1.0
+  ignore_robots_txt: false
+  excluded_path_keywords:
+  - /cart/
+  - /comprar/
+  - /checkout/
+  - /escritorio/
+  - /registro-de-estudiante/
+  - /my-account/
+  max_depth: 2
+  max_urls: 300
+  max_resources: 500
+  max_requests: 160
+  max_runtime_seconds: 480
+  discover_sitemaps: false
+  discover_apis: false
+  probe_api_documentation: false
+  follow_api_pagination: false
+  inspect_archives: false
+  max_archive_inspections: 0
+  max_archive_bytes: 2000000
+- source_id: fam
+  name: Federación de Asociaciones Municipales de Bolivia
+  entrypoint: https://fam.org.bo/
+  workflow: html
+  seeds:
+  - https://fam.org.bo/publicaciones/
+  update_category: MONTHLY
+  allowed_extensions:
+  - .pdf
+  - .xlsx
+  - .xls
+  - .csv
+  - .zip
+  allowed_hosts:
+  - fam.org.bo
+  - www.fam.org.bo
+  rate_limit_seconds: 1.0
+  ignore_robots_txt: false
+  excluded_path_keywords:
+  - /cdn-cgi/l/email-protection
+  max_depth: 2
+  max_urls: 300
+  max_resources: 800
+  max_requests: 160
+  max_runtime_seconds: 480
+  discover_sitemaps: false
+  discover_apis: false
+  probe_api_documentation: false
+  follow_api_pagination: false
+  inspect_archives: false
+  max_archive_inspections: 0
+  max_archive_bytes: 2000000
+- source_id: otros_historicos
+  name: Doing Business (Banco Mundial; archivo histórico)
+  entrypoint: https://datacatalog.worldbank.org/search/dataset/0038564/doing-business
+  workflow: html
+  seeds:
+  - https://datacatalog.worldbank.org/search/dataset/0038564/doing-business
+  update_category: MONTHLY
+  allowed_extensions:
+  - .pdf
+  - .xlsx
+  - .xls
+  - .csv
+  - .zip
+  allowed_hosts:
+  - datacatalog.worldbank.org
+  - datacatalogfiles.worldbank.org
+  - databank.worldbank.org
+  rate_limit_seconds: 1.0
+  ignore_robots_txt: false
+  max_depth: 1
+  max_urls: 160
+  max_resources: 150
+  max_requests: 70
+  max_runtime_seconds: 240
+  discover_sitemaps: false
+  discover_apis: false
+  probe_api_documentation: false
+  follow_api_pagination: false
+  inspect_archives: true
+  max_archive_inspections: 3
+  max_archive_bytes: 2000000
+- source_id: fmi
+  name: Fondo Monetario Internacional (datos WEO)
+  entrypoint: https://data.imf.org/en/datasets/IMF.RES%3AWEO
+  workflow: html
+  seeds:
+  - https://data.imf.org/en/datasets/IMF.RES%3AWEO
+  - https://data.imf.org/en/Resource-Pages/IMF-API
+  update_category: MONTHLY
+  allowed_extensions:
+  - .pdf
+  - .xlsx
+  - .xls
+  - .csv
+  - .zip
+  allowed_hosts:
+  - data.imf.org
+  rate_limit_seconds: 1.0
+  ignore_robots_txt: false
+  max_depth: 1
+  max_urls: 160
+  max_resources: 150
+  max_requests: 70
+  max_runtime_seconds: 240
+  discover_sitemaps: false
+  discover_apis: false
+  probe_api_documentation: false
+  follow_api_pagination: false
+  inspect_archives: false
+  max_archive_inspections: 0
+  max_archive_bytes: 2000000

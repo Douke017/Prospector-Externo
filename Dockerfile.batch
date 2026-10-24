@@ -1,0 +1,16 @@
+# HU-15: Crawler Batch App efímero con navegador ya provisionado.
+# El tag y el paquete Python Playwright deben coincidir.
+FROM mcr.microsoft.com/playwright/python:v1.55.0-noble
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH=/app:/app/src
+
+WORKDIR /app
+COPY . /app
+RUN python -m pip install --no-cache-dir '.[mongo]' 'playwright==1.55.0'
+
+# No se ejecuta crawling en build ni al arrancar la API.
+ENTRYPOINT ["python", "-m", "apps.crawler_batch.main"]
+CMD ["--help"]

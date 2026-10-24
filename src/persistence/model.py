@@ -14,6 +14,7 @@ PENDING = "PENDING"
 RUNNING = "RUNNING"
 SUCCEEDED = "SUCCEEDED"
 FAILED = "FAILED"
+PARTIAL = "PARTIAL"
 SKIPPED_STATUS = "SKIPPED_STATUS"
 
 VALID_STATES = {
@@ -21,13 +22,15 @@ VALID_STATES = {
     RUNNING,
     SUCCEEDED,
     FAILED,
+    PARTIAL,
     SKIPPED_STATUS,
 }
 
 ALLOWED_TRANSITIONS = {
     PENDING: {RUNNING, SKIPPED_STATUS},
-    RUNNING: {SUCCEEDED, FAILED},
-    FAILED: {RUNNING},
+    RUNNING: {SUCCEEDED, PARTIAL, FAILED},
+    FAILED: {RUNNING, SKIPPED_STATUS},
+    PARTIAL: {RUNNING, SKIPPED_STATUS},
     SUCCEEDED: set(),
     SKIPPED_STATUS: set(),
 }
@@ -187,6 +190,11 @@ def transition(
         row["finished_at_utc"] = None
         row["last_error"] = None
 
+    elif new_state == PARTIAL:
+        row["finished_at_utc"] = now
+        row["last_error"] = None
+        row["resource_count"] = resource_count
+
     elif new_state == SUCCEEDED:
         row["finished_at_utc"] = now
         row["last_error"] = None
@@ -241,14 +249,18 @@ def resume_candidates(
 ) -> list[str]:
     validate_checkpoint(checkpoint)
 
-    allowed = {PENDING}
-    if include_failed:
-        allowed.add(FAILED)
-
-    return [
+    pending = [
         source_id
         for source_id, row in checkpoint["sources"].items()
-        if row.get("state") in allowed
+        if row.get("state") == PENDING
+    ]
+    if not include_failed:
+        return pending
+
+    return pending + [
+        source_id
+        for source_id, row in checkpoint["sources"].items()
+        if row.get("state") in {FAILED, PARTIAL}
     ]
 
 

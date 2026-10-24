@@ -13,7 +13,7 @@ def _row():
     raw = yaml.safe_load(
         (root / "config" / "sources.yaml").read_text(encoding="utf-8")
     )
-    assert len(raw["sources"]) == 35
+    assert len(raw["sources"]) == 39
     return next(
         row
         for row in raw["sources"]

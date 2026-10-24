@@ -63,3 +63,47 @@ def test_inspect_tar_archive_bytes():
     assert entries[0].filename == "datos_2026.csv"
     assert entries[0].extension == ".csv"
     assert entries[0].size_bytes > 0
+
+
+def test_archive_zip_rejects_unsafe_members_and_honors_declared_limits():
+    payload = io.BytesIO()
+    with zipfile.ZipFile(payload, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr('../escape.pdf', b'unsafe')
+        zf.writestr('/absolute.xlsx', b'unsafe')
+        zf.writestr('documents/report.pdf', b'%PDF')
+        zf.writestr('documents/sheet.xlsx', b'Excel')
+    members = ArchiveExtractor.inspect_archive_bytes(payload.getvalue(), 'data.zip')
+    assert [member.filename for member in members] == ['documents/report.pdf', 'documents/sheet.xlsx']
+    with pytest.raises(ValueError, match='ARCHIVE_INSPECTION_LIMIT'):
+        ArchiveExtractor.inspect_archive_bytes(payload.getvalue(), 'data.zip', max_entries=1)
+    with pytest.raises(ValueError, match='ARCHIVE_INSPECTION_LIMIT'):
+        ArchiveExtractor.inspect_archive_bytes(payload.getvalue(), 'data.zip', max_uncompressed_bytes=3)
+
+
+def test_archive_tar_gz_is_supported_with_decompression_limit():
+    import gzip
+    raw = create_sample_tar_bytes()
+    compressed = gzip.compress(raw)
+    assert ArchiveExtractor.can_inspect('https://example.test/archivo.tar.gz?sig=123')
+    members = ArchiveExtractor.inspect_archive_bytes(compressed, 'archivo.tar.gz')
+    assert [m.filename for m in members] == ['datos_2026.csv']
+    with pytest.raises(ValueError, match='ARCHIVE_INSPECTION_LIMIT'):
+        ArchiveExtractor.inspect_archive_bytes(
+            compressed, 'archivo.tar.gz', max_uncompressed_bytes=1024,
+        )
+
+
+def test_archive_bad_zip_is_controlled():
+    with pytest.raises(ValueError, match='INVALID_ARCHIVE'):
+        ArchiveExtractor.inspect_archive_bytes(b'bad zip data', 'reports.zip')
+
+
+def test_archive_allows_harmless_dot_prefix_from_common_tar_tools():
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode='w') as tf:
+        data = b'csv'
+        info = tarfile.TarInfo('./datos/2026.csv')
+        info.size = len(data)
+        tf.addfile(info, io.BytesIO(data))
+    result = ArchiveExtractor.inspect_archive_bytes(buf.getvalue(), 'data.tar')
+    assert [member.filename for member in result] == ['datos/2026.csv']

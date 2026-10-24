@@ -18,7 +18,8 @@ class SourceStatusGate:
         config: SourceConfig,
         source_state: Optional[Source],
         force: bool = False,
-        now: Optional[datetime] = None
+        now: Optional[datetime] = None,
+        recovering_pipeline: bool = False,
     ) -> Tuple[bool, Optional[str]]:
         """
         Retorna: (es_elegible, motivo_de_exclusion_si_aplica).
@@ -33,6 +34,11 @@ class SourceStatusGate:
         # 1. Verificar salud
         if source_state.health_status == HealthStatus.SUSPENDED.value:
             return False, "SUSPENDED: Fuente suspendida por fallos persistentes acumulados"
+
+        # Verified recovery of an unfinished source in the SAME pipeline. It is
+        # not a periodic round and never overrides suspension or HTTP policies.
+        if recovering_pipeline:
+            return True, None
 
         # 2. Verificar cadencia de actualización
         current_time = now or datetime.now(timezone.utc)

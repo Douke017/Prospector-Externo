@@ -104,6 +104,9 @@ def test_resume_candidates_include_pending_and_failed_only():
     assert "s0" in candidates
     assert "s1" not in candidates
     assert "s41" not in candidates
+    assert candidates[:2] == ["s2", "s3"]
+    assert candidates[-1] == "s0"
+    assert "s0" not in resume_candidates(checkpoint, include_failed=False)
 
 
 def test_json_store_is_atomic_and_roundtrips(tmp_path: Path):

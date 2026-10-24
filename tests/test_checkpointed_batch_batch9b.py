@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
 from src.execution.checkpointed_batch import (
     build_single_source_config,
+    default_executor,
     initialize_or_resume,
     match_source_entry,
     run_checkpointed_sources,
@@ -117,6 +119,8 @@ def test_successful_execution_marks_succeeded(tmp_path: Path):
     store.save(checkpoint)
 
     def executor(**kwargs):
+        assert kwargs["catalog_dir"] == tmp_path / "catalog"
+        assert kwargs["force"] is True
         return 0
 
     updated, report = run_checkpointed_sources(
@@ -126,6 +130,8 @@ def test_successful_execution_marks_succeeded(tmp_path: Path):
         store=store,
         work_dir=tmp_path / "work",
         output_root=tmp_path / "out",
+        catalog_dir=tmp_path / "catalog",
+        force=True,
         max_sources=1,
         executor=executor,
     )
@@ -159,6 +165,20 @@ def test_failed_execution_is_resume_candidate(tmp_path: Path):
     assert report["failed"] == 1
     assert updated["sources"]["s0"]["state"] == FAILED
     assert "s0" in report["remaining_resume_candidates"]
+
+    resumed, resumed_report = run_checkpointed_sources(
+        plan=plan,
+        source_config=config,
+        checkpoint=updated,
+        store=store,
+        work_dir=tmp_path / "resume_work",
+        output_root=tmp_path / "resume_out",
+        max_sources=1,
+        executor=lambda **kwargs: 0,
+    )
+    assert resumed_report["executed_source_ids"] == ["s1"]
+    assert resumed["sources"]["s0"]["attempts"] == 1
+    assert resumed["sources"]["s1"]["state"] == SUCCEEDED
 
 
 def test_resume_does_not_reexecute_succeeded(tmp_path: Path):
@@ -223,3 +243,18 @@ def test_initialize_or_resume_roundtrip(tmp_path: Path):
     )
     assert is_new is False
     assert resumed["run_id"] == "run-1"
+
+
+def test_default_executor_passes_shared_catalog_and_force(tmp_path: Path):
+    with patch("src.execution.checkpointed_batch.subprocess.Popen") as run:
+        run.return_value.poll.return_value = 0
+        run.return_value.returncode = 0
+        assert default_executor(
+            python_executable="python", single_config_path=tmp_path / "single.yaml",
+            output_dir=tmp_path / "evidence", catalog_dir=tmp_path / "catalog",
+            force=True,
+        ) == 0
+    command = run.call_args.args[0]
+    assert command[command.index("--output-dir") + 1] == str(tmp_path / "evidence")
+    assert command[command.index("--catalog-dir") + 1] == str(tmp_path / "catalog")
+    assert "--force" in command

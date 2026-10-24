@@ -19,6 +19,8 @@ class CadenceState(BaseModel):
     category: UpdateCategory = UpdateCategory.DAILY
     next_eligible_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     consecutive_no_change_count: int = 0
+    weekly_no_change_count: int = 0
+    weekly_no_change_since_at: Optional[datetime] = None
     last_evaluated_at: Optional[datetime] = None
 
     def calculate_next_run(self, now: Optional[datetime] = None) -> datetime:
@@ -33,21 +35,41 @@ class CadenceState(BaseModel):
         self.last_evaluated_at = base_time
         return self.next_eligible_at
 
-    def register_change(self, base_category: UpdateCategory) -> None:
-        """Si hubo cambios, restablece la cadencia a su categoría base y resetea el contador."""
+    def register_change(
+        self, base_category: UpdateCategory, *, now: Optional[datetime] = None
+    ) -> None:
+        """Restablece la cadencia base y cancela cualquier período semanal sin cambios."""
         self.consecutive_no_change_count = 0
+        self.weekly_no_change_count = 0
+        self.weekly_no_change_since_at = None
         self.category = base_category
-        self.calculate_next_run()
+        self.calculate_next_run(now=now)
 
-    def register_no_change(self) -> None:
-        """Incrementa observaciones consecutivas sin cambios y adapta la frecuencia de manera conservadora."""
+    def register_no_change(self, *, now: Optional[datetime] = None) -> None:
+        """Reduce frecuencia solo con observaciones sin cambios y cuatro semanas reales.
+
+        Cinco observaciones DAILY -> WEEKLY. Para pasar a MONTHLY se requieren
+        cuatro observaciones nuevas en WEEKLY Y al menos 28 días transcurridos
+        desde su inicio; contar llamadas inmediatas no equivale a cuatro semanas.
+        """
+        evaluated_at = now or datetime.now(timezone.utc)
         self.consecutive_no_change_count += 1
-        # Transición conservadora:
-        # Si es diaria y van 7 corridas sin novedades -> semanal
-        if self.category == UpdateCategory.DAILY and self.consecutive_no_change_count >= 7:
-            self.category = UpdateCategory.WEEKLY
-        # Si es semanal y van 4 corridas sin novedades -> mensual
-        elif self.category == UpdateCategory.WEEKLY and self.consecutive_no_change_count >= 4:
-            self.category = UpdateCategory.MONTHLY
 
-        self.calculate_next_run()
+        if self.category == UpdateCategory.DAILY:
+            if self.consecutive_no_change_count >= 5:
+                self.category = UpdateCategory.WEEKLY
+                self.weekly_no_change_count = 0
+                self.weekly_no_change_since_at = evaluated_at
+        elif self.category == UpdateCategory.WEEKLY:
+            # Una fuente configurada de origen como WEEKLY no tiene transición
+            # previa; iniciamos un intervalo conservador en la primera observación.
+            if self.weekly_no_change_since_at is None:
+                self.weekly_no_change_since_at = evaluated_at
+            self.weekly_no_change_count += 1
+            if (
+                self.weekly_no_change_count >= 4
+                and evaluated_at - self.weekly_no_change_since_at >= timedelta(weeks=4)
+            ):
+                self.category = UpdateCategory.MONTHLY
+
+        self.calculate_next_run(now=evaluated_at)
