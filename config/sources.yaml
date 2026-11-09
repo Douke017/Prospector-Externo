@@ -33,9 +33,6 @@ sources:
   - https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera/
   - https://www.bbv.com.bo/acerca-de-la-bolsa/informacion-financiera-2024/
   - https://www.bbv.com.bo/hechos-relevantes-y-noticias/
-  # Las cinco paginas oficiales son semillas prioritarias. El sitemap de BBV
-  # puede saturar max_urls antes de recorrerlas (B13: MAX_URLS, 1 HTML).
-  # No se desactiva robots.txt ni se acorta el recorrido de enlaces HTML.
   discover_sitemaps: false
   update_category: DAILY
   allowed_extensions:
@@ -106,6 +103,17 @@ sources:
   max_api_document_depth: 1
   max_api_document_bytes: 500000
   grouping_contract: config/grouping/bcb.yaml
+  max_resources: 1000
+  contingency_url: https://www.bcb.gob.bo/?q=pub_boletin-sector-externo
+  contingency_urls:
+  - https://www.bcb.gob.bo/?q=pub_boletin-sector-externo
+  - https://www.bcb.gob.bo/?q=reporte-estadistico
+  - https://www.bcb.gob.bo/?q=pub_boletin-estadistico
+  - https://www.bcb.gob.bo/?q=pub_boletin-mensual
+  - https://www.bcb.gob.bo/publicaciones
+  - https://www.bcb.gob.bo/estadisticas
+  - https://www.bcb.gob.bo/?q=estad-sticas-semanales
+  - https://web.archive.org/web/20261106000133/https://www.bcb.gob.bo/
 - update_category: MONTHLY
   allowed_extensions:
   - .pdf
@@ -177,8 +185,6 @@ sources:
   entrypoint: https://www.asfi.gob.bo
   seeds:
   - https://www.asfi.gob.bo
-  # Páginas con rendimiento documental observado en B13; priorizarlas dentro
-  # del MISMO presupuesto HTTP (sin aumentar 250 requests/URLs ni 1000 recursos).
   - https://www.asfi.gob.bo/pb/decretos-supremos-referidos-servicios-financieros
   - https://www.asfi.gob.bo/pb/decretos
   - https://www.asfi.gob.bo/auditorias?page=1
@@ -649,8 +655,6 @@ sources:
   name: United Nations Data
   entrypoint: https://data.un.org
   workflow: api
-  # Dos indicadores curados, VERIFICADOS; no representan el catálogo UNData.
-  # Su agotamiento DEBE producir PARTIAL_SUCCESS y conservar el histórico.
   api_seed_scope: curated
   seeds:
   - https://unsd-datacommons.gcp.un-icc.cloud/core/api/v2/observation?date=LATEST&variable.dcids=undata%2Funodc%2FVIC_HOM_RT&entity.dcids=country%2FZAF&select=date&select=value&select=variable&select=entity
@@ -918,7 +922,6 @@ sources:
     - /DL_SelectFields.aspx
     evidence_seed_urls:
     - https://www.transtats.bts.gov/DL_SelectFields.aspx?QO_fu146_anzr=&gnoyr_VQ=GED
-# Lote 12E: fuentes recuperadas tras evidencia 12B/12C; sin bypass robots/TLS.
 - source_id: ibch
   name: Instituto Boliviano del Cemento y Hormigón
   entrypoint: https://www.ibch.com/

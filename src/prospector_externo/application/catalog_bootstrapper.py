@@ -93,7 +93,8 @@ def bootstrap_official_catalog_if_needed(
 
         audit_row = matrix_by_id.get(key, {})
         health, audit_code, audit_note = _classify_audit_row(audit_row)
-        baseline_count = int(audit_row.get("baseline_raw_records") or 0)
+        existing_res_count = len(catalog_repo.list_resources(source_id=cfg.source_id))
+        baseline_count = max(int(audit_row.get("baseline_raw_records") or 0), existing_res_count)
 
         if current is None:
             source = Source(
@@ -121,11 +122,14 @@ def bootstrap_official_catalog_if_needed(
             )
             catalog_repo.save_source(source)
             seeded += 1
-        elif not current.seeds and cfg.seeds:
-            current.seeds = list(cfg.seeds)
-            current.allowed_extensions = list(cfg.allowed_extensions)
-            current.allowed_hosts = list(cfg.allowed_hosts)
-            current.excluded_path_keywords = list(cfg.excluded_path_keywords)
+        elif (not current.seeds and cfg.seeds) or (current.baseline_resource_count == 0 and baseline_count > 0):
+            if not current.seeds and cfg.seeds:
+                current.seeds = list(cfg.seeds)
+                current.allowed_extensions = list(cfg.allowed_extensions)
+                current.allowed_hosts = list(cfg.allowed_hosts)
+                current.excluded_path_keywords = list(cfg.excluded_path_keywords)
+            if current.baseline_resource_count == 0 and baseline_count > 0:
+                current.baseline_resource_count = baseline_count
             if current.audit_code is None and audit_code is not None:
                 current.health_status = health
                 current.audit_code = audit_code
