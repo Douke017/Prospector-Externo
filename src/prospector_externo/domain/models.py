@@ -15,6 +15,15 @@ class ChangeStatus(str, Enum):
     NOT_EVALUATED = "NOT_EVALUATED"
 
 
+class FileProcessingStatus(str, Enum):
+    """Estado auditable de procesamiento a nivel de archivo (Objetivo 4)."""
+
+    PENDIENTE = "PENDIENTE"
+    EN_PROCESO = "EN_PROCESO"
+    PROCESADO_EXITOSAMENTE = "PROCESADO_EXITOSAMENTE"
+    ERROR = "ERROR"
+
+
 class DiscoveryType(str, Enum):
     HTML = "html"
     JAVASCRIPT = "javascript"
@@ -64,6 +73,10 @@ class SourceConfig(BaseModel):
     workflow: str = "html"
     seeds: List[str] = Field(default_factory=list)
     update_category: str = "DAILY"
+
+    # Resiliencia y contingencia (Objetivo 3)
+    contingency_url: Optional[str] = None
+    contingency_urls: List[str] = Field(default_factory=list)
 
     # Compatibilidad histórica. En el nuevo motor NO son gates destructivos del catálogo bruto.
     allowed_extensions: List[str] = Field(
@@ -135,6 +148,10 @@ class SourceConfig(BaseModel):
 
     @model_validator(mode="after")
     def validate_curated_api_seeds(self) -> "SourceConfig":
+        if self.contingency_url and not self.contingency_urls:
+            self.contingency_urls = [self.contingency_url]
+        elif self.contingency_urls and not self.contingency_url:
+            self.contingency_url = self.contingency_urls[0]
         if self.api_seed_scope == "curated":
             if self.workflow != "api":
                 raise ValueError("api_seed_scope=curated exige workflow=api")
@@ -157,7 +174,7 @@ class DiscoveredUrl(BaseModel):
 
 
 class ResourceCandidate(BaseModel):
-    """Recurso público descubierto. No representa todavía FILE/REPORT/DATA_BASE de Analize."""
+    """Recurso público descubierto y auditado a nivel de archivo."""
 
     resource_key: str
     url: str
@@ -173,6 +190,9 @@ class ResourceCandidate(BaseModel):
     period_label: Optional[str] = None
     content_hash: Optional[str] = None
     change_status: ChangeStatus = ChangeStatus.NEW
+    processing_status: FileProcessingStatus = FileProcessingStatus.PENDIENTE
+    processing_updated_at: Optional[datetime] = None
+    processing_error: Optional[str] = None
     # Ausencias consecutivas verificadas en recorridos completos comparables.
     consecutive_absences: int = Field(default=0, ge=0)
     discovered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -213,6 +233,33 @@ class Source(BaseModel):
     workflow: str
     health_status: str = "ACTIVE"
     update_category: str = "DAILY"
+
+    # Diagnósticos reales de auditoría y alertas estructurales (Objetivo 5)
+    audit_code: Optional[str] = None
+    audit_note: Optional[str] = None
+    dom_structural_hash: Optional[str] = None
+    api_schema_hash: Optional[str] = None
+    baseline_selectors: List[str] = Field(default_factory=list)
+    baseline_resource_count: int = 0
+
+    # Parámetros declarativos de política de crawleo (Objetivo 1 y 2)
+    policy_customized: bool = False
+    seeds: List[str] = Field(default_factory=list)
+    allowed_extensions: List[str] = Field(default_factory=list)
+    rate_limit_seconds: float = 1.0
+    max_urls: int = 250
+    max_resources: int = 1000
+    ignore_robots_txt: bool = False
+
+    # Resiliencia y contingencia (Objetivo 3)
+    contingency_url: Optional[str] = None
+    contingency_urls: List[str] = Field(default_factory=list)
+    active_contingency_url: Optional[str] = None
+
+    # Filtros de acceso y dominio autorizado (Objetivo 1)
+    excluded_path_keywords: List[str] = Field(default_factory=list)
+    allowed_hosts: List[str] = Field(default_factory=list)
+
     # Conservados entre corridas para evitar reiniciar las máquinas de estado.
     # Los catálogos anteriores, sin estos campos, siguen siendo compatibles.
     consecutive_failures: int = Field(default=0, ge=0)

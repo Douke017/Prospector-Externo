@@ -3,8 +3,14 @@ Puerto abstracto para el repositorio de catálogo, snapshots y observaciones.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
-from prospector_externo.domain.models import Source, Snapshot, ResourceCandidate
+from datetime import datetime, timezone
+from typing import Any, List, Optional
+from prospector_externo.domain.models import (
+    FileProcessingStatus,
+    ResourceCandidate,
+    Snapshot,
+    Source,
+)
 from prospector_externo.domain.observations import SourceRunObservation
 
 
@@ -82,3 +88,46 @@ class CatalogRepositoryPort(ABC):
     def list_resources(self, source_id: Optional[str] = None) -> List[ResourceCandidate]:
         """Lista recursos descubiertos, opcionalmente filtrados por fuente."""
         pass
+
+    def update_resource_processing_status(
+        self,
+        resource_key: str,
+        status: FileProcessingStatus,
+        error: Optional[str] = None,
+    ) -> Optional[ResourceCandidate]:
+        """Actualiza el estado de procesamiento de un archivo en el catálogo."""
+        now = datetime.now(timezone.utc)
+        for src in self.list_sources():
+            cat = self.get_resource_catalog(src.source_id)
+            if cat is None:
+                snap = self.get_latest_snapshot(src.source_id)
+                cat = snap.resources if snap else []
+            updated_target: Optional[ResourceCandidate] = None
+            for res in cat:
+                if res.resource_key == resource_key:
+                    res.processing_status = status
+                    res.processing_updated_at = now
+                    res.processing_error = error
+                    updated_target = res
+                    break
+            if updated_target is not None:
+                run_id = src.catalog_last_run_id or src.last_run_id or "manual_status_update"
+                self.save_resource_catalog(src.source_id, run_id, cat)
+                return updated_target
+        return None
+
+    def save_discovery_candidates(self, candidates: List[Any]) -> None:
+        """Persiste fuentes preseleccionadas de exploración abierta (Objetivo 1)."""
+        return None
+
+    def list_discovery_candidates(self) -> List[Any]:
+        """Lista fuentes preseleccionadas de exploración abierta."""
+        return []
+
+    def save_structural_alert(self, alert: Any) -> None:
+        """Persiste una alerta temprana de cambio estructural (Objetivo 5)."""
+        return None
+
+    def list_structural_alerts(self, source_id: Optional[str] = None) -> List[Any]:
+        """Lista alertas estructurales registradas."""
+        return []

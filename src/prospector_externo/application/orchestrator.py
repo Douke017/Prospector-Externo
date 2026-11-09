@@ -141,7 +141,52 @@ class RunOrchestrator:
             )
         with open(self.config_path, "r", encoding="utf-8") as handle:
             data = yaml.safe_load(handle) or {}
-        return [SourceConfig.model_validate(item) for item in data.get("sources", [])]
+        configs = [SourceConfig.model_validate(item) for item in data.get("sources", [])]
+        by_id = {cfg.source_id.lower(): cfg for cfg in configs}
+
+        # Superponer políticas personalizadas desde UI y fuentes promovidas de descubrimiento abierto
+        for persisted in self.catalog_repo.list_sources():
+            key = persisted.source_id.lower()
+            if key in by_id and getattr(persisted, "policy_customized", False):
+                cfg = by_id[key]
+                cfg.entrypoint = persisted.entrypoint or cfg.entrypoint
+                if persisted.seeds:
+                    cfg.seeds = list(persisted.seeds)
+                if persisted.allowed_extensions:
+                    cfg.allowed_extensions = list(persisted.allowed_extensions)
+                cfg.rate_limit_seconds = persisted.rate_limit_seconds
+                cfg.max_urls = persisted.max_urls
+                cfg.max_resources = persisted.max_resources
+                cfg.ignore_robots_txt = persisted.ignore_robots_txt
+                cfg.update_category = persisted.update_category or cfg.update_category
+                if persisted.contingency_urls:
+                    cfg.contingency_urls = list(persisted.contingency_urls)
+                    cfg.contingency_url = persisted.contingency_urls[0]
+                if persisted.excluded_path_keywords:
+                    cfg.excluded_path_keywords = list(persisted.excluded_path_keywords)
+                if persisted.allowed_hosts:
+                    cfg.allowed_hosts = list(persisted.allowed_hosts)
+            elif key not in by_id and getattr(persisted, "policy_customized", False):
+                promoted_cfg = SourceConfig(
+                    source_id=persisted.source_id,
+                    name=persisted.name,
+                    entrypoint=persisted.entrypoint,
+                    workflow=persisted.workflow,
+                    seeds=list(persisted.seeds),
+                    update_category=persisted.update_category,
+                    allowed_extensions=list(persisted.allowed_extensions) or [".pdf", ".xlsx", ".csv", ".zip"],
+                    rate_limit_seconds=persisted.rate_limit_seconds,
+                    max_urls=persisted.max_urls,
+                    max_resources=persisted.max_resources,
+                    ignore_robots_txt=persisted.ignore_robots_txt,
+                    contingency_urls=list(persisted.contingency_urls),
+                    excluded_path_keywords=list(persisted.excluded_path_keywords),
+                    allowed_hosts=list(persisted.allowed_hosts),
+                )
+                configs.append(promoted_cfg)
+                by_id[key] = promoted_cfg
+
+        return configs
 
     async def run_batch_async(
         self,
@@ -236,17 +281,55 @@ class RunOrchestrator:
                 semaphore = asyncio.Semaphore(self.max_source_concurrency)
 
                 async def process_source(config: SourceConfig) -> None:
+                    from urllib.parse import urlsplit
+
                     async with pool.async_source_slot(config):
                         async with semaphore:
                             dispatched = self.dispatcher.dispatch(config)
                             extraction = (await dispatched if inspect.isawaitable(dispatched)
                                           else dispatched)
+                            used_contingency_url: Optional[str] = None
+
+                            # Failover automático hacia URLs de contingencia (Objetivo 3)
+                            if not extraction.success and config.contingency_urls:
+                                for backup_url in config.contingency_urls:
+                                    backup_host = urlsplit(backup_url).netloc.lower()
+                                    fallback_hosts = list(config.allowed_hosts)
+                                    if fallback_hosts and backup_host and backup_host not in fallback_hosts:
+                                        fallback_hosts.append(backup_host)
+                                    fallback_cfg = config.model_copy(
+                                        update={
+                                            "entrypoint": backup_url,
+                                            "seeds": [backup_url],
+                                            "allowed_hosts": fallback_hosts,
+                                        }
+                                    )
+                                    logger.warning(
+                                        "Activando failover automático para [%s] -> %s",
+                                        config.source_id,
+                                        backup_url,
+                                    )
+                                    fb_dispatched = self.dispatcher.dispatch(fallback_cfg)
+                                    fb_extraction = (
+                                        await fb_dispatched
+                                        if inspect.isawaitable(fb_dispatched)
+                                        else fb_dispatched
+                                    )
+                                    if fb_extraction.success:
+                                        extraction = fb_extraction
+                                        used_contingency_url = backup_url
+                                        break
+
                             try:
                                 obs = self.catalog_service.reconcile_and_checkpoint(
                                     config=config,
                                     run_id=run_id,
                                     extraction_result=extraction,
                                 )
+                                src_after = self.catalog_repo.get_source(config.source_id)
+                                if src_after is not None:
+                                    src_after.active_contingency_url = used_contingency_url
+                                    self.catalog_repo.save_source(src_after)
                             except OSError:
                                 # HTTP success is not checkpoint success. Keep a
                                 # failed, retryable observation/report even when

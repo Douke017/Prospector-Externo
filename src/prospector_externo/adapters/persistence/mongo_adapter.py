@@ -308,3 +308,75 @@ class MongoPersistenceAdapter(CatalogRepositoryPort, RunReportRepositoryPort):
             doc.pop("_id", None)
             results.append(RunReport.model_validate(doc))
         return results
+
+    def update_resource_processing_status(
+        self,
+        resource_key: str,
+        status: Any,
+        error: Optional[str] = None,
+    ) -> Optional[ResourceCandidate]:
+        from datetime import timezone as tz
+        from prospector_externo.domain.models import FileProcessingStatus
+
+        st_val = status.value if isinstance(status, FileProcessingStatus) else str(status)
+        now = datetime.now(tz.utc)
+        doc = self.resource_candidates_col.find_one({"resource_key": resource_key})
+        if doc is None:
+            return super().update_resource_processing_status(resource_key, status, error=error)
+        self.resource_candidates_col.update_many(
+            {"resource_key": resource_key},
+            {
+                "$set": {
+                    "processing_status": st_val,
+                    "processing_updated_at": now.isoformat(),
+                    "processing_error": error,
+                }
+            },
+        )
+        refreshed = self.resource_candidates_col.find_one({"resource_key": resource_key})
+        if not refreshed:
+            return None
+        refreshed.pop("_id", None)
+        return ResourceCandidate.model_validate(refreshed)
+
+    def save_discovery_candidates(self, candidates: List[Any]) -> None:
+        col = self.db["open_discovery_candidates"]
+        for item in candidates:
+            dumped = item.model_dump(mode="json") if hasattr(item, "model_dump") else dict(item)
+            col.update_one(
+                {"candidate_id": dumped["candidate_id"]},
+                {"$set": dumped},
+                upsert=True,
+            )
+
+    def list_discovery_candidates(self) -> List[Any]:
+        from prospector_externo.application.open_discovery_service import OpenDiscoveryCandidate
+
+        col = self.db["open_discovery_candidates"]
+        results = []
+        for doc in col.find().sort("combined_score", -1):
+            doc.pop("_id", None)
+            results.append(OpenDiscoveryCandidate.model_validate(doc))
+        return results
+
+    def save_structural_alert(self, alert: Any) -> None:
+        col = self.db["structural_alerts"]
+        dumped = alert.model_dump(mode="json") if hasattr(alert, "model_dump") else dict(alert)
+        col.update_one(
+            {"alert_id": dumped["alert_id"]},
+            {"$set": dumped},
+            upsert=True,
+        )
+
+    def list_structural_alerts(self, source_id: Optional[str] = None) -> List[Any]:
+        from prospector_externo.domain.structural_monitor import StructuralAlert
+
+        col = self.db["structural_alerts"]
+        query: Dict[str, Any] = {}
+        if source_id:
+            query["source_id"] = source_id
+        results = []
+        for doc in col.find(query).sort("detected_at", -1):
+            doc.pop("_id", None)
+            results.append(StructuralAlert.model_validate(doc))
+        return results

@@ -9,7 +9,14 @@ from datetime import datetime, timezone
 from typing import Tuple, List, Dict
 
 from prospector_externo.ports.catalog_repository import CatalogRepositoryPort
-from prospector_externo.domain.models import Source, SourceConfig, Snapshot, ResourceCandidate, ChangeStatus
+from prospector_externo.domain.models import (
+    Source,
+    SourceConfig,
+    Snapshot,
+    ResourceCandidate,
+    ChangeStatus,
+    FileProcessingStatus,
+)
 from prospector_externo.domain.observations import SourceRunObservation, ExecutionStatus, ContentStatus
 from prospector_externo.domain.discovery import DiscoveryFrontier
 from prospector_externo.kernel.contracts import ExtractionResult
@@ -70,8 +77,9 @@ class CatalogApplicationService:
             update_category=config.update_category,
         )
         source_entity.name = config.name or source_entity.name or source_id.upper()
-        source_entity.entrypoint = config.entrypoint
-        source_entity.workflow = config.workflow
+        if not getattr(source_entity, "policy_customized", False):
+            source_entity.entrypoint = config.entrypoint
+            source_entity.workflow = config.workflow
         source_entity.last_run_id = run_id
         source_entity.last_run_at = now
         source_entity.updated_at = now
@@ -142,11 +150,16 @@ class CatalogApplicationService:
             historical = historical_keys.get(r.resource_key)
             if historical is None or historical.change_status == ChangeStatus.REMOVED:
                 r.change_status = ChangeStatus.NEW
+                r.processing_status = FileProcessingStatus.PENDIENTE
             elif (self._resource_evidence(historical) != self._resource_evidence(r)
                   and (self._resource_evidence(historical) or self._resource_evidence(r))):
                 r.change_status = ChangeStatus.MODIFIED
+                r.processing_status = FileProcessingStatus.PENDIENTE
             else:
                 r.change_status = ChangeStatus.UNCHANGED
+                r.processing_status = historical.processing_status
+                r.processing_updated_at = historical.processing_updated_at
+                r.processing_error = historical.processing_error
             r.consecutive_absences = 0
             consolidated[r.resource_key] = r.model_copy(deep=True)
             if r.change_status in (ChangeStatus.NEW, ChangeStatus.MODIFIED):

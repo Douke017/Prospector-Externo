@@ -435,3 +435,57 @@ class LocalJsonRepositoryAdapter(CatalogRepositoryPort, RunReportRepositoryPort)
             except Exception:
                 pass
         return sorted(reports, key=lambda item: item.started_at, reverse=True)[:limit]
+
+    def save_discovery_candidates(self, candidates: List[object]) -> None:
+        """Persiste candidatos de descubrimiento abierto en JSON atómico."""
+        cand_file = self.state_dir / "open_discovery_candidates.json"
+        existing: dict[str, dict] = {}
+        if cand_file.is_file():
+            try:
+                existing = json.loads(cand_file.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                existing = {}
+        for item in candidates:
+            dumped = item.model_dump(mode="json") if hasattr(item, "model_dump") else dict(item)
+            existing[dumped["candidate_id"]] = dumped
+        self._atomic_write_text(cand_file, json.dumps(existing, indent=2, ensure_ascii=False))
+
+    def list_discovery_candidates(self) -> List[object]:
+        from prospector_externo.application.open_discovery_service import OpenDiscoveryCandidate
+
+        cand_file = self.state_dir / "open_discovery_candidates.json"
+        if not cand_file.is_file():
+            return []
+        try:
+            raw = json.loads(cand_file.read_text(encoding="utf-8"))
+            items = [OpenDiscoveryCandidate.model_validate(v) for v in raw.values()]
+            return sorted(items, key=lambda c: c.combined_score, reverse=True)
+        except (OSError, ValueError):
+            return []
+
+    def save_structural_alert(self, alert: object) -> None:
+        alerts_file = self.state_dir / "structural_alerts.json"
+        existing: dict[str, dict] = {}
+        if alerts_file.is_file():
+            try:
+                existing = json.loads(alerts_file.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                existing = {}
+        dumped = alert.model_dump(mode="json") if hasattr(alert, "model_dump") else dict(alert)
+        existing[dumped["alert_id"]] = dumped
+        self._atomic_write_text(alerts_file, json.dumps(existing, indent=2, ensure_ascii=False))
+
+    def list_structural_alerts(self, source_id: Optional[str] = None) -> List[object]:
+        from prospector_externo.domain.structural_monitor import StructuralAlert
+
+        alerts_file = self.state_dir / "structural_alerts.json"
+        if not alerts_file.is_file():
+            return []
+        try:
+            raw = json.loads(alerts_file.read_text(encoding="utf-8"))
+            items = [StructuralAlert.model_validate(v) for v in raw.values()]
+            if source_id:
+                items = [a for a in items if a.source_id.lower() == source_id.lower()]
+            return sorted(items, key=lambda a: a.detected_at, reverse=True)
+        except (OSError, ValueError):
+            return []

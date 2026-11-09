@@ -1,7 +1,17 @@
 # HU-16: operational logs, never commit scheduler runtime files
+logs/
 logs/scheduler/
+*.log
 
-# Cachés e instalación local; conservar output/, .runtime/ y parches como evidencia.
+# Datos generados en runtime, respaldos y mapas pesados (AGENTS.md)
+output/
+output/**/mapa_*.json
+output/state/backups/
+output/reports/
+.runtime/
+*.tmp
+
+# Cachés e instalación local
 __pycache__/
 *.py[cod]
 .pytest_cache/
