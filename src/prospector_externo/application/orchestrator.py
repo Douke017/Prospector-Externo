@@ -208,6 +208,27 @@ class RunOrchestrator:
                 if cfg.source_id.lower() == source_id_filter.lower()
             ]
             if not target_configs:
+                persisted_src = self.catalog_repo.get_source(source_id_filter)
+                if persisted_src is not None and persisted_src.entrypoint:
+                    target_configs = [
+                        SourceConfig(
+                            source_id=persisted_src.source_id,
+                            name=persisted_src.name,
+                            entrypoint=persisted_src.entrypoint,
+                            workflow=persisted_src.workflow or "html",
+                            seeds=list(persisted_src.seeds) or [persisted_src.entrypoint],
+                            update_category=persisted_src.update_category,
+                            allowed_extensions=list(persisted_src.allowed_extensions) or [".pdf", ".xlsx", ".csv", ".zip"],
+                            rate_limit_seconds=min(float(persisted_src.rate_limit_seconds or 0.5), 0.5),
+                            max_urls=min(int(persisted_src.max_urls or 15), 25),
+                            max_resources=min(int(persisted_src.max_resources or 50), 100),
+                            ignore_robots_txt=persisted_src.ignore_robots_txt,
+                            contingency_urls=list(persisted_src.contingency_urls),
+                            excluded_path_keywords=list(persisted_src.excluded_path_keywords),
+                            allowed_hosts=list(persisted_src.allowed_hosts),
+                        )
+                    ]
+            if not target_configs:
                 raise ValueError(
                     f"Fuente '{source_id_filter}' no encontrada en la configuración"
                 )
