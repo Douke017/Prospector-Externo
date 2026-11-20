@@ -35,17 +35,27 @@ from prospector_externo.kernel.contracts import ExtractionResult
 class ResourceDetector:
     """Clasificación barata por URL. No realiza HEAD masivo."""
 
+    COMPOUND_EXTENSIONS = (".tar.gz",)
     RESOURCE_EXTENSIONS = {
-        ".csv", ".tsv", ".xls", ".xlsx", ".ods",
-        ".json", ".xml", ".geojson",
+        ".csv", ".tsv", ".xls", ".xlsx", ".ods", ".parquet",
+        ".json", ".xml", ".geojson", ".dat", ".txt", ".sav", ".dta",
         ".pdf", ".doc", ".docx",
-        ".zip", ".tar", ".gz", ".tgz", ".rar", ".7z",
+        ".zip", ".tar", ".tar.gz", ".gz", ".tgz", ".rar", ".7z",
+    }
+    COMPRESSED_EXTENSIONS = {".zip", ".tar", ".tar.gz", ".gz", ".tgz", ".rar", ".7z"}
+    TABULAR_SCIENTIFIC_EXTENSIONS = {
+        ".csv", ".tsv", ".xls", ".xlsx", ".ods", ".parquet",
+        ".json", ".xml", ".geojson", ".dat", ".sav", ".dta",
     }
 
     @classmethod
     def extension_for(cls, url: str) -> str:
         parsed = urlparse(url)
-        ext = os.path.splitext(parsed.path)[1].lower()
+        path_lower = parsed.path.lower()
+        for compound in cls.COMPOUND_EXTENSIONS:
+            if path_lower.endswith(compound):
+                return compound
+        ext = os.path.splitext(path_lower)[1].lower()
         if ext in cls.RESOURCE_EXTENSIONS:
             return ext
 
@@ -58,6 +68,15 @@ class ResourceDetector:
     @classmethod
     def is_resource(cls, url: str) -> bool:
         return bool(cls.extension_for(url))
+
+    @classmethod
+    def classify_resource_category(cls, extension: str) -> str:
+        ext = (extension or "").strip().lower()
+        if ext in cls.COMPRESSED_EXTENSIONS:
+            return "COMPRIMIDO"
+        if ext in cls.TABULAR_SCIENTIFIC_EXTENSIONS:
+            return "TABULAR_CIENTIFICO"
+        return "DOCUMENTAL"
 
 
 class BaseWorkflow(SourceWorkflow):
@@ -302,6 +321,7 @@ class BaseWorkflow(SourceWorkflow):
             source_id=config.source_id,
             title=effective_title,
             file_extension=ext,
+            resource_category=ResourceDetector.classify_resource_category(ext),
             discovered_from_url=current_url,
             period_label=period,
             change_status=ChangeStatus.NEW,
@@ -309,6 +329,91 @@ class BaseWorkflow(SourceWorkflow):
             anchor_text=anchor_text or title.strip() or None,
             context_text=context_text,
         )
+
+    @staticmethod
+    def extract_content_disposition_filename(header_value: Optional[str]) -> Optional[str]:
+        """Extrae el nombre de archivo declarado desde Content-Disposition (RFC 5987 / estándar)."""
+        if not header_value:
+            return None
+        match_ext = re.search(r"filename\*\s*=\s*[^']*'[^']*'([^;\r\n]+)", header_value, re.IGNORECASE)
+        if match_ext:
+            return unquote(match_ext.group(1).strip().strip('"'))
+        match_std = re.search(r'filename\s*=\s*"?([^";\r\n]+)"?', header_value, re.IGNORECASE)
+        if match_std:
+            return match_std.group(1).strip()
+        return None
+
+    @classmethod
+    def apply_http_metadata(
+        cls,
+        resource: ResourceCandidate,
+        headers: Optional[dict],
+        status: Optional[int],
+    ) -> ResourceCandidate:
+        """Enriquece un ResourceCandidate con metadatos HTTP completos sin descargar cuerpo."""
+        if status is not None:
+            resource.http_status = status
+        if status == 304:
+            resource.revalidated_not_modified = True
+        if not headers:
+            return resource
+        lower_map = {str(k).lower(): str(v) for k, v in headers.items() if v is not None}
+        if "content-type" in lower_map:
+            resource.content_type = lower_map["content-type"].split(";", 1)[0].strip().lower()
+        if "content-length" in lower_map:
+            try:
+                length_val = int(lower_map["content-length"].strip())
+                if length_val >= 0:
+                    resource.content_length_bytes = length_val
+            except ValueError:
+                pass
+        if "etag" in lower_map:
+            resource.etag = lower_map["etag"].strip()
+        if "last-modified" in lower_map:
+            resource.last_modified_header = lower_map["last-modified"].strip()
+        if "content-disposition" in lower_map:
+            raw_cd = lower_map["content-disposition"].strip()
+            resource.content_disposition = raw_cd
+            declared = cls.extract_content_disposition_filename(raw_cd)
+            if declared:
+                resource.declared_filename = declared
+                if not resource.file_extension:
+                    cd_ext = ResourceDetector.extension_for(declared)
+                    if cd_ext:
+                        resource.file_extension = cd_ext
+        if resource.file_extension:
+            resource.resource_category = ResourceDetector.classify_resource_category(
+                resource.file_extension
+            )
+        return resource
+
+    async def revalidate_resource_headers(
+        self,
+        resource: ResourceCandidate,
+        *,
+        previous_etag: Optional[str] = None,
+        previous_last_modified: Optional[str] = None,
+    ) -> ResourceCandidate:
+        """Consulta cabeceras con revalidación condicional HTTP 304 cuando existen validadores."""
+        session = self._session()
+        if previous_etag or previous_last_modified:
+            seed_headers: dict[str, str] = {}
+            if previous_etag:
+                seed_headers["ETag"] = previous_etag
+            if previous_last_modified:
+                seed_headers["Last-Modified"] = previous_last_modified
+            session.client._conditional_cache.observe(resource.url, seed_headers)
+
+        headers, status, _error = await session.fetch_headers(resource.url, conditional=True)
+        if status == 304:
+            resource.http_status = 304
+            resource.revalidated_not_modified = True
+            if previous_etag and not resource.etag:
+                resource.etag = previous_etag
+            if previous_last_modified and not resource.last_modified_header:
+                resource.last_modified_header = previous_last_modified
+            return resource
+        return self.apply_http_metadata(resource, headers, status)
 
     def _make_api_resource(
         self,
@@ -546,8 +651,24 @@ class BaseWorkflow(SourceWorkflow):
             coverage.archive_inspected += 1
             inspected.add(archive.url)
             from_archive = archive.url
+            archive.archive_entries = [
+                {
+                    "filename": m.filename,
+                    "size_bytes": m.size_bytes,
+                    "extension": m.extension,
+                }
+                for m in members
+            ]
+            archive.resource_category = "COMPRIMIDO"
+            allowed_ext_set = {
+                (e.lower() if e.startswith(".") else f".{e.lower()}")
+                for e in (config.allowed_extensions or [])
+            }
             for member in members:
                 if not member.extension or member.extension not in ResourceDetector.RESOURCE_EXTENSIONS:
+                    continue
+                # Evitar ruido de archivos notas/readme .txt dentro de ZIP salvo solicitud explícita
+                if member.extension == ".txt" and ".txt" not in allowed_ext_set:
                     continue
                 if len(resources) >= config.max_resources:
                     coverage.resources_limit_reached += 1
@@ -561,6 +682,7 @@ class BaseWorkflow(SourceWorkflow):
                     source_id=config.source_id,
                     title=member.filename,
                     file_extension=member.extension,
+                    resource_category=ResourceDetector.classify_resource_category(member.extension),
                     content_length_bytes=member.size_bytes,
                     discovered_from_url=archive.discovered_from_url,
                     extracted_from_archive=from_archive,

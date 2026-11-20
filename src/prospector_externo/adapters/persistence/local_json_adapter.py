@@ -489,3 +489,151 @@ class LocalJsonRepositoryAdapter(CatalogRepositoryPort, RunReportRepositoryPort)
             return sorted(items, key=lambda a: a.detected_at, reverse=True)
         except (OSError, ValueError):
             return []
+
+    def save_failover_event(self, event: object) -> None:
+        events_file = self.state_dir / "failover_events.json"
+        items: list[dict] = []
+        if events_file.is_file():
+            try:
+                loaded = json.loads(events_file.read_text(encoding="utf-8"))
+                if isinstance(loaded, list):
+                    items = loaded
+            except (OSError, json.JSONDecodeError):
+                items = []
+        dumped = event.model_dump(mode="json") if hasattr(event, "model_dump") else dict(event)
+        items.append(dumped)
+        self._atomic_write_text(events_file, json.dumps(items[-1000:], indent=2, ensure_ascii=False))
+
+    def list_failover_events(
+        self, source_id: Optional[str] = None, limit: int = 50
+    ) -> List[object]:
+        from prospector_externo.domain.models import FailoverEvent
+
+        events_file = self.state_dir / "failover_events.json"
+        if not events_file.is_file():
+            return []
+        try:
+            raw = json.loads(events_file.read_text(encoding="utf-8"))
+            items = [FailoverEvent.model_validate(v) for v in raw]
+            if source_id:
+                items = [ev for ev in items if ev.source_id.lower() == source_id.lower()]
+            return sorted(items, key=lambda ev: ev.occurred_at, reverse=True)[:limit]
+        except (OSError, ValueError):
+            return []
+
+    def save_resource_version(self, version: object) -> None:
+        versions_file = self.state_dir / "resource_versions.json"
+        data: dict[str, list[dict]] = {}
+        if versions_file.is_file():
+            try:
+                loaded = json.loads(versions_file.read_text(encoding="utf-8"))
+                if isinstance(loaded, dict):
+                    data = loaded
+            except (OSError, json.JSONDecodeError):
+                data = {}
+        dumped = version.model_dump(mode="json") if hasattr(version, "model_dump") else dict(version)
+        rkey = dumped["resource_key"]
+        bucket = data.setdefault(rkey, [])
+        if not any(v.get("version_number") == dumped["version_number"] for v in bucket):
+            bucket.append(dumped)
+        self._atomic_write_text(versions_file, json.dumps(data, indent=2, ensure_ascii=False))
+
+    def list_resource_versions(self, resource_key: str) -> List[object]:
+        from prospector_externo.domain.models import ResourceVersion
+
+        versions_file = self.state_dir / "resource_versions.json"
+        if not versions_file.is_file():
+            return []
+        try:
+            raw = json.loads(versions_file.read_text(encoding="utf-8"))
+            bucket = raw.get(resource_key, [])
+            items = [ResourceVersion.model_validate(v) for v in bucket]
+            return sorted(items, key=lambda v: v.version_number)
+        except (OSError, ValueError):
+            return []
+
+    def save_resource_status_audit(self, event: object) -> None:
+        audit_file = self.state_dir / "resource_status_audit.json"
+        items: list[dict] = []
+        if audit_file.is_file():
+            try:
+                loaded = json.loads(audit_file.read_text(encoding="utf-8"))
+                if isinstance(loaded, list):
+                    items = loaded
+            except (OSError, json.JSONDecodeError):
+                items = []
+        dumped = event.model_dump(mode="json") if hasattr(event, "model_dump") else dict(event)
+        items.append(dumped)
+        self._atomic_write_text(audit_file, json.dumps(items[-5000:], indent=2, ensure_ascii=False))
+
+    def list_resource_status_audit(self, resource_key: str) -> List[object]:
+        from prospector_externo.domain.models import ResourceStatusAuditEvent
+
+        audit_file = self.state_dir / "resource_status_audit.json"
+        if not audit_file.is_file():
+            return []
+        try:
+            raw = json.loads(audit_file.read_text(encoding="utf-8"))
+            items = [
+                ResourceStatusAuditEvent.model_validate(v)
+                for v in raw
+                if v.get("resource_key") == resource_key
+            ]
+            return sorted(items, key=lambda ev: ev.occurred_at, reverse=True)
+        except (OSError, ValueError):
+            return []
+
+    def find_status_audit_by_idempotency_key(self, idempotency_key: str) -> Optional[object]:
+        from prospector_externo.domain.models import ResourceStatusAuditEvent
+
+        audit_file = self.state_dir / "resource_status_audit.json"
+        if not audit_file.is_file():
+            return None
+        try:
+            raw = json.loads(audit_file.read_text(encoding="utf-8"))
+            for v in reversed(raw):
+                if v.get("idempotency_key") == idempotency_key:
+                    return ResourceStatusAuditEvent.model_validate(v)
+        except (OSError, ValueError):
+            return None
+        return None
+
+    def save_alert_channel(self, channel: object) -> None:
+        channels_file = self.state_dir / "alert_channels.json"
+        existing: dict[str, dict] = {}
+        if channels_file.is_file():
+            try:
+                loaded = json.loads(channels_file.read_text(encoding="utf-8"))
+                if isinstance(loaded, dict):
+                    existing = loaded
+            except (OSError, json.JSONDecodeError):
+                existing = {}
+        dumped = channel.model_dump(mode="json") if hasattr(channel, "model_dump") else dict(channel)
+        existing[dumped["channel_id"]] = dumped
+        self._atomic_write_text(channels_file, json.dumps(existing, indent=2, ensure_ascii=False))
+
+    def list_alert_channels(self) -> List[object]:
+        from prospector_externo.ports.alert_dispatcher import AlertChannelConfig
+
+        channels_file = self.state_dir / "alert_channels.json"
+        if not channels_file.is_file():
+            return []
+        try:
+            raw = json.loads(channels_file.read_text(encoding="utf-8"))
+            return [AlertChannelConfig.model_validate(v) for v in raw.values()]
+        except (OSError, ValueError):
+            return []
+
+    def delete_alert_channel(self, channel_id: str) -> bool:
+        channels_file = self.state_dir / "alert_channels.json"
+        if not channels_file.is_file():
+            return False
+        try:
+            raw = json.loads(channels_file.read_text(encoding="utf-8"))
+            if channel_id not in raw:
+                return False
+            del raw[channel_id]
+            self._atomic_write_text(channels_file, json.dumps(raw, indent=2, ensure_ascii=False))
+            return True
+        except (OSError, ValueError):
+            return False

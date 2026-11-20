@@ -183,10 +183,16 @@ class ResourceCandidate(BaseModel):
     file_extension: str = ""
     content_type: Optional[str] = None
     content_length_bytes: Optional[int] = None
+    content_disposition: Optional[str] = None
+    declared_filename: Optional[str] = None
     last_modified_header: Optional[str] = None
     etag: Optional[str] = None
+    revalidated_not_modified: bool = False
     discovered_from_url: Optional[str] = None
     extracted_from_archive: Optional[str] = None
+    archive_entries: List[Dict[str, Any]] = Field(default_factory=list)
+    resource_category: str = "DOCUMENTAL"
+    current_version: int = Field(default=1, ge=1)
     period_label: Optional[str] = None
     content_hash: Optional[str] = None
     change_status: ChangeStatus = ChangeStatus.NEW
@@ -240,6 +246,7 @@ class Source(BaseModel):
     dom_structural_hash: Optional[str] = None
     api_schema_hash: Optional[str] = None
     baseline_selectors: List[str] = Field(default_factory=list)
+    baseline_json_paths: List[str] = Field(default_factory=list)
     baseline_resource_count: int = 0
 
     # Parámetros declarativos de política de crawleo (Objetivo 1 y 2)
@@ -276,3 +283,59 @@ class Source(BaseModel):
     last_run_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+StatusActor = Literal["PROSPECTOR_INTERNO", "PIPELINE", "MANUAL_OPERATOR"]
+FreshnessClass = Literal["ESPEJO_VIVO", "HISTORICO_SOLO_LECTURA"]
+
+
+class FailoverEvent(BaseModel):
+    """Evento auditable de conmutación automática hacia una URL de contingencia (Objetivo 3)."""
+
+    event_id: str = Field(default_factory=lambda: f"fov_{uuid.uuid4().hex[:10]}")
+    source_id: str
+    run_id: str
+    failed_url: str
+    resolved_url: Optional[str] = None
+    failure_code: Optional[str] = None
+    http_status: Optional[int] = None
+    latency_ms: float = 0.0
+    succeeded: bool = False
+    auto_discovered: bool = False
+    freshness_class: FreshnessClass = "ESPEJO_VIVO"
+    detail: Optional[str] = None
+    occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ResourceVersion(BaseModel):
+    """Instantánea histórica inmutable de una versión (vN) de un recurso catalogado (Objetivo 4)."""
+
+    version_id: str = Field(default_factory=lambda: f"ver_{uuid.uuid4().hex[:10]}")
+    resource_key: str
+    source_id: str
+    version_number: int = Field(ge=1)
+    run_id: str
+    url: str
+    content_hash: Optional[str] = None
+    etag: Optional[str] = None
+    last_modified_header: Optional[str] = None
+    content_length_bytes: Optional[int] = None
+    declared_filename: Optional[str] = None
+    detected_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ResourceStatusAuditEvent(BaseModel):
+    """Registro inmutable de transición de estado de procesamiento de un archivo (Objetivo 4)."""
+
+    audit_id: str = Field(default_factory=lambda: f"aud_{uuid.uuid4().hex[:10]}")
+    resource_key: str
+    source_id: str
+    previous_status: FileProcessingStatus
+    new_status: FileProcessingStatus
+    actor: StatusActor = "MANUAL_OPERATOR"
+    override_reason: Optional[str] = None
+    download_id: Optional[str] = None
+    sha256: Optional[str] = None
+    error_detail: Optional[str] = None
+    idempotency_key: Optional[str] = None
+    occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

@@ -29,6 +29,7 @@ class RunStatus(str, Enum):
     PARTIAL = "PARTIAL"
     FAILED = "FAILED"
     INTERRUPTED = "INTERRUPTED"
+    CANCELLED = "CANCELLED"
 
 
 class Run(BaseModel):

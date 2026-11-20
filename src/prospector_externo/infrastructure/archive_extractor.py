@@ -22,7 +22,7 @@ class ArchiveEntry:
 class ArchiveExtractor:
     """Lee metadatos de miembros, nunca sus contenidos ni archivos en disco."""
 
-    COMPRESSED_EXTENSIONS = {".zip", ".tar", ".gz", ".tgz", ".bz2"}
+    COMPRESSED_EXTENSIONS = {".zip", ".tar", ".tar.gz", ".gz", ".tgz", ".bz2", ".rar", ".7z"}
     INSPECTABLE_SUFFIXES = (".zip", ".tar", ".tar.gz", ".tgz")
 
     @classmethod

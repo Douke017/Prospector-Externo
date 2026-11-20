@@ -314,6 +314,7 @@ class MongoPersistenceAdapter(CatalogRepositoryPort, RunReportRepositoryPort):
         resource_key: str,
         status: Any,
         error: Optional[str] = None,
+        content_hash: Optional[str] = None,
     ) -> Optional[ResourceCandidate]:
         from datetime import timezone as tz
         from prospector_externo.domain.models import FileProcessingStatus
@@ -322,22 +323,32 @@ class MongoPersistenceAdapter(CatalogRepositoryPort, RunReportRepositoryPort):
         now = datetime.now(tz.utc)
         doc = self.resource_candidates_col.find_one({"resource_key": resource_key})
         if doc is None:
-            return super().update_resource_processing_status(resource_key, status, error=error)
+            return super().update_resource_processing_status(
+                resource_key, status, error=error, content_hash=content_hash
+            )
+        update_fields: Dict[str, Any] = {
+            "processing_status": st_val,
+            "processing_updated_at": now.isoformat(),
+            "processing_error": error,
+        }
+        if content_hash:
+            update_fields["content_hash"] = content_hash
         self.resource_candidates_col.update_many(
             {"resource_key": resource_key},
-            {
-                "$set": {
-                    "processing_status": st_val,
-                    "processing_updated_at": now.isoformat(),
-                    "processing_error": error,
-                }
-            },
+            {"$set": update_fields},
         )
         refreshed = self.resource_candidates_col.find_one({"resource_key": resource_key})
         if not refreshed:
             return None
         refreshed.pop("_id", None)
         return ResourceCandidate.model_validate(refreshed)
+
+    def get_resource_by_key(self, resource_key: str) -> Optional[ResourceCandidate]:
+        doc = self.resource_candidates_col.find_one({"resource_key": resource_key})
+        if doc:
+            doc.pop("_id", None)
+            return ResourceCandidate.model_validate(doc)
+        return super().get_resource_by_key(resource_key)
 
     def save_discovery_candidates(self, candidates: List[Any]) -> None:
         col = self.db["open_discovery_candidates"]
@@ -380,3 +391,85 @@ class MongoPersistenceAdapter(CatalogRepositoryPort, RunReportRepositoryPort):
             doc.pop("_id", None)
             results.append(StructuralAlert.model_validate(doc))
         return results
+
+    def save_failover_event(self, event: Any) -> None:
+        col = self.db["failover_events"]
+        dumped = event.model_dump(mode="json") if hasattr(event, "model_dump") else dict(event)
+        col.update_one({"event_id": dumped["event_id"]}, {"$set": dumped}, upsert=True)
+
+    def list_failover_events(
+        self, source_id: Optional[str] = None, limit: int = 50
+    ) -> List[Any]:
+        from prospector_externo.domain.models import FailoverEvent
+
+        col = self.db["failover_events"]
+        query: Dict[str, Any] = {"source_id": source_id} if source_id else {}
+        results = []
+        for doc in col.find(query).sort("occurred_at", -1).limit(limit):
+            doc.pop("_id", None)
+            results.append(FailoverEvent.model_validate(doc))
+        return results
+
+    def save_resource_version(self, version: Any) -> None:
+        col = self.db["resource_versions"]
+        dumped = version.model_dump(mode="json") if hasattr(version, "model_dump") else dict(version)
+        col.update_one(
+            {"resource_key": dumped["resource_key"], "version_number": dumped["version_number"]},
+            {"$setOnInsert": dumped},
+            upsert=True,
+        )
+
+    def list_resource_versions(self, resource_key: str) -> List[Any]:
+        from prospector_externo.domain.models import ResourceVersion
+
+        col = self.db["resource_versions"]
+        results = []
+        for doc in col.find({"resource_key": resource_key}).sort("version_number", 1):
+            doc.pop("_id", None)
+            results.append(ResourceVersion.model_validate(doc))
+        return results
+
+    def save_resource_status_audit(self, event: Any) -> None:
+        col = self.db["resource_status_audit"]
+        dumped = event.model_dump(mode="json") if hasattr(event, "model_dump") else dict(event)
+        col.insert_one(dumped)
+
+    def list_resource_status_audit(self, resource_key: str) -> List[Any]:
+        from prospector_externo.domain.models import ResourceStatusAuditEvent
+
+        col = self.db["resource_status_audit"]
+        results = []
+        for doc in col.find({"resource_key": resource_key}).sort("occurred_at", -1):
+            doc.pop("_id", None)
+            results.append(ResourceStatusAuditEvent.model_validate(doc))
+        return results
+
+    def find_status_audit_by_idempotency_key(self, idempotency_key: str) -> Optional[Any]:
+        from prospector_externo.domain.models import ResourceStatusAuditEvent
+
+        col = self.db["resource_status_audit"]
+        doc = col.find_one({"idempotency_key": idempotency_key})
+        if doc is None:
+            return None
+        doc.pop("_id", None)
+        return ResourceStatusAuditEvent.model_validate(doc)
+
+    def save_alert_channel(self, channel: Any) -> None:
+        col = self.db["alert_channels"]
+        dumped = channel.model_dump(mode="json") if hasattr(channel, "model_dump") else dict(channel)
+        col.update_one({"channel_id": dumped["channel_id"]}, {"$set": dumped}, upsert=True)
+
+    def list_alert_channels(self) -> List[Any]:
+        from prospector_externo.ports.alert_dispatcher import AlertChannelConfig
+
+        col = self.db["alert_channels"]
+        results = []
+        for doc in col.find():
+            doc.pop("_id", None)
+            results.append(AlertChannelConfig.model_validate(doc))
+        return results
+
+    def delete_alert_channel(self, channel_id: str) -> bool:
+        col = self.db["alert_channels"]
+        res = col.delete_one({"channel_id": channel_id})
+        return bool(res.deleted_count > 0)

@@ -24,9 +24,15 @@ class HtmlWorkflow(BaseWorkflow):
         "text/csv": ".csv",
         "application/zip": ".zip",
         "application/x-zip-compressed": ".zip",
+        "application/x-rar-compressed": ".rar",
+        "application/gzip": ".tar.gz",
+        "application/x-tar": ".tar",
+        "application/vnd.apache.parquet": ".parquet",
+        "application/x-parquet": ".parquet",
         "application/json": ".json",
         "application/xml": ".xml",
         "text/xml": ".xml",
+        "text/plain": ".txt",
     }
 
     @classmethod
@@ -77,8 +83,8 @@ class HtmlWorkflow(BaseWorkflow):
         )
         if extension and not resource.file_extension:
             resource.file_extension = extension
-        resource.content_type = content_type or None
-        resource.http_status = status
+            resource.resource_category = ResourceDetector.classify_resource_category(extension)
+        self.apply_http_metadata(resource, response_headers, status)
 
         if resource.resource_key in seen_resource_keys:
             return True

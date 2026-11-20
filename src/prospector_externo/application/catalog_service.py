@@ -14,6 +14,7 @@ from prospector_externo.domain.models import (
     SourceConfig,
     Snapshot,
     ResourceCandidate,
+    ResourceVersion,
     ChangeStatus,
     FileProcessingStatus,
 )
@@ -148,18 +149,80 @@ class CatalogApplicationService:
                 raise ValueError(f"Recurso duplicado en la corrida: {r.resource_key}")
             current_keys.add(r.resource_key)
             historical = historical_keys.get(r.resource_key)
+            evidence_changed = False
+            if historical is not None:
+                hist_ev = self._resource_evidence(historical)
+                curr_ev = self._resource_evidence(r)
+                if hist_ev != curr_ev and (hist_ev or curr_ev):
+                    evidence_changed = True
+                elif (
+                    historical.content_length_bytes is not None
+                    and r.content_length_bytes is not None
+                    and historical.content_length_bytes != r.content_length_bytes
+                ):
+                    evidence_changed = True
+
             if historical is None or historical.change_status == ChangeStatus.REMOVED:
                 r.change_status = ChangeStatus.NEW
                 r.processing_status = FileProcessingStatus.PENDIENTE
-            elif (self._resource_evidence(historical) != self._resource_evidence(r)
-                  and (self._resource_evidence(historical) or self._resource_evidence(r))):
+                r.current_version = 1
+                self.catalog_repo.save_resource_version(
+                    ResourceVersion(
+                        resource_key=r.resource_key,
+                        source_id=source_id,
+                        version_number=1,
+                        run_id=run_id,
+                        url=r.url,
+                        content_hash=r.content_hash,
+                        etag=r.etag,
+                        last_modified_header=r.last_modified_header,
+                        content_length_bytes=r.content_length_bytes,
+                        declared_filename=r.declared_filename,
+                        detected_at=now,
+                    )
+                )
+            elif evidence_changed:
+                existing_versions = self.catalog_repo.list_resource_versions(r.resource_key)
+                if not existing_versions:
+                    self.catalog_repo.save_resource_version(
+                        ResourceVersion(
+                            resource_key=historical.resource_key,
+                            source_id=source_id,
+                            version_number=max(1, historical.current_version),
+                            run_id=source_entity.catalog_last_run_id or "baseline",
+                            url=historical.url,
+                            content_hash=historical.content_hash,
+                            etag=historical.etag,
+                            last_modified_header=historical.last_modified_header,
+                            content_length_bytes=historical.content_length_bytes,
+                            declared_filename=historical.declared_filename,
+                            detected_at=historical.discovered_at,
+                        )
+                    )
                 r.change_status = ChangeStatus.MODIFIED
                 r.processing_status = FileProcessingStatus.PENDIENTE
+                r.current_version = max(1, historical.current_version) + 1
+                self.catalog_repo.save_resource_version(
+                    ResourceVersion(
+                        resource_key=r.resource_key,
+                        source_id=source_id,
+                        version_number=r.current_version,
+                        run_id=run_id,
+                        url=r.url,
+                        content_hash=r.content_hash,
+                        etag=r.etag,
+                        last_modified_header=r.last_modified_header,
+                        content_length_bytes=r.content_length_bytes,
+                        declared_filename=r.declared_filename,
+                        detected_at=now,
+                    )
+                )
             else:
                 r.change_status = ChangeStatus.UNCHANGED
                 r.processing_status = historical.processing_status
                 r.processing_updated_at = historical.processing_updated_at
                 r.processing_error = historical.processing_error
+                r.current_version = max(1, historical.current_version)
             r.consecutive_absences = 0
             consolidated[r.resource_key] = r.model_copy(deep=True)
             if r.change_status in (ChangeStatus.NEW, ChangeStatus.MODIFIED):

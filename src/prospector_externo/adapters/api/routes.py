@@ -3,45 +3,72 @@
 from __future__ import annotations
 
 import asyncio
+import csv
 from datetime import datetime, timezone
+import io
 import json
 import os
 from pathlib import Path
+import tempfile
 import threading
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, AsyncIterator, Dict, List, Literal, Optional
 from urllib.parse import urlsplit
+import uuid
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response
+from fastapi.responses import StreamingResponse
 from pydantic import AnyHttpUrl, BaseModel, Field, field_validator, model_validator
 import yaml
 
+from prospector_externo.application.alert_notification_service import AlertNotificationService
 from prospector_externo.application.contingency_service import (
+    ContingencyCandidate,
     ContingencyDiscoveryService,
     ContingencyEvaluationResponse,
+    ResilienceCoverageReport,
 )
 from prospector_externo.application.open_discovery_service import (
+    CandidateStatus,
+    DiscardCandidateRequest,
     OpenDiscoveryCandidate,
     OpenDiscoverySearchRequest,
     OpenDiscoveryService,
     PromoteCandidateRequest,
 )
-from prospector_externo.application.orchestrator import RunOrchestrator
+from prospector_externo.application.orchestrator import (
+    DryRunExtractionResponse,
+    RunOrchestrator,
+)
 from prospector_externo.application.projection_service import DataxProjectionService
+from prospector_externo.application.run_control import RUN_CONTROL, TERMINAL_EVENT_TYPES
 from prospector_externo.domain.models import (
+    FailoverEvent,
     FileProcessingStatus,
     ResourceCandidate,
+    ResourceStatusAuditEvent,
+    ResourceVersion,
     Source,
+    SourceConfig,
+    StatusActor,
 )
 from prospector_externo.domain.normalizer import UrlNormalizer
-from prospector_externo.domain.observations import Run, RunReport, SourceRunObservation
+from prospector_externo.domain.observations import (
+    Run,
+    RunReport,
+    RunStatus,
+    SourceRunObservation,
+)
 from prospector_externo.domain.projection import DataxProjection
 from prospector_externo.domain.structural_monitor import (
+    AlertDeliveryLog,
+    AlertStatus,
     MaintenanceTechnicalReport,
     StructuralAlert,
     build_maintenance_report,
     map_audit_severity,
     verify_source_structure_live,
 )
+from prospector_externo.ports.alert_dispatcher import AlertChannelConfig
 from prospector_externo.ports.catalog_repository import CatalogRepositoryPort
 from prospector_externo.ports.run_report_repository import RunReportRepositoryPort
 from prospector_externo.workflows.base import ResourceDetector
@@ -165,10 +192,36 @@ class SourcePolicyUpdateRequest(BaseModel):
 
 
 class ResourceStatusUpdateRequest(BaseModel):
-    """Solicitud de actualización del estado de procesamiento de un archivo (Objetivo 4)."""
+    """Solicitud auditable de actualización de estado o callback de Prospector Interno."""
 
     processing_status: FileProcessingStatus
     processing_error: Optional[str] = None
+    actor: StatusActor = "MANUAL_OPERATOR"
+    override_reason: Optional[str] = None
+    download_id: Optional[str] = None
+    sha256: Optional[str] = None
+    idempotency_key: Optional[str] = None
+
+
+class ContingencyProbeRequest(BaseModel):
+    """Solicitud de verificación de salud individual para una URL de contingencia."""
+
+    url: str = Field(..., min_length=8)
+
+    @field_validator("url")
+    @classmethod
+    def validate_probe_url(cls, value: str) -> str:
+        return _validate_http_url_literal(value)
+
+
+class AlertLifecycleUpdateRequest(BaseModel):
+    """Transición de ciclo de vida de una alerta estructural o de mantenimiento."""
+
+    status: AlertStatus
+    assignee: Optional[str] = None
+    ticket_url: Optional[str] = None
+    muted_until: Optional[datetime] = None
+    resolution_note: Optional[str] = None
 
 
 class TriggerRunRequest(BaseModel):
@@ -188,6 +241,42 @@ class TriggerRunResponse(BaseModel):
     message: str
     source_id: Optional[str] = None
     run_id: Optional[str] = None
+
+
+class CancelRunResponse(BaseModel):
+    """Confirmación de solicitud de cancelación cooperativa de una corrida."""
+
+    run_id: str
+    status: Literal["CANCELLING", "CANCELLED"]
+    message: str
+
+
+class DryRunPolicyRequest(BaseModel):
+    """Parámetros opcionales para simular extracción sin persistir cambios."""
+
+    entrypoint: Optional[str] = None
+    seeds: Optional[List[str]] = None
+    allowed_extensions: Optional[List[str]] = None
+    excluded_path_keywords: Optional[List[str]] = None
+    allowed_hosts: Optional[List[str]] = None
+    rate_limit_seconds: Optional[float] = Field(default=None, ge=0.0, le=30.0)
+    ignore_robots_txt: Optional[bool] = None
+    max_pages: int = Field(default=3, ge=1, le=10)
+    max_resources: int = Field(default=25, ge=1, le=100)
+
+    @field_validator("entrypoint")
+    @classmethod
+    def validate_entrypoint(cls, value: Optional[str]) -> Optional[str]:
+        if value is not None:
+            return _validate_http_url_literal(value)
+        return value
+
+    @field_validator("seeds")
+    @classmethod
+    def validate_seeds(cls, value: Optional[List[str]]) -> Optional[List[str]]:
+        if value is not None:
+            return [UrlNormalizer.normalize(_validate_http_url_literal(item)) for item in value]
+        return value
 
 
 class StorageStatusResponse(BaseModel):
@@ -273,6 +362,7 @@ def create_catalog_router(
     router = APIRouter()
     open_discovery_svc = OpenDiscoveryService(catalog_repo)
     contingency_svc = ContingencyDiscoveryService(catalog_repo)
+    alert_notification_svc = AlertNotificationService(catalog_repo)
 
     def paginate(items: List[Any], limit: Optional[int], offset: int, key: Any) -> List[Any]:
         if limit is None and offset == 0:
@@ -319,8 +409,18 @@ def create_catalog_router(
         tags=["Discovery"],
         summary="Lista las fuentes preseleccionadas en exploraciones abiertas",
     )
-    def list_open_discovery_candidates() -> List[OpenDiscoveryCandidate]:
-        return open_discovery_svc.list_candidates()
+    def list_open_discovery_candidates(
+        include_discarded: bool = Query(
+            True, description="Incluir candidatos previamente descartados"
+        ),
+        status: Optional[CandidateStatus] = Query(
+            None, description="Filtrar por estado (PRESELECCIONADA, APROBADA, DESCARTADA)"
+        ),
+    ) -> List[OpenDiscoveryCandidate]:
+        return open_discovery_svc.list_candidates(
+            include_discarded=include_discarded,
+            status=status,
+        )
 
     @router.post(
         "/discovery/candidates/{candidate_id}/promote",
@@ -337,43 +437,145 @@ def create_catalog_router(
         except KeyError as err:
             raise HTTPException(status_code=404, detail=str(err)) from err
 
+    @router.post(
+        "/discovery/candidates/{candidate_id}/discard",
+        response_model=OpenDiscoveryCandidate,
+        tags=["Discovery"],
+        summary="Descarta de forma persistente un candidato con motivo auditable",
+    )
+    def discard_open_discovery_candidate(
+        candidate_id: str,
+        payload: DiscardCandidateRequest,
+    ) -> OpenDiscoveryCandidate:
+        if not payload.reason.strip():
+            raise HTTPException(
+                status_code=422,
+                detail="Debe registrar un motivo no vacío para descartar el candidato.",
+            )
+        try:
+            return open_discovery_svc.discard_candidate(candidate_id, payload)
+        except KeyError as err:
+            raise HTTPException(status_code=404, detail=str(err)) from err
+
+    @router.post(
+        "/discovery/candidates/{candidate_id}/reactivate",
+        response_model=OpenDiscoveryCandidate,
+        tags=["Discovery"],
+        summary="Reactiva explícitamente un candidato previamente descartado",
+    )
+    def reactivate_open_discovery_candidate(
+        candidate_id: str,
+    ) -> OpenDiscoveryCandidate:
+        try:
+            return open_discovery_svc.reactivate_candidate(candidate_id)
+        except KeyError as err:
+            raise HTTPException(status_code=404, detail=str(err)) from err
+
     # =========================================================================
     # OBJETIVOS 2 y 4: Catálogo, Extracción Dirigida y Trazabilidad de Archivos
     # =========================================================================
 
-    @router.get("/catalog/resources", response_model=List[ResourceCandidate])
-    def get_resources(
-        source_id: Optional[str] = Query(None, description="Filtrar por ID de fuente"),
-        search: Optional[str] = Query(None, description="Texto en título, URL o clave"),
-        extension: Optional[str] = Query(None, description="Extensión (.pdf, .xlsx, .csv, .zip)"),
-        processing_status: Optional[FileProcessingStatus] = Query(
-            None, description="Estado de procesamiento a nivel de archivo"
-        ),
-        limit: Optional[int] = Query(None, ge=1, le=500),
-        offset: int = Query(0, ge=0),
+    def _filter_resources(
+        *,
+        source_id: Optional[str] = None,
+        search: Optional[str] = None,
+        extension: Optional[str] = None,
+        processing_status: Optional[FileProcessingStatus] = None,
+        resource_category: Optional[str] = None,
     ) -> List[ResourceCandidate]:
-        has_extra_filters = bool(search or extension or processing_status is not None)
-        if (
-            not has_extra_filters
-            and (limit is not None or offset)
-            and hasattr(catalog_repo, "query_resources")
-        ):
-            return catalog_repo.query_resources(source_id, limit=limit, offset=offset)
-
         resources = catalog_repo.list_resources(source_id=source_id)
         if extension:
             ext_norm = extension.lower() if extension.startswith(".") else f".{extension.lower()}"
             resources = [r for r in resources if (r.file_extension or "").lower() == ext_norm]
         if processing_status is not None:
             resources = [r for r in resources if r.processing_status == processing_status]
+        if resource_category and resource_category.strip():
+            cat_upper = resource_category.strip().upper()
+            resources = [r for r in resources if (r.resource_category or "").upper() == cat_upper]
         if search and search.strip():
             term = search.strip().lower()
             resources = [
-                r for r in resources
+                r
+                for r in resources
                 if term in r.url.lower()
                 or term in (r.title or "").lower()
                 or term in r.resource_key.lower()
+                or term in (r.declared_filename or "").lower()
+                or term in (r.content_hash or "").lower()
             ]
+        return resources
+
+    @router.get("/catalog/resources", response_model=List[ResourceCandidate])
+    def get_resources(
+        response: Response,
+        source_id: Optional[str] = Query(None, description="Filtrar por ID de fuente"),
+        search: Optional[str] = Query(None, description="Texto en título, URL, hash o clave"),
+        extension: Optional[str] = Query(None, description="Extensión (.pdf, .xlsx, .parquet...)"),
+        processing_status: Optional[FileProcessingStatus] = Query(
+            None, description="Estado de procesamiento a nivel de archivo"
+        ),
+        resource_category: Optional[str] = Query(
+            None, description="Categoría tipológica (TABULAR_CIENTIFICO, COMPRIMIDO, DOCUMENTAL)"
+        ),
+        sort_by: Optional[
+            Literal[
+                "discovered_at",
+                "title",
+                "source_id",
+                "file_extension",
+                "content_length_bytes",
+                "current_version",
+                "processing_status",
+            ]
+        ] = Query(None, description="Campo de ordenamiento server-side"),
+        sort_dir: Literal["asc", "desc"] = Query("asc", description="Dirección de ordenamiento"),
+        limit: Optional[int] = Query(None, ge=1, le=500),
+        offset: int = Query(0, ge=0),
+    ) -> List[ResourceCandidate]:
+        has_extra_filters = bool(
+            search
+            or extension
+            or processing_status is not None
+            or resource_category
+            or sort_by is not None
+        )
+        if (
+            not has_extra_filters
+            and (limit is not None or offset)
+            and hasattr(catalog_repo, "query_resources")
+        ):
+            total_all = len(catalog_repo.list_resources(source_id=source_id))
+            response.headers["X-Total-Count"] = str(total_all)
+            response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
+            return catalog_repo.query_resources(source_id, limit=limit, offset=offset)
+
+        resources = _filter_resources(
+            source_id=source_id,
+            search=search,
+            extension=extension,
+            processing_status=processing_status,
+            resource_category=resource_category,
+        )
+        response.headers["X-Total-Count"] = str(len(resources))
+        response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
+
+        if sort_by is not None:
+            reverse = sort_dir == "desc"
+
+            def _sort_key(res: ResourceCandidate) -> Any:
+                if sort_by == "discovered_at":
+                    return res.discovered_at.isoformat()
+                if sort_by == "content_length_bytes":
+                    return res.content_length_bytes or -1
+                if sort_by == "current_version":
+                    return res.current_version
+                if sort_by == "processing_status":
+                    return res.processing_status.value
+                return str(getattr(res, sort_by, "") or "").lower()
+
+            ordered = sorted(resources, key=_sort_key, reverse=reverse)
+            return ordered[offset : offset + limit if limit is not None else None]
+
         return paginate(
             resources,
             limit,
@@ -381,26 +583,232 @@ def create_catalog_router(
             lambda resource: (resource.source_id, resource.resource_key, resource.url),
         )
 
+    @router.get(
+        "/catalog/resources/export",
+        tags=["Catalog"],
+        summary="Exporta el subconjunto filtrado del catálogo como manifiesto JSONL, CSV o Parquet",
+    )
+    def export_resources_manifest(
+        format: Literal["jsonl", "csv", "parquet"] = Query("jsonl"),
+        source_id: Optional[str] = Query(None),
+        search: Optional[str] = Query(None),
+        extension: Optional[str] = Query(None),
+        processing_status: Optional[FileProcessingStatus] = Query(None),
+        resource_category: Optional[str] = Query(None),
+    ) -> Response:
+        resources = _filter_resources(
+            source_id=source_id,
+            search=search,
+            extension=extension,
+            processing_status=processing_status,
+            resource_category=resource_category,
+        )
+        rows = [
+            {
+                "resource_key": r.resource_key,
+                "source_id": r.source_id,
+                "url": r.url,
+                "title": r.title,
+                "file_extension": r.file_extension,
+                "resource_category": r.resource_category,
+                "period_label": r.period_label,
+                "version": r.current_version,
+                "content_hash": r.content_hash,
+                "processing_status": r.processing_status.value,
+                "change_status": r.change_status.value,
+                "content_type": r.content_type,
+                "content_length_bytes": r.content_length_bytes,
+                "declared_filename": r.declared_filename,
+                "etag": r.etag,
+                "last_modified_header": r.last_modified_header,
+                "http_status": r.http_status,
+                "discovered_at": r.discovered_at.isoformat(),
+            }
+            for r in resources
+        ]
+        headers = {
+            "Content-Disposition": f'attachment; filename="datax_catalog_manifest.{format}"',
+            "X-Total-Count": str(len(rows)),
+            "Access-Control-Expose-Headers": "X-Total-Count, Content-Disposition",
+        }
+        if format == "jsonl":
+            body = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows)
+            if body:
+                body += "\n"
+            return Response(content=body, media_type="application/x-ndjson", headers=headers)
+
+        fieldnames = [
+            "resource_key",
+            "source_id",
+            "url",
+            "title",
+            "file_extension",
+            "resource_category",
+            "period_label",
+            "version",
+            "content_hash",
+            "processing_status",
+            "change_status",
+            "content_type",
+            "content_length_bytes",
+            "declared_filename",
+            "etag",
+            "last_modified_header",
+            "http_status",
+            "discovered_at",
+        ]
+        if format == "csv":
+            buf = io.StringIO()
+            writer = csv.DictWriter(buf, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+            return Response(
+                content=buf.getvalue(),
+                media_type="text/csv; charset=utf-8",
+                headers=headers,
+            )
+
+        # Formato columnar binario Apache Parquet mediante DuckDB in-memory
+        import duckdb
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_in = Path(tmpdir) / "manifest.json"
+            pq_out = Path(tmpdir) / "manifest.parquet"
+            con = duckdb.connect(":memory:")
+            try:
+                if rows:
+                    json_in.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
+                    con.execute(
+                        f"COPY (SELECT * FROM read_json_auto('{json_in.as_posix()}')) "
+                        f"TO '{pq_out.as_posix()}' (FORMAT PARQUET, COMPRESSION ZSTD)"
+                    )
+                else:
+                    cols_sql = ", ".join(f"CAST(NULL AS VARCHAR) AS {col}" for col in fieldnames)
+                    con.execute(
+                        f"COPY (SELECT {cols_sql} WHERE FALSE) "
+                        f"TO '{pq_out.as_posix()}' (FORMAT PARQUET, COMPRESSION ZSTD)"
+                    )
+            finally:
+                con.close()
+            pq_bytes = pq_out.read_bytes()
+        return Response(
+            content=pq_bytes,
+            media_type="application/vnd.apache.parquet",
+            headers=headers,
+        )
+
+    @router.get(
+        "/catalog/resources/{resource_key}/versions",
+        response_model=List[ResourceVersion],
+        tags=["Catalog"],
+        summary="Lista el historial inmutable de versiones (v1..vN) de un recurso",
+    )
+    def get_resource_versions(resource_key: str) -> List[ResourceVersion]:
+        current = catalog_repo.get_resource_by_key(resource_key)
+        versions = catalog_repo.list_resource_versions(resource_key)
+        if current is None and not versions:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Recurso '{resource_key}' no encontrado en el catálogo",
+            )
+        if not versions and current is not None:
+            return [
+                ResourceVersion(
+                    resource_key=current.resource_key,
+                    source_id=current.source_id,
+                    version_number=max(1, current.current_version),
+                    run_id="baseline",
+                    url=current.url,
+                    content_hash=current.content_hash,
+                    etag=current.etag,
+                    last_modified_header=current.last_modified_header,
+                    content_length_bytes=current.content_length_bytes,
+                    declared_filename=current.declared_filename,
+                    detected_at=current.discovered_at,
+                )
+            ]
+        return versions
+
+    @router.get(
+        "/catalog/resources/{resource_key}/audit",
+        response_model=List[ResourceStatusAuditEvent],
+        tags=["Catalog"],
+        summary="Lista la bitácora inmutable de transiciones de estado de un archivo",
+    )
+    def get_resource_status_audit(resource_key: str) -> List[ResourceStatusAuditEvent]:
+        current = catalog_repo.get_resource_by_key(resource_key)
+        events = catalog_repo.list_resource_status_audit(resource_key)
+        if current is None and not events:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Recurso '{resource_key}' no encontrado en el catálogo",
+            )
+        return events
+
     @router.patch(
         "/catalog/resources/{resource_key}/status",
         response_model=ResourceCandidate,
         tags=["Catalog"],
-        summary="Actualiza el estado de procesamiento auditable de un archivo extraído",
+        summary="Actualiza el estado de procesamiento vía callback de Interno o override manual auditado",
     )
     def update_resource_status(
         resource_key: str,
         payload: ResourceStatusUpdateRequest,
     ) -> ResourceCandidate:
+        if payload.actor == "MANUAL_OPERATOR":
+            reason = (payload.override_reason or "").strip()
+            if len(reason) < 5:
+                raise HTTPException(
+                    status_code=422,
+                    detail=(
+                        "Toda sobreescritura manual de estado exige 'override_reason' "
+                        "explícito no vacío (mínimo 5 caracteres)."
+                    ),
+                )
+
+        if payload.idempotency_key:
+            prior_event = catalog_repo.find_status_audit_by_idempotency_key(
+                payload.idempotency_key
+            )
+            if prior_event is not None:
+                existing_res = catalog_repo.get_resource_by_key(resource_key)
+                if existing_res is not None:
+                    return existing_res
+
+        current = catalog_repo.get_resource_by_key(resource_key)
+        if current is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Recurso '{resource_key}' no encontrado en el catálogo",
+            )
+        prev_status = current.processing_status
+
         updated = catalog_repo.update_resource_processing_status(
             resource_key=resource_key,
             status=payload.processing_status,
             error=payload.processing_error,
+            content_hash=payload.sha256,
         )
         if updated is None:
             raise HTTPException(
                 status_code=404,
                 detail=f"Recurso '{resource_key}' no encontrado en el catálogo",
             )
+
+        catalog_repo.save_resource_status_audit(
+            ResourceStatusAuditEvent(
+                resource_key=resource_key,
+                source_id=updated.source_id,
+                previous_status=prev_status,
+                new_status=payload.processing_status,
+                actor=payload.actor,
+                override_reason=(payload.override_reason or "").strip() or None,
+                download_id=payload.download_id,
+                sha256=payload.sha256,
+                error_detail=payload.processing_error,
+                idempotency_key=payload.idempotency_key,
+            )
+        )
         return updated
 
     @router.get("/catalog/sources", response_model=List[Source])
@@ -468,6 +876,109 @@ def create_catalog_router(
         _sync_source_to_yaml_safe(source)
         return source
 
+    @router.post(
+        "/catalog/sources/{source_id}/dry-run",
+        response_model=DryRunExtractionResponse,
+        tags=["Catalog"],
+        summary="Simula la extracción dirigida sobre una fuente sin persistir cambios",
+    )
+    async def dry_run_source_extraction(
+        source_id: str,
+        payload: Optional[DryRunPolicyRequest] = None,
+    ) -> DryRunExtractionResponse:
+        req = payload or DryRunPolicyRequest()
+        source = catalog_repo.get_source(source_id)
+        resolved_cfg = config_path or _resolve_config_yaml_path()
+        base_config: Optional[SourceConfig] = None
+
+        if resolved_cfg and resolved_cfg.is_file():
+            try:
+                raw_cfg = yaml.safe_load(resolved_cfg.read_text(encoding="utf-8")) or {}
+                for item in raw_cfg.get("sources", []):
+                    if (
+                        isinstance(item, dict)
+                        and str(item.get("source_id", "")).lower() == source_id.lower()
+                    ):
+                        base_config = SourceConfig.model_validate(item)
+                        break
+            except Exception:
+                base_config = None
+
+        if source is None and base_config is None:
+            raise HTTPException(
+                status_code=404, detail=f"Fuente '{source_id}' no encontrada"
+            )
+
+        if base_config is None and source is not None:
+            base_config = SourceConfig(
+                source_id=source.source_id,
+                name=source.name,
+                entrypoint=source.entrypoint,
+                workflow=source.workflow,
+                update_category=source.update_category,
+                seeds=list(source.seeds) if source.seeds else [source.entrypoint],
+                allowed_extensions=list(source.allowed_extensions),
+                rate_limit_seconds=source.rate_limit_seconds,
+                max_urls=source.max_urls,
+                max_resources=source.max_resources,
+                ignore_robots_txt=source.ignore_robots_txt,
+                excluded_path_keywords=list(source.excluded_path_keywords),
+                allowed_hosts=list(source.allowed_hosts),
+                contingency_url=source.contingency_url,
+                contingency_urls=list(source.contingency_urls),
+            )
+        elif base_config is not None and source is not None and source.policy_customized:
+            base_config = base_config.model_copy(
+                update={
+                    "entrypoint": source.entrypoint or base_config.entrypoint,
+                    "seeds": list(source.seeds) if source.seeds else base_config.seeds,
+                    "allowed_extensions": (
+                        list(source.allowed_extensions)
+                        if source.allowed_extensions
+                        else base_config.allowed_extensions
+                    ),
+                    "rate_limit_seconds": source.rate_limit_seconds,
+                    "ignore_robots_txt": source.ignore_robots_txt,
+                    "excluded_path_keywords": list(source.excluded_path_keywords),
+                    "allowed_hosts": (
+                        list(source.allowed_hosts)
+                        if source.allowed_hosts
+                        else base_config.allowed_hosts
+                    ),
+                }
+            )
+
+        assert base_config is not None
+        updates: Dict[str, Any] = {}
+        if req.entrypoint is not None:
+            updates["entrypoint"] = req.entrypoint
+            if req.seeds is None:
+                updates["seeds"] = [req.entrypoint]
+        if req.seeds is not None:
+            updates["seeds"] = req.seeds
+        if req.allowed_extensions is not None:
+            updates["allowed_extensions"] = req.allowed_extensions
+        if req.excluded_path_keywords is not None:
+            updates["excluded_path_keywords"] = req.excluded_path_keywords
+        if req.allowed_hosts is not None:
+            updates["allowed_hosts"] = req.allowed_hosts
+        if req.rate_limit_seconds is not None:
+            updates["rate_limit_seconds"] = req.rate_limit_seconds
+        if req.ignore_robots_txt is not None:
+            updates["ignore_robots_txt"] = req.ignore_robots_txt
+
+        effective_cfg = base_config.model_copy(update=updates) if updates else base_config
+        orchestrator = RunOrchestrator(
+            catalog_repo=catalog_repo,
+            report_repo=report_repo,
+            config_path=resolved_cfg,
+        )
+        return await orchestrator.dry_run_source_async(
+            effective_cfg,
+            max_pages=req.max_pages,
+            max_resources=req.max_resources,
+        )
+
     # =========================================================================
     # OBJETIVO 3: Resiliencia y Evaluación Automática de Contingencias
     # =========================================================================
@@ -490,18 +1001,71 @@ def create_catalog_router(
             _sync_source_to_yaml_safe(source)
         return result
 
+    @router.post(
+        "/catalog/sources/{source_id}/contingency/probe",
+        response_model=ContingencyCandidate,
+        tags=["Resilience"],
+        summary="Verifica en vivo una URL de respaldo individual (HTTP, latencia, TLS, archivos)",
+    )
+    def probe_source_contingency_url(
+        source_id: str,
+        payload: ContingencyProbeRequest,
+    ) -> ContingencyCandidate:
+        source = catalog_repo.get_source(source_id)
+        if not source:
+            raise HTTPException(status_code=404, detail=f"Fuente '{source_id}' no encontrada")
+        return contingency_svc.probe_single_url(
+            payload.url,
+            origin_type="CONFIGURADA",
+            update_category=source.update_category,
+        )
+
+    @router.get(
+        "/catalog/resilience/coverage",
+        response_model=ResilienceCoverageReport,
+        tags=["Resilience"],
+        summary="Audita la cobertura de resiliencia e identifica puntos únicos de fallo (0 respaldos)",
+    )
+    def get_resilience_coverage() -> ResilienceCoverageReport:
+        return contingency_svc.compute_resilience_coverage(catalog_repo.list_sources())
+
+    @router.get(
+        "/catalog/sources/{source_id}/failovers",
+        response_model=List[FailoverEvent],
+        tags=["Resilience"],
+        summary="Lista el historial de conmutaciones automáticas (failover_log) de una fuente",
+    )
+    def list_source_failovers(
+        source_id: str,
+        limit: int = Query(50, ge=1, le=200),
+    ) -> List[FailoverEvent]:
+        return catalog_repo.list_failover_events(source_id=source_id, limit=limit)
+
+    @router.get(
+        "/catalog/failovers",
+        response_model=List[FailoverEvent],
+        tags=["Resilience"],
+        summary="Lista global de eventos de conmutación automática a contingencia",
+    )
+    def list_all_failovers(
+        source_id: Optional[str] = Query(None),
+        limit: int = Query(50, ge=1, le=200),
+    ) -> List[FailoverEvent]:
+        return catalog_repo.list_failover_events(source_id=source_id, limit=limit)
+
     # =========================================================================
-    # OBJETIVO 5: Monitoreo Estructural y Reporte Técnico para Taiga
+    # OBJETIVO 5: Monitoreo Estructural, Canales Push y Reporte Técnico Taiga
     # =========================================================================
 
     @router.get(
         "/alerts",
         response_model=List[StructuralAlert],
         tags=["Alerts"],
-        summary="Lista alertas tempranas de cambios estructurales o bloqueos de acceso",
+        summary="Lista alertas tempranas de cambios estructurales, volumen o bloqueos de acceso",
     )
     def list_alerts(
         source_id: Optional[str] = Query(None, description="Filtrar por ID de fuente"),
+        status: Optional[AlertStatus] = Query(None, description="Filtrar por ciclo de vida"),
     ) -> List[StructuralAlert]:
         non_incident_codes = {"OPERATIONAL_OK", "OK", "NONE", "SIN_INCIDENCIA"}
         persisted: List[StructuralAlert] = [
@@ -511,7 +1075,6 @@ def create_catalog_router(
         ]
         seen_sources = {a.source_id.lower() for a in persisted}
 
-        # Incluir incidencias activas de auditoría del catálogo aún no persistidas como alerta puntual
         for src in catalog_repo.list_sources():
             if source_id and src.source_id.lower() != source_id.lower():
                 continue
@@ -538,9 +1101,109 @@ def create_catalog_router(
                         ),
                         contingency_active=src.active_contingency_url,
                         detected_at=src.updated_at,
+                        last_seen_at=src.updated_at,
                     )
                 )
+        if status is not None:
+            persisted = [a for a in persisted if a.status == status]
         return sorted(persisted, key=lambda a: a.detected_at, reverse=True)
+
+    @router.get(
+        "/alerts/channels",
+        response_model=List[AlertChannelConfig],
+        tags=["Alerts"],
+        summary="Lista canales de notificación push configurados (Webhook, Slack, Teams, SMTP, Taiga)",
+    )
+    def list_alert_channels() -> List[AlertChannelConfig]:
+        return catalog_repo.list_alert_channels()
+
+    @router.post(
+        "/alerts/channels",
+        response_model=AlertChannelConfig,
+        tags=["Alerts"],
+        summary="Crea o actualiza un canal de notificación push de alertas",
+    )
+    def save_alert_channel(payload: AlertChannelConfig) -> AlertChannelConfig:
+        catalog_repo.save_alert_channel(payload)
+        return payload
+
+    @router.delete(
+        "/alerts/channels/{channel_id}",
+        tags=["Alerts"],
+        summary="Elimina un canal de notificación push",
+    )
+    def delete_alert_channel(channel_id: str) -> Dict[str, Any]:
+        deleted = catalog_repo.delete_alert_channel(channel_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail=f"Canal '{channel_id}' no encontrado")
+        return {"deleted": True, "channel_id": channel_id}
+
+    @router.post(
+        "/alerts/channels/{channel_id}/test",
+        response_model=AlertDeliveryLog,
+        tags=["Alerts"],
+        summary="Envía una notificación de prueba al canal especificado",
+    )
+    def test_alert_channel(channel_id: str) -> AlertDeliveryLog:
+        channels = catalog_repo.list_alert_channels()
+        target = next((c for c in channels if c.channel_id == channel_id), None)
+        if target is None:
+            raise HTTPException(status_code=404, detail=f"Canal '{channel_id}' no encontrado")
+        return alert_notification_svc.test_channel(target)
+
+    @router.patch(
+        "/alerts/{alert_id}",
+        response_model=StructuralAlert,
+        tags=["Alerts"],
+        summary="Transiciona el ciclo de vida de una alerta (RECONOCIDA, EN_MANTENIMIENTO, SILENCIADA, RESUELTA)",
+    )
+    def update_alert_lifecycle(
+        alert_id: str,
+        payload: AlertLifecycleUpdateRequest,
+    ) -> StructuralAlert:
+        # Materializar alerta derivada del catálogo si aún no existía en structural_alerts
+        if alert_id.startswith("alrt_cat_"):
+            src_id = alert_id.removeprefix("alrt_cat_")
+            existing_persisted = [
+                a for a in catalog_repo.list_structural_alerts() if a.alert_id == alert_id
+            ]
+            if not existing_persisted:
+                src = catalog_repo.get_source(src_id)
+                if src is not None:
+                    code = (src.audit_code or "DOM_CHANGED").strip().upper()
+                    catalog_repo.save_structural_alert(
+                        StructuralAlert(
+                            alert_id=alert_id,
+                            source_id=src.source_id,
+                            source_name=src.name,
+                            entrypoint=src.entrypoint,
+                            alert_code=code,
+                            severity=map_audit_severity(code),
+                            previous_signature=src.dom_structural_hash or src.api_schema_hash,
+                            current_signature=src.dom_structural_hash or src.api_schema_hash,
+                            affected_selectors=src.baseline_selectors,
+                            diagnostic_summary=(
+                                src.audit_note
+                                or f"Incidencia operativa '{code}' detectada en {src.name}."
+                            ),
+                            contingency_active=src.active_contingency_url,
+                            detected_at=src.updated_at,
+                            last_seen_at=src.updated_at,
+                        )
+                    )
+        try:
+            return alert_notification_svc.update_alert_lifecycle(
+                alert_id,
+                status=payload.status,
+                assignee=payload.assignee,
+                ticket_url=payload.ticket_url,
+                muted_until=payload.muted_until,
+                resolution_note=payload.resolution_note,
+            )
+        except ValueError as err:
+            raise HTTPException(status_code=422, detail=str(err)) from err
+        except KeyError as err:
+            raise HTTPException(status_code=404, detail=str(err)) from err
 
     @router.post(
         "/catalog/sources/{source_id}/verify-structure",
@@ -555,7 +1218,7 @@ def create_catalog_router(
         updated_source, alert, report = verify_source_structure_live(source)
         catalog_repo.save_source(updated_source)
         if alert is not None:
-            catalog_repo.save_structural_alert(alert)
+            alert_notification_svc.record_and_dispatch(alert, source=updated_source)
         return report
 
     @router.get(
@@ -772,17 +1435,25 @@ def create_catalog_router(
                 source_id=payload.source_id,
             )
 
+        run_id = (
+            f"run_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+            f"_{uuid.uuid4().hex[:6]}"
+        )
+        RUN_CONTROL.register(run_id)
+
         def _execute_in_background() -> None:
             try:
                 orchestrator = RunOrchestrator(
                     catalog_repo=catalog_repo,
                     report_repo=report_repo,
                     config_path=resolved_cfg,
+                    run_control=RUN_CONTROL,
                 )
                 asyncio.run(
                     orchestrator.run_batch_async(
                         source_id_filter=payload.source_id,
                         force=payload.force,
+                        run_id=run_id,
                     )
                 )
             finally:
@@ -794,6 +1465,124 @@ def create_catalog_router(
             status="STARTED",
             message=f"Extracción dirigida iniciada en segundo plano para {target_desc}.",
             source_id=payload.source_id,
+            run_id=run_id,
+        )
+
+    @router.post(
+        "/runs/{run_id}/cancel",
+        response_model=CancelRunResponse,
+        tags=["Runs"],
+        summary="Solicita la cancelación limpia de una corrida en ejecución",
+    )
+    def cancel_extraction_run(run_id: str) -> CancelRunResponse:
+        control_state = RUN_CONTROL.get(run_id)
+        if control_state is not None:
+            if control_state.finished_event.is_set():
+                raise HTTPException(
+                    status_code=409,
+                    detail=f"La corrida '{run_id}' ya finalizó y no puede cancelarse.",
+                )
+            RUN_CONTROL.request_cancel(run_id)
+            return CancelRunResponse(
+                run_id=run_id,
+                status="CANCELLING",
+                message=f"Cancelación limpia solicitada para la corrida '{run_id}'.",
+            )
+
+        persisted = report_repo.get_run(run_id)
+        if persisted is None:
+            raise HTTPException(status_code=404, detail=f"Corrida '{run_id}' no encontrada")
+        if persisted.status != RunStatus.RUNNING:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"La corrida '{run_id}' se encuentra en estado '{persisted.status.value}' "
+                    "y no puede cancelarse."
+                ),
+            )
+        persisted.status = RunStatus.CANCELLED
+        persisted.finished_at = datetime.now(timezone.utc)
+        persisted.failure_code = "CANCELLED_BY_OPERATOR"
+        report_repo.save_run(persisted)
+        RUN_CONTROL.publish(
+            run_id,
+            "run_cancelled",
+            {"status": RunStatus.CANCELLED.value, "failure_code": persisted.failure_code},
+        )
+        return CancelRunResponse(
+            run_id=run_id,
+            status="CANCELLED",
+            message=f"Corrida '{run_id}' marcada como cancelada.",
+        )
+
+    @router.get(
+        "/runs/{run_id}/stream",
+        tags=["Runs"],
+        summary="Stream SSE en tiempo real del progreso de una corrida de extracción",
+    )
+    async def stream_run_progress(run_id: str) -> StreamingResponse:
+        control_state = RUN_CONTROL.get(run_id)
+        persisted = report_repo.get_run(run_id)
+        if control_state is None and persisted is None:
+            raise HTTPException(status_code=404, detail=f"Corrida '{run_id}' no encontrada")
+
+        async def event_generator() -> AsyncIterator[str]:
+            if control_state is None:
+                assert persisted is not None
+                event_name = (
+                    "run_cancelled"
+                    if persisted.status == RunStatus.CANCELLED
+                    else "run_failed"
+                    if persisted.status in (RunStatus.FAILED, RunStatus.INTERRUPTED)
+                    else "run_completed"
+                )
+                payload = {
+                    "event": event_name,
+                    "run_id": persisted.run_id,
+                    "timestamp": (
+                        persisted.finished_at or persisted.started_at
+                    ).isoformat(),
+                    "data": {
+                        "status": persisted.status.value,
+                        "sources_processed": persisted.sources_processed,
+                        "sources_failed": persisted.sources_failed,
+                        "sources_skipped": persisted.sources_skipped,
+                    },
+                }
+                yield f"event: {event_name}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+                return
+
+            cursor = 0
+            heartbeat_ticks = 0
+            while True:
+                with control_state.condition:
+                    pending = control_state.events[cursor:]
+                    is_done = control_state.finished_event.is_set()
+                if pending:
+                    heartbeat_ticks = 0
+                    for ev in pending:
+                        cursor += 1
+                        ev_name = ev.get("event", "message")
+                        yield f"event: {ev_name}\ndata: {json.dumps(ev, ensure_ascii=False)}\n\n"
+                        if ev_name in TERMINAL_EVENT_TYPES:
+                            return
+                elif is_done:
+                    return
+                else:
+                    heartbeat_ticks += 1
+                    if heartbeat_ticks >= 30:
+                        heartbeat_ticks = 0
+                        yield ": keep-alive\n\n"
+                    await asyncio.sleep(0.1)
+
+        return StreamingResponse(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
         )
 
     @router.get("/runs", response_model=List[RunReport])

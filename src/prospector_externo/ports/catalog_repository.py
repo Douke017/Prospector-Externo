@@ -94,6 +94,7 @@ class CatalogRepositoryPort(ABC):
         resource_key: str,
         status: FileProcessingStatus,
         error: Optional[str] = None,
+        content_hash: Optional[str] = None,
     ) -> Optional[ResourceCandidate]:
         """Actualiza el estado de procesamiento de un archivo en el catálogo."""
         now = datetime.now(timezone.utc)
@@ -108,12 +109,21 @@ class CatalogRepositoryPort(ABC):
                     res.processing_status = status
                     res.processing_updated_at = now
                     res.processing_error = error
+                    if content_hash:
+                        res.content_hash = content_hash
                     updated_target = res
                     break
             if updated_target is not None:
                 run_id = src.catalog_last_run_id or src.last_run_id or "manual_status_update"
                 self.save_resource_catalog(src.source_id, run_id, cat)
                 return updated_target
+        return None
+
+    def get_resource_by_key(self, resource_key: str) -> Optional[ResourceCandidate]:
+        """Localiza un ResourceCandidate por su clave canónica."""
+        for res in self.list_resources():
+            if res.resource_key == resource_key:
+                return res
         return None
 
     def save_discovery_candidates(self, candidates: List[Any]) -> None:
@@ -131,3 +141,45 @@ class CatalogRepositoryPort(ABC):
     def list_structural_alerts(self, source_id: Optional[str] = None) -> List[Any]:
         """Lista alertas estructurales registradas."""
         return []
+
+    def save_failover_event(self, event: Any) -> None:
+        """Persiste un evento de conmutación automática a contingencia (Objetivo 3)."""
+        return None
+
+    def list_failover_events(
+        self, source_id: Optional[str] = None, limit: int = 50
+    ) -> List[Any]:
+        """Lista eventos de conmutación ordenados del más reciente al más antiguo."""
+        return []
+
+    def save_resource_version(self, version: Any) -> None:
+        """Persiste una versión histórica inmutable de un recurso (Objetivo 4)."""
+        return None
+
+    def list_resource_versions(self, resource_key: str) -> List[Any]:
+        """Lista todas las versiones históricas de un recurso en orden ascendente."""
+        return []
+
+    def save_resource_status_audit(self, event: Any) -> None:
+        """Persiste un evento de auditoría de cambio de estado de recurso (Objetivo 4)."""
+        return None
+
+    def list_resource_status_audit(self, resource_key: str) -> List[Any]:
+        """Lista la bitácora inmutable de estados de un recurso."""
+        return []
+
+    def find_status_audit_by_idempotency_key(self, idempotency_key: str) -> Optional[Any]:
+        """Busca si un callback idempotente ya fue registrado previamente."""
+        return None
+
+    def save_alert_channel(self, channel: Any) -> None:
+        """Persiste la configuración de un canal push de alertas (Objetivo 5)."""
+        return None
+
+    def list_alert_channels(self) -> List[Any]:
+        """Lista los canales push de alertas configurados."""
+        return []
+
+    def delete_alert_channel(self, channel_id: str) -> bool:
+        """Elimina un canal push de alertas por su identificador."""
+        return False

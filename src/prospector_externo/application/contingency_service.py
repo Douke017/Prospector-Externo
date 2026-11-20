@@ -1,9 +1,10 @@
-"""Servicio de Descubrimiento y Evaluación Automática de Contingencias (Objetivo 3).
+"""Servicio de Descubrimiento, Evaluación y Cobertura de Contingencias (Objetivo 3).
 
-Busca, verifica técnicamente y registra URLs alternativas de confianza
-(espejos institucionales, repositorios de datos abiertos y capturas históricas
-verificadas en Wayback Machine CDX) para garantizar resiliencia ante caídas
-o descontinuación de los enlaces principales.
+Localiza, verifica por HTTP + TLS X.509 real y clasifica URLs de respaldo en:
+- `ESPEJO_VIVO`: espejos institucionales, redirecciones permanentes 301/308,
+  sitemaps y catálogos CKAN aptos para conmutación automática vigente.
+- `HISTORICO_SOLO_LECTURA`: capturas congeladas (p. ej. Wayback Machine CDX)
+  que NUNCA reemplazan automáticamente a una fuente activa (DAILY/WEEKLY/MONTHLY).
 """
 
 from __future__ import annotations
@@ -11,26 +12,70 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import re
 import time
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Sequence
 from urllib.parse import quote_plus, urljoin, urlsplit, urlunsplit
 
 from bs4 import BeautifulSoup
 import httpx
 from pydantic import BaseModel, Field
 
-from prospector_externo.domain.models import Source
+from prospector_externo.domain.models import FreshnessClass, Source
+from prospector_externo.infrastructure.tls_inspector import TlsX509Inspector
 from prospector_externo.ports.catalog_repository import CatalogRepositoryPort
 
 
 BackupOriginType = Literal[
     "CONFIGURADA",
+    "REDIRECCION_PERMANENTE",
+    "SITEMAP_ALTERNO",
     "ESPEJO_INSTITUCIONAL",
     "RUTA_ESTADISTICA_ALTERNA",
     "DATOS_ABIERTOS",
     "WAYBACK_CDX",
 ]
 
-DOC_EXT_PATTERN = re.compile(r"\.(pdf|xlsx|xls|csv|zip|docx)(?:$|\?|#)", re.IGNORECASE)
+ACTIVE_UPDATE_CATEGORIES = {"DAILY", "WEEKLY", "MONTHLY"}
+HISTORICAL_ARCHIVE_HOSTS = (
+    "web.archive.org",
+    "archive.is",
+    "archive.today",
+    "archive.ph",
+    "perma.cc",
+)
+WAYBACK_TS_RE = re.compile(r"/web/(\d{14})/")
+DOC_EXT_PATTERN = re.compile(
+    r"\.(pdf|xlsx|xls|csv|zip|docx|parquet|json|xml|sav|dta|rar|tar\.gz)(?:$|\?|#)",
+    re.IGNORECASE,
+)
+
+
+def is_historical_archive_url(url: str) -> bool:
+    """Determina si una URL corresponde a un archivo web histórico congelado."""
+    host = (urlsplit(url).hostname or "").lower()
+    return any(host == h or host.endswith(f".{h}") for h in HISTORICAL_ARCHIVE_HOSTS)
+
+
+def extract_wayback_captured_at(url: str) -> Optional[str]:
+    """Extrae la fecha ISO de captura desde una URL de Wayback Machine."""
+    match = WAYBACK_TS_RE.search(url)
+    if not match:
+        return None
+    raw = match.group(1)
+    try:
+        dt = datetime.strptime(raw, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
+        return dt.isoformat()
+    except ValueError:
+        return None
+
+
+def classify_backup_freshness(
+    url: str,
+    origin_type: Optional[BackupOriginType] = None,
+) -> tuple[FreshnessClass, Optional[str]]:
+    """Distingue estrictamente espejos vivos de capturas históricas de solo lectura."""
+    if origin_type == "WAYBACK_CDX" or is_historical_archive_url(url):
+        return "HISTORICO_SOLO_LECTURA", extract_wayback_captured_at(url)
+    return "ESPEJO_VIVO", None
 
 
 class ContingencyCandidate(BaseModel):
@@ -38,9 +83,14 @@ class ContingencyCandidate(BaseModel):
 
     url: str
     origin_type: BackupOriginType
+    freshness_class: FreshnessClass = "ESPEJO_VIVO"
+    snapshot_captured_at: Optional[str] = None
+    eligible_for_live_failover: bool = True
     reachable: bool
     http_status: Optional[int] = None
     latency_ms: Optional[float] = None
+    tls_valid: bool = False
+    tls_error_code: Optional[str] = None
     content_type: Optional[str] = None
     valid_structure: bool = False
     detected_resources_count: int = 0
@@ -58,31 +108,90 @@ class ContingencyEvaluationResponse(BaseModel):
     auto_registered_count: int = 0
     candidates: List[ContingencyCandidate] = Field(default_factory=list)
     updated_contingency_urls: List[str] = Field(default_factory=list)
+    historical_only_urls: List[str] = Field(default_factory=list)
+
+
+class SourceResilienceEntry(BaseModel):
+    """Estado de resiliencia de una fuente individual dentro de la matriz de cobertura."""
+
+    source_id: str
+    name: str
+    entrypoint: str
+    update_category: str
+    health_status: str
+    live_backup_count: int
+    historical_backup_count: int
+    active_contingency_url: Optional[str] = None
+    risk_level: Literal["PROTEGIDA", "SOLO_HISTORICO", "PUNTO_UNICO_DE_FALLO"]
+    contingency_urls: List[str] = Field(default_factory=list)
+
+
+class ResilienceCoverageReport(BaseModel):
+    """Resumen ejecutivo de cobertura de resiliencia del catálogo."""
+
+    total_sources: int
+    protected_sources: int
+    historical_only_sources: int
+    zero_backup_sources: int
+    coverage_pct: float
+    single_points_of_failure: List[SourceResilienceEntry] = Field(default_factory=list)
+    entries: List[SourceResilienceEntry] = Field(default_factory=list)
 
 
 class ContingencyDiscoveryService:
-    """Localiza, evalúa en vivo y registra fuentes de respaldo confiables."""
+    """Localiza, evalúa en vivo y audita fuentes de respaldo confiables."""
 
     def __init__(
         self,
         catalog_repo: CatalogRepositoryPort,
         http_timeout: float = 7.0,
+        *,
+        tls_inspector: Optional[TlsX509Inspector] = None,
+        http_transport: Optional[httpx.BaseTransport] = None,
     ) -> None:
         self.catalog_repo = catalog_repo
         self.http_timeout = http_timeout
+        self.tls_inspector = tls_inspector or TlsX509Inspector(timeout=min(http_timeout, 5.0))
+        self.http_transport = http_transport
+
+    def probe_single_url(
+        self,
+        url: str,
+        *,
+        origin_type: BackupOriginType = "CONFIGURADA",
+        update_category: str = "DAILY",
+    ) -> ContingencyCandidate:
+        """Verifica en vivo una URL de respaldo individual (HTTP, latencia, TLS, archivos)."""
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (compatible; DATAX-Resilience-Probe/2.0; +https://datax.com.bo)"
+            ),
+        }
+        with httpx.Client(
+            timeout=self.http_timeout,
+            follow_redirects=True,
+            headers=headers,
+            transport=self.http_transport,
+        ) as client:
+            return self._probe_candidate(
+                client,
+                url.strip(),
+                origin_type,
+                update_category=update_category,
+            )
 
     def discover_and_evaluate(
         self,
         source: Source,
         auto_register: bool = True,
     ) -> ContingencyEvaluationResponse:
-        """Genera candidatos espejo/históricos, los prueba por HTTP y registra los aptos."""
+        """Genera candidatos espejo/históricos, los prueba y registra solo espejos vivos aptos."""
         raw_candidates = self._collect_candidate_urls(source)
         evaluated: list[ContingencyCandidate] = []
 
         headers = {
             "User-Agent": (
-                "Mozilla/5.0 (compatible; DATAX-Resilience-Probe/1.0; +https://datax.com.bo)"
+                "Mozilla/5.0 (compatible; DATAX-Resilience-Probe/2.0; +https://datax.com.bo)"
             ),
         }
 
@@ -90,25 +199,43 @@ class ContingencyDiscoveryService:
             timeout=self.http_timeout,
             follow_redirects=True,
             headers=headers,
+            transport=self.http_transport,
         ) as client:
-            # 1. Consultar Wayback CDX para capturas HTTP 200 verificadas
-            wayback_urls = self._query_wayback_cdx(client, source.entrypoint)
-            for wb_url in wayback_urls:
-                if all(wb_url != existing_u for existing_u, _ in raw_candidates):
-                    raw_candidates.append((wb_url, "WAYBACK_CDX"))
+            # 0. Inspeccionar redirecciones permanentes 301/308 del entrypoint
+            redirect_url = self._probe_permanent_redirect(source.entrypoint)
+            if redirect_url and all(redirect_url != u for u, _ in raw_candidates):
+                raw_candidates.insert(0, (redirect_url, "REDIRECCION_PERMANENTE"))
 
-            # 2. Consultar datos.gob.bo CKAN por nombre/sigla institucional
+            # 1. Consultar datos.gob.bo CKAN por nombre/sigla institucional (espejos vivos)
             ckan_urls = self._query_datos_gob_bo(client, source)
             for ck_url in ckan_urls:
                 if all(ck_url != existing_u for existing_u, _ in raw_candidates):
                     raw_candidates.append((ck_url, "DATOS_ABIERTOS"))
 
+            # 2. Consultar Wayback CDX (siempre marcado como HISTORICO_SOLO_LECTURA)
+            wayback_urls = self._query_wayback_cdx(client, source.entrypoint)
+            for wb_url in wayback_urls:
+                if all(wb_url != existing_u for existing_u, _ in raw_candidates):
+                    raw_candidates.append((wb_url, "WAYBACK_CDX"))
+
             # 3. Evaluar cada URL candidata en vivo
-            for cand_url, origin_type in raw_candidates[:10]:
-                evaluated.append(self._probe_candidate(client, cand_url, origin_type))
+            for cand_url, origin_type in raw_candidates[:12]:
+                evaluated.append(
+                    self._probe_candidate(
+                        client,
+                        cand_url,
+                        origin_type,
+                        update_category=source.update_category,
+                    )
+                )
 
         evaluated.sort(
-            key=lambda item: (item.reachable, item.confidence_score, -(item.latency_ms or 99999.0)),
+            key=lambda item: (
+                item.eligible_for_live_failover,
+                item.reachable,
+                item.confidence_score,
+                -(item.latency_ms or 99999.0),
+            ),
             reverse=True,
         )
 
@@ -117,8 +244,15 @@ class ContingencyDiscoveryService:
         if source.contingency_url and source.contingency_url not in current_backups:
             current_backups.insert(0, source.contingency_url)
 
+        historical_urls = [
+            item.url for item in evaluated if item.freshness_class == "HISTORICO_SOLO_LECTURA"
+        ]
+
         if auto_register:
             for item in evaluated:
+                # Regla estricta: capturas históricas NUNCA reemplazan fuentes vigentes activas
+                if not item.eligible_for_live_failover:
+                    continue
                 if item.reachable and item.confidence_score >= 65 and item.url not in current_backups:
                     current_backups.append(item.url)
                     auto_added += 1
@@ -136,7 +270,80 @@ class ContingencyDiscoveryService:
             auto_registered_count=auto_added,
             candidates=evaluated,
             updated_contingency_urls=current_backups,
+            historical_only_urls=historical_urls,
         )
+
+    @staticmethod
+    def compute_resilience_coverage(sources: Sequence[Source]) -> ResilienceCoverageReport:
+        """Audita la cobertura de resiliencia del catálogo e identifica puntos únicos de fallo."""
+        entries: list[SourceResilienceEntry] = []
+        protected = 0
+        historical_only = 0
+        zero_backup = 0
+
+        for src in sorted(sources, key=lambda s: s.source_id):
+            backups = list(dict.fromkeys(
+                [u for u in (src.contingency_urls or []) if u.strip()]
+                + ([src.contingency_url] if src.contingency_url else [])
+            ))
+            live_count = sum(1 for u in backups if not is_historical_archive_url(u))
+            hist_count = sum(1 for u in backups if is_historical_archive_url(u))
+
+            if live_count > 0:
+                risk: Literal["PROTEGIDA", "SOLO_HISTORICO", "PUNTO_UNICO_DE_FALLO"] = "PROTEGIDA"
+                protected += 1
+            elif hist_count > 0:
+                risk = "SOLO_HISTORICO"
+                historical_only += 1
+            else:
+                risk = "PUNTO_UNICO_DE_FALLO"
+                zero_backup += 1
+
+            entries.append(
+                SourceResilienceEntry(
+                    source_id=src.source_id,
+                    name=src.name,
+                    entrypoint=src.entrypoint,
+                    update_category=src.update_category,
+                    health_status=src.health_status,
+                    live_backup_count=live_count,
+                    historical_backup_count=hist_count,
+                    active_contingency_url=src.active_contingency_url,
+                    risk_level=risk,
+                    contingency_urls=backups,
+                )
+            )
+
+        total = len(entries)
+        coverage_pct = round((protected / total) * 100.0, 2) if total > 0 else 0.0
+        spofs = [e for e in entries if e.risk_level != "PROTEGIDA"]
+        return ResilienceCoverageReport(
+            total_sources=total,
+            protected_sources=protected,
+            historical_only_sources=historical_only,
+            zero_backup_sources=zero_backup,
+            coverage_pct=coverage_pct,
+            single_points_of_failure=spofs,
+            entries=entries,
+        )
+
+    def _probe_permanent_redirect(self, entrypoint: str) -> Optional[str]:
+        try:
+            with httpx.Client(
+                timeout=min(self.http_timeout, 5.0),
+                follow_redirects=False,
+                transport=self.http_transport,
+            ) as client:
+                resp = client.head(entrypoint)
+                if resp.status_code in (301, 308):
+                    location = resp.headers.get("Location")
+                    if location:
+                        resolved = urljoin(entrypoint, location.strip())
+                        if resolved.rstrip("/") != entrypoint.rstrip("/"):
+                            return resolved
+        except httpx.HTTPError:
+            return None
+        return None
 
     def _collect_candidate_urls(self, source: Source) -> List[tuple[str, BackupOriginType]]:
         pairs: list[tuple[str, BackupOriginType]] = []
@@ -163,8 +370,10 @@ class ContingencyDiscoveryService:
         scheme = parsed.scheme.lower() or "https"
         if host:
             alt_host = host[4:] if host.startswith("www.") else f"www.{host}"
-            add(urlunsplit((scheme, alt_host, parsed.path or "/", parsed.query, "")), "ESPEJO_INSTITUCIONAL")
-
+            add(
+                urlunsplit((scheme, alt_host, parsed.path or "/", parsed.query, "")),
+                "ESPEJO_INSTITUCIONAL",
+            )
             root_base = urlunsplit((scheme, host, "/", "", ""))
             for common_path in ("/estadisticas", "/publicaciones", "/boletines"):
                 if parsed.path.rstrip("/").lower() != common_path:
@@ -174,7 +383,7 @@ class ContingencyDiscoveryService:
 
     @staticmethod
     def _query_wayback_cdx(client: httpx.Client, target_url: str) -> List[str]:
-        """Consulta Wayback Machine CDX API para obtener snapshots HTTP 200 recientes."""
+        """Consulta Wayback Machine CDX API para capturas históricas de referencia."""
         cdx_endpoint = (
             "https://web.archive.org/cdx/search/cdx"
             f"?url={quote_plus(target_url)}&output=json&fl=timestamp,original,statuscode,mimetype"
@@ -219,12 +428,19 @@ class ContingencyDiscoveryService:
         except (httpx.HTTPError, ValueError, AttributeError):
             return []
 
-    @staticmethod
     def _probe_candidate(
+        self,
         client: httpx.Client,
         url: str,
         origin_type: BackupOriginType,
+        *,
+        update_category: str = "DAILY",
     ) -> ContingencyCandidate:
+        freshness, captured_at = classify_backup_freshness(url, origin_type)
+        is_active_source = (update_category or "DAILY").upper() in ACTIVE_UPDATE_CATEGORIES
+        eligible_live = not (freshness == "HISTORICO_SOLO_LECTURA" and is_active_source)
+
+        tls_res = self.tls_inspector.inspect(url)
         t0 = time.perf_counter()
         try:
             resp = client.get(url)
@@ -233,9 +449,14 @@ class ContingencyDiscoveryService:
             return ContingencyCandidate(
                 url=url,
                 origin_type=origin_type,
+                freshness_class=freshness,
+                snapshot_captured_at=captured_at,
+                eligible_for_live_failover=False,
                 reachable=False,
                 http_status=None,
                 latency_ms=None,
+                tls_valid=tls_res.tls_valid,
+                tls_error_code=tls_res.error_code,
                 valid_structure=False,
                 detected_resources_count=0,
                 confidence_score=0,
@@ -247,9 +468,14 @@ class ContingencyDiscoveryService:
             return ContingencyCandidate(
                 url=url,
                 origin_type=origin_type,
+                freshness_class=freshness,
+                snapshot_captured_at=captured_at,
+                eligible_for_live_failover=False,
                 reachable=False,
                 http_status=resp.status_code,
                 latency_ms=latency,
+                tls_valid=tls_res.tls_valid,
+                tls_error_code=tls_res.error_code,
                 content_type=ctype or None,
                 valid_structure=False,
                 detected_resources_count=0,
@@ -262,7 +488,8 @@ class ContingencyDiscoveryService:
             raw_bytes.startswith(b"%PDF-")
             or raw_bytes.startswith(b"PK\x03\x04")
             or raw_bytes.startswith(b"\xd0\xcf\x11\xe0")
-            or ctype in {"text/csv", "application/json", "application/pdf"}
+            or raw_bytes.startswith(b"PAR1")
+            or ctype in {"text/csv", "application/json", "application/pdf", "application/octet-stream"}
         )
 
         doc_links = 0
@@ -274,9 +501,11 @@ class ContingencyDiscoveryService:
                     doc_links += 1
 
         valid_struct = is_direct_binary or doc_links > 0 or ("json" in ctype)
-        base_score = 55
-        if url.startswith("https://"):
-            base_score += 10
+        base_score = 52
+        if tls_res.tls_valid:
+            base_score += 13
+        elif url.startswith("https://"):
+            base_score += 4
         if is_direct_binary:
             base_score += 25
             doc_links = max(doc_links, 1)
@@ -288,19 +517,29 @@ class ContingencyDiscoveryService:
             base_score += 7
 
         score = min(100, base_score)
-        if score >= 75:
-            rec = "Óptima como fuente de respaldo verificada (alta disponibilidad y enlaces válidos)."
+        if freshness == "HISTORICO_SOLO_LECTURA":
+            rec = (
+                "Captura histórica de solo lectura (Wayback/Archivo). "
+                "Útil para recuperación forense; bloqueada para reemplazo automático de fuentes vigentes."
+            )
+        elif score >= 75:
+            rec = "Espejo vivo óptimo (alta disponibilidad, TLS y archivos objetivo verificados)."
         elif score >= 65:
-            rec = "Apta como contingencia secundaria verificada."
+            rec = "Espejo vivo apto como contingencia secundaria."
         else:
             rec = "Accesible por HTTP 200, pero con baja densidad de archivos descargables directos."
 
         return ContingencyCandidate(
             url=url,
             origin_type=origin_type,
+            freshness_class=freshness,
+            snapshot_captured_at=captured_at,
+            eligible_for_live_failover=eligible_live and valid_struct,
             reachable=True,
             http_status=resp.status_code,
             latency_ms=latency,
+            tls_valid=tls_res.tls_valid,
+            tls_error_code=tls_res.error_code,
             content_type=ctype or None,
             valid_structure=valid_struct,
             detected_resources_count=doc_links,

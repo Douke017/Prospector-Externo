@@ -164,10 +164,22 @@ def test_obj4_file_processing_status_lifecycle(tmp_path: Path, monkeypatch) -> N
     assert len(res_list) == 1
     assert res_list[0]["processing_status"] == "PENDIENTE"
 
-    # Marcar PROCESADO_EXITOSAMENTE
-    patch_resp = client.patch(
+    # Sobreescritura manual sin motivo debe ser rechazada con 422 (v2.0)
+    rejected_resp = client.patch(
         "/catalog/resources/rk_doc_01/status",
         json={"processing_status": "PROCESADO_EXITOSAMENTE"},
+    )
+    assert rejected_resp.status_code == 422
+
+    # Callback desde PROSPECTOR_INTERNO marca PROCESADO_EXITOSAMENTE
+    patch_resp = client.patch(
+        "/catalog/resources/rk_doc_01/status",
+        json={
+            "processing_status": "PROCESADO_EXITOSAMENTE",
+            "actor": "PROSPECTOR_INTERNO",
+            "download_id": "dl_test_01",
+            "sha256": "1" * 64,
+        },
     )
     assert patch_resp.status_code == 200
     assert patch_resp.json()["processing_status"] == "PROCESADO_EXITOSAMENTE"
