@@ -4,6 +4,7 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PROSPECTOR_BACKEND=mongo \
     PROSPECTOR_SEED_ON_BOOT=1 \
     PROSPECTOR_DISABLE_YAML_SYNC=1
 
@@ -18,14 +19,20 @@ COPY src ./src
 COPY apps ./apps
 COPY config ./config
 COPY docs ./docs
-COPY output ./output
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -e .
+ARG INSTALL_PLAYWRIGHT=false
+
+RUN mkdir -p /app/output/state /app/output/reports && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -e ".[mongo]" && \
+    if [ "$INSTALL_PLAYWRIGHT" = "true" ]; then \
+        pip install --no-cache-dir -e ".[browser]" && \
+        playwright install --with-deps chromium; \
+    fi
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD curl -fsS http://127.0.0.1:8000/health || exit 1
 
 CMD ["uvicorn", "apps.catalog_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
